@@ -269,8 +269,13 @@ const RawElementNodeRenderer = (
     }
 
     case "arrowTable":
+      const border = node.element.arrowTable?.border || undefined
       return (
-        <ArrowTable element={node.quiverElement as Quiver} {...elementProps} />
+        <ArrowTable
+          element={node.quiverElement as Quiver}
+          border={border}
+          {...elementProps}
+        />
       )
 
     case "audio":

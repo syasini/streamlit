@@ -55,6 +55,7 @@ message Block {
       BOTTOM = 2;
     }
     VerticalAlignment vertical_alignment = 3;
+    bool border = 4;
   }
 
   message Expandable {

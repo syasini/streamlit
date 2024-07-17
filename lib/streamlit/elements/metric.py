@@ -57,6 +57,7 @@ class MetricMixin:
         delta_color: DeltaColor = "normal",
         help: str | None = None,
         label_visibility: LabelVisibility = "visible",
+        border: bool = False,
     ) -> DeltaGenerator:
         r"""Display a metric in big bold font, with an optional indicator of how the metric changed.
 
@@ -92,27 +93,36 @@ class MetricMixin:
             Unsupported elements are unwrapped so only their children (text contents) render.
             Display unsupported elements as literal characters by
             backslash-escaping them. E.g. ``1\. Not an ordered list``.
+
         value : int, float, str, or None
              Value of the metric. None is rendered as a long dash.
+
         delta : int, float, str, or None
             Indicator of how the metric changed, rendered with an arrow below
             the metric. If delta is negative (int/float) or starts with a minus
             sign (str), the arrow points down and the text is red; else the
             arrow points up and the text is green. If None (default), no delta
             indicator is shown.
+
         delta_color : "normal", "inverse", or "off"
              If "normal" (default), the delta indicator is shown as described
              above. If "inverse", it is red when positive and green when
              negative. This is useful when a negative change is considered
              good, e.g. if cost decreased. If "off", delta is  shown in gray
              regardless of its value.
+
         help : str
             An optional tooltip that gets displayed next to the metric label.
+
         label_visibility : "visible", "hidden", or "collapsed"
             The visibility of the label. If "hidden", the label doesn't show but there
             is still empty space for it (equivalent to label="").
             If "collapsed", both the label and the space are removed. Default is
             "visible".
+
+        border : bool
+            Whether to show a border around the metric container. If ``False`` (default), no
+            border is shown. If ``True``, a border is shown.
 
         Example
         -------
@@ -158,6 +168,7 @@ class MetricMixin:
         metric_proto.body = _parse_value(value)
         metric_proto.label = _parse_label(label)
         metric_proto.delta = _parse_delta(delta)
+        metric_proto.border = border
         if help is not None:
             metric_proto.help = dedent(help)
 

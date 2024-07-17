@@ -37,7 +37,7 @@ export interface MetricProps {
 }
 
 export default function Metric({ element }: MetricProps): ReactElement {
-  const { colors }: EmotionTheme = useTheme()
+  const { colors, radii }: EmotionTheme = useTheme()
   const { MetricColor, MetricDirection } = MetricProto
 
   let direction: any = null
@@ -71,34 +71,35 @@ export default function Metric({ element }: MetricProps): ReactElement {
 
   const arrowMargin = "0 threeXS 0 0"
   const deltaStyle = { color }
-  const deltaExists = element.delta !== ""
+
+  const { body, label, delta, labelVisibility, help, border } = element
+  const deltaExists = delta !== ""
+
+  const style = {
+    ...(border && {
+      border: `1px solid ${colors.fadedText10}`,
+      borderRadius: radii.lg,
+      padding: "calc(1em - 1px)", // 1px to account for border
+    }),
+  }
 
   return (
-    <div data-testid="stMetric">
+    <div data-testid="stMetric" style={style}>
       <StyledMetricLabelText
         data-testid="stMetricLabel"
-        visibility={labelVisibilityProtoValueToEnum(
-          element.labelVisibility?.value
-        )}
+        visibility={labelVisibilityProtoValueToEnum(labelVisibility?.value)}
       >
         <StyledTruncateText>
-          <StreamlitMarkdown
-            source={element.label}
-            allowHTML={false}
-            isLabel
-          />
+          <StreamlitMarkdown source={label} allowHTML={false} isLabel />
         </StyledTruncateText>
-        {element.help && (
+        {help && (
           <StyledWidgetLabelHelpInline>
-            <TooltipIcon
-              content={element.help}
-              placement={Placement.TOP_RIGHT}
-            />
+            <TooltipIcon content={help} placement={Placement.TOP_RIGHT} />
           </StyledWidgetLabelHelpInline>
         )}
       </StyledMetricLabelText>
       <StyledMetricValueText data-testid="stMetricValue">
-        <StyledTruncateText> {element.body} </StyledTruncateText>
+        <StyledTruncateText> {body} </StyledTruncateText>
       </StyledMetricValueText>
       {deltaExists && (
         <StyledMetricDeltaText data-testid="stMetricDelta" style={deltaStyle}>
@@ -113,7 +114,7 @@ export default function Metric({ element }: MetricProps): ReactElement {
             size="lg"
             margin={arrowMargin}
           />
-          <StyledTruncateText> {element.delta} </StyledTruncateText>
+          <StyledTruncateText> {delta} </StyledTruncateText>
         </StyledMetricDeltaText>
       )}
     </div>

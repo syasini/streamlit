@@ -24,37 +24,54 @@ export const StyledTableContainer = styled.div(({ theme }) => ({
   overflow: ["auto", "overlay"],
 }))
 
-export const StyledTable = styled.table(({ theme }) => ({
-  width: theme.sizes.full,
-  marginBottom: theme.spacing.lg,
-  color: theme.colors.bodyText,
-  borderCollapse: "collapse",
-  border: `${theme.sizes.borderWidth} solid ${theme.colors.fadedText05}`,
-}))
+export interface StyledTableProps {
+  tableBorder?: boolean
+}
 
-const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
-  borderBottom: `${theme.sizes.borderWidth}  solid ${theme.colors.fadedText05}`,
-  borderRight: `${theme.sizes.borderWidth}  solid ${theme.colors.fadedText05}`,
+export const StyledTable = styled.table<StyledTableProps>(
+  ({ tableBorder, theme }) => ({
+    width: theme.sizes.full,
+    marginBottom: theme.spacing.lg,
+    color: theme.colors.bodyText,
+    borderCollapse: "collapse",
+    border: tableBorder
+      ? `${theme.sizes.borderWidth} solid ${theme.colors.fadedText05}`
+      : `${theme.sizes.borderWidth} solid transparent`,
+  })
+)
+
+const styleCellFunction = (
+  theme: EmotionTheme,
+  border?: boolean
+): CSSObject => ({
+  borderBottom: border
+    ? `${theme.sizes.borderWidth} solid ${theme.colors.fadedText05}`
+    : `${theme.sizes.borderWidth} solid transparent`,
+  borderRight: border
+    ? `${theme.sizes.borderWidth} solid ${theme.colors.fadedText05}`
+    : `${theme.sizes.borderWidth} solid transparent`,
   verticalAlign: "middle",
   padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
   fontWeight: theme.fontWeights.normal,
 })
 
-export const StyledTableCell = styled.td(({ theme }) =>
-  styleCellFunction(theme)
+export const StyledTableCell = styled.td<StyledTableProps>(
+  ({ tableBorder, theme }) => styleCellFunction(theme, tableBorder)
 )
-export const StyledTableCellHeader = styled.th(({ theme }) => ({
-  ...styleCellFunction(theme),
+export const StyledTableCellHeader = styled.th<StyledTableProps>(
+  ({ tableBorder, theme }) => ({
+    ...styleCellFunction(theme, tableBorder),
 
-  color: theme.colors.fadedText60,
+    color: theme.colors.fadedText60,
 
-  "@media print": {
-    // Firefox prints a double blurred table header. Normal font weight fixes it
-    "@-moz-document url-prefix()": {
-      fontWeight: "normal",
+    "@media print": {
+      // Firefox prints a double blurred table header. Normal font weight fixes it
+      "@-moz-document url-prefix()": {
+        fontWeight: "normal",
+      },
     },
-  },
-}))
+  })
+)
 
 export const StyledEmptyTableCell = styled(StyledTableCell)(({ theme }) => ({
   color: theme.colors.darkGray,

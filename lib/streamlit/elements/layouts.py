@@ -151,6 +151,7 @@ class LayoutsMixin:
         *,
         gap: Literal["small", "medium", "large"] = "small",
         vertical_alignment: Literal["top", "center", "bottom"] = "top",
+        border: bool = False,
     ) -> list[DeltaGenerator]:
         """Insert containers laid out as side-by-side columns.
 
@@ -186,6 +187,11 @@ class LayoutsMixin:
         vertical_alignment : "top", "center", or "bottom"
             The vertical alignment of the content inside the columns. The
             default is ``"top"``.
+
+        border : bool
+            Whether to show a border around each column. If ``False`` (default), no
+            border is shown. If ``True``, a border is shown around each column at the full
+            height of the column section.
 
         Returns
         -------
@@ -318,6 +324,7 @@ class LayoutsMixin:
             col_proto.column.vertical_alignment = vertical_alignment_mapping[
                 vertical_alignment
             ]
+            col_proto.column.border = border
             col_proto.allow_empty = True
             return col_proto
 

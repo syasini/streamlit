@@ -570,7 +570,7 @@ class ArrowMixin:
             return self.dg._enqueue("arrow_data_frame", proto)
 
     @gather_metrics("table")
-    def table(self, data: Data = None) -> DeltaGenerator:
+    def table(self, data: Data = None, *, border: bool = True) -> DeltaGenerator:
         """Display a static table.
 
         This differs from ``st.dataframe`` in that the table in this case is
@@ -580,6 +580,10 @@ class ArrowMixin:
         ----------
         data : pandas.DataFrame, pandas.Styler, pyarrow.Table, numpy.ndarray, pyspark.sql.DataFrame, snowflake.snowpark.dataframe.DataFrame, snowflake.snowpark.table.Table, Iterable, dict, or None
             The table data.
+
+        border : bool
+            Whether to show a borders around and within the table. If ``False`` (default), no
+            borders are shown. If ``True``, a border is shown around and within the table.
 
         Example
         -------
@@ -613,7 +617,7 @@ class ArrowMixin:
         default_uuid = str(hash(delta_path))
 
         proto = ArrowProto()
-        marshall(proto, data, default_uuid)
+        marshall(proto, data, default_uuid, border)
         return self.dg._enqueue("arrow_table", proto)
 
     @gather_metrics("add_rows")
@@ -682,7 +686,12 @@ class ArrowMixin:
         return cast("DeltaGenerator", self)
 
 
-def marshall(proto: ArrowProto, data: Data, default_uuid: str | None = None) -> None:
+def marshall(
+    proto: ArrowProto,
+    data: Data,
+    default_uuid: str | None = None,
+    border: bool | None = True,
+) -> None:
     """Marshall pandas.DataFrame into an Arrow proto.
 
     Parameters
@@ -709,3 +718,4 @@ def marshall(proto: ArrowProto, data: Data, default_uuid: str | None = None) -> 
         marshall_styler(proto, data, default_uuid)
 
     proto.data = dataframe_util.convert_anything_to_arrow_bytes(data)
+    proto.border = border
