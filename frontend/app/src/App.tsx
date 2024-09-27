@@ -2039,91 +2039,136 @@ export class App extends PureComponent<Props, State> {
               />
               {renderedDialog}
             </StyledApp>
-          </Hotkeys>
-
-          <MsgLogger>
-            {this.state.handledMessageBundles.map((bundle, bundleIndex) => {
-              const metadata =
-                this.state.handledMessageBundleMetadata[bundleIndex]
-              return (
-                <>
-                  <span>
-                    {this.state.handledMessageBundles.length - bundleIndex}.{" "}
-                  </span>
-                  <MsgBundle key={metadata.receivedAt}>
-                    <div>Bundle (receivedAt: {metadata.receivedAt}):</div>
-                    {bundle.map((msg, index) => {
-                      const parsedMsg = {
-                        scriptRunId: msg.newSession?.scriptRunId,
-                        type: msg.type,
-                        fragmentId: msg.delta?.fragmentId,
-                        ...{
-                          sessionId: msg.newSession?.scriptRunId,
-                          fragmentIds: msg.newSession?.fragmentIdsThisRun,
-                          scriptFinishedStatus: msg.scriptFinished
-                            ? ForwardMsg.ScriptFinishedStatus[
-                                msg.scriptFinished
-                              ]
-                            : undefined,
-                          deltaType:
-                            (msg.delta?.newElement as ElementProto)?.type ||
-                            (msg.delta?.addBlock as BlockProto)?.type,
-                          deltaPath:
-                            msg.metadata?.deltaPath &&
-                            msg.metadata?.deltaPath.length > 0
-                              ? msg.metadata?.deltaPath
-                              : undefined,
-                        },
-                      }
-                      const classNameDeltaPath = `[${msg.metadata?.deltaPath}]`
+            <StyledDebugPanel>
+              <Selectbox
+                disabled={false}
+                value={this.state.selectedDebugMenuOption}
+                options={["Messages", "Deleted"]}
+                onChange={value =>
+                  this.setState({ selectedDebugMenuOption: value ?? 0 })
+                }
+              />
+            {this.state.selectedDebugMenuOption === 0 && (
+                <MsgLogger>
+                  <div>
+                    MessageBundles: {this.state.handledMessageBundles.length}
+                  </div>
+                  <div>---</div>
+                  {this.state.handledMessageBundles.map(
+                    (bundle, bundleIndex) => {
+                      const metadata =
+                        this.state.handledMessageBundleMetadata[bundleIndex]
                       return (
-                        <Msg
-                          key={msg.hash + index}
-                          className={
-                            classNameDeltaPath !== "[]"
-                              ? classNameDeltaPath
-                              : ""
-                          }
-                          onMouseOver={() => {
-                            const elements =
-                              document.getElementsByClassName(
-                                classNameDeltaPath
-                              )
-                            // only highlight when there is more than one element to hightlight / link
-                            if (elements.length < 2) {
-                              return
+                        <MsgBundle key={metadata.receivedAt}>
+                          <div>
+                            {this.state.handledMessageBundles.length -
+                              bundleIndex}
+                            . Bundle (receivedAt: {metadata.receivedAt}):
+                          </div>
+                          {bundle.map((msg, index) => {
+                            const parsedMsg = {
+                              scriptRunId: msg.newSession?.scriptRunId,
+                              type: msg.type,
+                              fragmentId: msg.delta?.fragmentId,
+                              ...{
+                                sessionId: msg.newSession?.scriptRunId,
+                                fragmentIds:
+                                  msg.newSession?.fragmentIdsThisRun,
+                                scriptFinishedStatus: msg.scriptFinished
+                                  ? ForwardMsg.ScriptFinishedStatus[
+                                      msg.scriptFinished
+                                    ]
+                                  : undefined,
+                                deltaType:
+                                  (msg.delta?.newElement as ElementProto)
+                                    ?.type ||
+                                  (msg.delta?.addBlock as BlockProto)?.type,
+                                // eslint-disable-next-line
+                                // @ts-ignore
+                                loadedFromCache: msg.loadedFromCache,
+                                deltaPath:
+                                  msg.metadata?.deltaPath &&
+                                  msg.metadata?.deltaPath.length > 0
+                                    ? msg.metadata?.deltaPath
+                                    : undefined,
+                              },
                             }
-                            for (let i = 0; i < elements.length; i++) {
-                              const element = elements[i] as HTMLElement
-                              if (element.classList.contains("highlight")) {
-                                continue
-                              }
-                              element.classList.add("highlight")
-                              element.style.border = "1px solid red"
-                            }
-                          }}
-                          onMouseOut={() => {
-                            const elements =
-                              document.getElementsByClassName(
-                                classNameDeltaPath
-                              )
-                            for (let i = 0; i < elements.length; i++) {
-                              const element = elements[i] as HTMLElement
-                              element.classList.remove("highlight")
-                              element.style.border = ""
-                            }
-                          }}
-                        >
-                          {JSON.stringify(parsedMsg, undefined, 1)}
-                        </Msg>
+                            const classNameDeltaPath = `[${msg.metadata?.deltaPath}]`
+                            return (
+                              <Msg
+                                key={msg.hash + index}
+                                className={
+                                  classNameDeltaPath !== "[]"
+                                    ? classNameDeltaPath
+                                    : ""
+                                }
+                                onMouseOver={() => {
+                                  const elements =
+                                    document.getElementsByClassName(
+                                      classNameDeltaPath
+                                    )
+                                  // only highlight when there is more than one element to hightlight / link
+                                  if (elements.length < 2) {
+                                    return
+                                  }
+                                  for (let i = 0; i < elements.length; i++) {
+                                    const element = elements[i] as HTMLElement
+                                    if (
+                                      element.classList.contains("highlight")
+                                    ) {
+                                      continue
+                                    }
+                                    element.classList.add("highlight")
+                                    element.style.border = "1px solid red"
+                                  }
+                                }}
+                                onMouseOut={() => {
+                                  const elements =
+                                    document.getElementsByClassName(
+                                      classNameDeltaPath
+                                    )
+                                  for (let i = 0; i < elements.length; i++) {
+                                    const element = elements[i] as HTMLElement
+                                    element.classList.remove("highlight")
+                                    element.style.border = ""
+                                  }
+                                }}
+                              >
+                                {parsedMsg.type}
+                                {parsedMsg.deltaPath &&
+                                  `[${parsedMsg.deltaPath}]`}
+                                <Json
+                                  element={JsonProto.create({
+                                    body: JSON.stringify({ ...parsedMsg }),
+                                  })}
+                                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                  // @ts-ignore
+                                  width="100%"
+                                />
+                              </Msg>
+                            )
+                          })}
+                          <div>---</div>
+                        </MsgBundle>
                       )
+                    }
+                  )}
+                </MsgLogger>
+              )}
+              {this.state.selectedDebugMenuOption === 1 &&
+                this.state.deletedNotesInfo.map(info => (
+                  <Json
+                    key={info}
+                    element={JsonProto.create({
+                      body: info,
                     })}
-                    <div>---</div>
-                  </MsgBundle>
-                </>
-              )
-            })}
-          </MsgLogger>
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    width="100%"
+                  />
+                ))}
+            </StyledDebugPanel>
+          </HotKeys>
         </LibContext.Provider>
       </AppContext.Provider>
     )
