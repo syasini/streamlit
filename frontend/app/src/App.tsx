@@ -22,6 +22,7 @@ import { enableAllPlugins as enableImmerPlugins } from "immer"
 import classNames from "classnames"
 import without from "lodash/without"
 
+import Selectbox from "@streamlit/lib/src/components/shared/Dropdown"
 import {
   AppConfig,
   AppRoot,
@@ -128,6 +129,7 @@ import {
   MsgBundle,
   MsgLogger,
   StyledApp,
+  StyledDebugPanel,
 } from "@streamlit/app/src/styled-components"
 import withScreencast, {
   ScreenCastHOC,
@@ -192,6 +194,8 @@ interface State {
   inputsDisabled: boolean
   handledMessageBundles: ForwardMsg[][]
   handledMessageBundleMetadata: MessageBundleMetadata[]
+  selectedDebugMenuOption: number
+  deletedNotesInfo: string[]
 }
 
 const ELEMENT_LIST_BUFFER_TIMEOUT_MS = 10
@@ -331,6 +335,8 @@ export class App extends PureComponent<Props, State> {
       inputsDisabled: false,
       handledMessageBundles: [],
       handledMessageBundleMetadata: [],
+      selectedDebugMenuOption: 0,
+      deletedNotesInfo: [],
     }
 
     this.connectionManager = null
@@ -1224,13 +1230,18 @@ export class App extends PureComponent<Props, State> {
         // We also don't do this if our script had a compilation error and didn't
         // finish successfully.
         this.setState(
-          ({ scriptRunId, fragmentIdsThisRun }) => ({
-            // Apply any pending elements that haven't been applied.
-            elements: this.pendingElementsBuffer.clearStaleNodes(
-              scriptRunId,
-              fragmentIdsThisRun
-            ),
-          }),
+          ({ scriptRunId, fragmentIdsThisRun }) => {
+            const [newAppRoot, deletedNodesInfo] =
+              this.pendingElementsBuffer.clearStaleNodes(
+                scriptRunId,
+                fragmentIdsThisRun
+              )
+            return {
+              // Apply any pending elements that haven't been applied.
+              elements: newAppRoot,
+              deletedNotesInfo: deletedNodesInfo,
+            }
+          },
           () => {
             this.pendingElementsBuffer = this.state.elements
           }
@@ -2036,6 +2047,9 @@ export class App extends PureComponent<Props, State> {
                 currentPageScriptHash={currentPageScriptHash}
                 hideSidebarNav={hideSidebarNav || hostHideSidebarNav}
                 expandSidebarNav={expandSidebarNav}
+                setDeletedNodesInfo={(deletedNotesInfo: string[]) => {
+                  this.setState({ deletedNotesInfo: deletedNotesInfo })
+                }}
               />
               {renderedDialog}
             </StyledApp>
@@ -2048,7 +2062,7 @@ export class App extends PureComponent<Props, State> {
                   this.setState({ selectedDebugMenuOption: value ?? 0 })
                 }
               />
-            {this.state.selectedDebugMenuOption === 0 && (
+              {this.state.selectedDebugMenuOption === 0 && (
                 <MsgLogger>
                   <div>
                     MessageBundles: {this.state.handledMessageBundles.length}
@@ -2168,7 +2182,7 @@ export class App extends PureComponent<Props, State> {
                   />
                 ))}
             </StyledDebugPanel>
-          </HotKeys>
+          </Hotkeys>
         </LibContext.Provider>
       </AppContext.Provider>
     )

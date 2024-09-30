@@ -171,7 +171,10 @@ class StreamlitLibExample extends PureComponent<Props, State> {
   public endScriptRun = (): void => {
     this.setState(prevState => ({
       scriptRunState: ScriptRunState.NOT_RUNNING,
-      elements: prevState.elements.clearStaleNodes(prevState.scriptRunId, []),
+      elements: prevState.elements.clearStaleNodes(
+        prevState.scriptRunId,
+        []
+      )[0],
     }))
   }
 

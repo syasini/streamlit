@@ -1190,7 +1190,7 @@ describe("AppRoot.clearStaleNodes", () => {
     const delta = makeProto(DeltaProto, {
       newElement: { text: { body: "newElement!" } },
     })
-    const newRoot = ROOT.applyDelta(
+    const [newRoot] = ROOT.applyDelta(
       "new_session_id",
       delta,
       forwardMsgMetadata([0, 1, 1])
@@ -1212,7 +1212,7 @@ describe("AppRoot.clearStaleNodes", () => {
     })
     expect(newRoot.logo).not.toBeNull()
 
-    const newNewRoot = newRoot.clearStaleNodes("new_script_run_id", [])
+    const [newNewRoot] = newRoot.clearStaleNodes("new_script_run_id", [])
     expect(newNewRoot.logo).toBeNull()
   })
 
@@ -1308,7 +1308,7 @@ describe("AppRoot.clearStaleNodes", () => {
       )
       .applyDelta("new_session_id", tab1, forwardMsgMetadata([0, 2, 0]))
 
-    const pruned = root.clearStaleNodes("new_session_id", ["my_fragment_id"])
+    const [pruned] = root.clearStaleNodes("new_session_id", ["my_fragment_id"])
 
     expect(pruned.main.getIn([0])).toBeInstanceOf(BlockNode)
     expect((pruned.main.getIn([0]) as BlockNode).children).toHaveLength(3)
@@ -1376,7 +1376,7 @@ describe("AppRoot.clearStaleNodes", () => {
 
     expect((newRoot.main.getIn([1]) as BlockNode).children).toHaveLength(4)
 
-    const pruned = newRoot.clearStaleNodes("new_session_id", [
+    const [pruned] = newRoot.clearStaleNodes("new_session_id", [
       "my_fragment_id",
     ])
 
