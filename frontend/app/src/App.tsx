@@ -1021,6 +1021,20 @@ export class App extends PureComponent<Props, State> {
 
       // Set the favicon to its default values
       this.onPageIconChanged(`${import.meta.env.BASE_URL}favicon.png`)
+
+      // Use previously saved layout if exists, otherwise default to CENTERED
+      // Pages using set_page_config(layout=...) will be overriding these values
+      this.setState((prevState: State) => {
+        const newLayout =
+          pageLayouts[newPageScriptHash] ?? PageConfig.Layout.CENTERED
+        return {
+          layout: newLayout,
+          userSettings: {
+            ...prevState.userSettings,
+            wideMode: newLayout === PageConfig.Layout.WIDE,
+          },
+        }
+      })
     } else {
       this.setState({
         fragmentIdsThisRun,
