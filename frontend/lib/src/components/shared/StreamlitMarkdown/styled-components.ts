@@ -39,6 +39,41 @@ function sharedMarkdownStyle(theme: Theme): any {
   }
 }
 
+function getMarkdownHeadingDefinitions(theme: Theme): any {
+  return {
+    "h1, h2, h3, h4, h5, h6": {
+      fontFamily: theme.genericFonts.headingFont,
+      lineHeight: theme.lineHeights.tight,
+      margin: 0,
+    },
+    h1: {
+      fontWeight: theme.fontWeights.extrabold,
+      padding: `${theme.spacing.xl} 0 ${theme.spacing.lg} 0`,
+    },
+    "h2, h3, h4, h5, h6": {
+      fontWeight: theme.fontWeights.bold,
+    },
+    "h3, h4, h5, h6": {
+      letterSpacing: "-0.005em",
+    },
+    h2: {
+      padding: `${theme.spacing.lg} 0 ${theme.spacing.lg} 0`,
+    },
+    h3: {
+      padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
+    },
+    h4: {
+      padding: `${theme.spacing.md} 0 ${theme.spacing.lg} 0`,
+    },
+    h5: {
+      padding: `0 0 ${theme.spacing.lg} 0`,
+    },
+    h6: {
+      padding: `0 0 ${theme.spacing.lg} 0`,
+    },
+  }
+}
+
 export const StyledStreamlitMarkdown =
   styled.div<StyledStreamlitMarkdownProps>(
     ({
@@ -57,6 +92,7 @@ export const StyledStreamlitMarkdown =
         fontFamily: theme.genericFonts.bodyFont,
         marginBottom: isLabel ? "" : `-${theme.spacing.lg}`,
         ...sharedMarkdownStyle(theme),
+        ...getMarkdownHeadingDefinitions(theme),
 
         p: {
           wordBreak: "break-word",
