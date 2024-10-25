@@ -144,7 +144,7 @@ export const StyledSpinner = styled(Spinner)(({ theme }) => {
     padding: theme.spacing.none,
     margin: theme.spacing.none,
     borderColor: theme.colors.borderColor,
-    borderTopColor: theme.colors.primary,
+    borderTopColor: theme.colors.secondary,
     flexGrow: 0,
     flexShrink: 0,
   }

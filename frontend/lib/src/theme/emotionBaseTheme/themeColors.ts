@@ -32,6 +32,7 @@ const requiredThemeColors = {
   dangerBg: transparentize(colors.red70, 0.8),
 
   primary: colors.red70,
+  secondary: colors.blue70,
   disabled: colors.gray40,
   lightestGray: colors.gray20,
   lightGray: colors.gray30,

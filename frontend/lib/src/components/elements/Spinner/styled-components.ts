@@ -34,9 +34,7 @@ export const ThemedStyledSpinner = styled(Spinner, {
     padding: theme.spacing.none,
     margin: theme.spacing.none,
     borderColor: theme.colors.borderColor,
-    borderTopColor: usingCustomTheme
-      ? theme.colors.primary
-      : theme.colors.blue70,
+    borderTopColor: theme.colors.secondary,
     flexGrow: 0,
     flexShrink: 0,
   }

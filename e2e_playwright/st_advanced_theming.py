@@ -10,6 +10,17 @@ import pydeck as pdk
 import streamlit as st
 from streamlit.config import get_option, set_option
 
+
+def page1():
+    pass
+
+
+def page2():
+    pass
+
+
+st.navigation([st.Page(page1), st.Page(page2)])
+
 st.set_page_config("Mega tester app", "🎈", initial_sidebar_state="collapsed")
 
 st.sidebar.header("Hello Sidebar")
@@ -41,7 +52,11 @@ with st.popover("Theme Editor"):
 
         st.divider()
 
+        show_input_field_border = st.checkbox(
+            "Show input field border", get_option("theme.inputFieldBorder") or True
+        )
         col1, col2 = st.columns(2)
+
         with col1:
             primary_color = st.color_picker(
                 "Primary color",
@@ -51,11 +66,15 @@ with st.popover("Theme Editor"):
                 "Background color",
                 value=get_option("theme.backgroundColor") or "#181818",
             )
-            secondary_background_color = st.color_picker(
-                "Secondary background color",
-                value=get_option("theme.secondaryBackgroundColor") or "#2C2C2C",
+            secondary_color = st.color_picker(
+                "Secondary color",
+                value=get_option("theme.secondaryColor") or "#1BD760",
             )
         with col2:
+            secondary_background_color = st.color_picker(
+                "Secondary background",
+                value=get_option("theme.secondaryBackgroundColor") or "#2C2C2C",
+            )
             text_color = st.color_picker(
                 "Text color",
                 value=get_option("theme.textColor") or "#FFFFFF",
@@ -152,6 +171,8 @@ with st.popover("Theme Editor"):
             set_option("theme.bodyFont", body_font)
             set_option("theme.headingFont", heading_font)
             set_option("theme.codeFont", code_font)
+            set_option("theme.inputFieldBorder", show_input_field_border)
+            set_option("theme.secondaryColor", secondary_color)
             st.rerun()
 
 # st.html("app_styles.html")
@@ -510,6 +531,7 @@ else:
     st.container().chat_input()
 
 "st.chat_message"
+st.chat_message("user").write("Hello!")
 st.chat_message("assistant").write("Hello there!")
 
 if st.button("Start st.status"):

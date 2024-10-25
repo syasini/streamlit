@@ -15,7 +15,7 @@
  */
 
 import camelcase from "camelcase"
-import { getLuminance, parseToRgba, toHex } from "color2k"
+import { darken, getLuminance, lighten, parseToRgba, toHex } from "color2k"
 import decamelize from "decamelize"
 import cloneDeep from "lodash/cloneDeep"
 import isObject from "lodash/isObject"
@@ -162,6 +162,8 @@ export const createEmotionTheme = (
     spacing,
     linkColor,
     fontSizes,
+    inputFieldBorder,
+    secondaryColor,
     ...customColors
   } = themeInput
 
@@ -213,6 +215,7 @@ export const createEmotionTheme = (
       sidebarSecondaryBackgroundColor
   if (widgetBackgroundColor)
     newGenericColors.widgetBackgroundColor = widgetBackgroundColor
+
   if (widgetBorderColor) newGenericColors.widgetBorderColor = widgetBorderColor
   if (skeletonBackgroundColor)
     newGenericColors.skeletonBackgroundColor = skeletonBackgroundColor
@@ -220,6 +223,8 @@ export const createEmotionTheme = (
   if (linkColor) {
     newGenericColors.linkText = linkColor
   }
+
+  newGenericColors.secondary = secondaryColor ?? newGenericColors.primary
 
   const conditionalOverrides: any = {}
 
@@ -230,6 +235,11 @@ export const createEmotionTheme = (
 
   if (borderColor) {
     conditionalOverrides.colors.borderColor = borderColor
+  }
+
+  if (inputFieldBorder && !widgetBorderColor) {
+    conditionalOverrides.colors.widgetBorderColor =
+      conditionalOverrides.colors.borderColor
   }
 
   if (notNullOrUndefined(roundedness)) {
@@ -305,6 +315,9 @@ export const createEmotionTheme = (
     // twoSmPx: fontSizeTwoSmall, // twoSm but as a number, in pixels
     // smPx: fontSizeSmall, // sm but as a number, in pixels
     // mdPx: fontSizeMedium, // med but as a number, in pixels
+    console.log("FOOOOOOO")
+    console.log("DARKEN", toHex(darken(colors.blue80, 0.07)))
+    console.log("LIGTHEN", toHex(lighten(colors.blue80, 0.165)))
 
     conditionalOverrides.fontSizes = {
       ...baseThemeConfig.emotion.fontSizes,

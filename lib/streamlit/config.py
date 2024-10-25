@@ -1085,6 +1085,21 @@ _create_option(
     type_=bool,
 )
 
+_create_option(
+    "theme.inputFieldBorder",
+    description="""
+    Whether to show a border around input fields.
+    """,
+    type_=bool,
+)
+
+_create_option(
+    "theme.secondaryColor",
+    description="""""",
+    type_=bool,
+)
+
+
 # Config Section: Secrets #
 
 _create_section("secrets", "Secrets configuration.")

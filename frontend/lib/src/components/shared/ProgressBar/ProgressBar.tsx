@@ -84,9 +84,7 @@ function ProgressBar({
     },
     BarProgress: {
       style: () => ({
-        backgroundColor: usingCustomTheme
-          ? theme.colors.primary
-          : theme.colors.blue70,
+        backgroundColor: theme.colors.secondary,
         borderTopLeftRadius: theme.spacing.twoXS,
         borderTopRightRadius: theme.spacing.twoXS,
         borderBottomLeftRadius: theme.spacing.twoXS,

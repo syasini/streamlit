@@ -68,13 +68,8 @@ export const ExpanderIcon = (props: ExpanderIconProps): ReactElement => {
   }
 
   if (icon === "spinner") {
-    const usingCustomTheme = !isPresetTheme(activeTheme)
     return (
-      <StyledSpinnerIcon
-        usingCustomTheme={usingCustomTheme}
-        data-testid="stExpanderIconSpinner"
-        {...iconProps}
-      />
+      <StyledSpinnerIcon data-testid="stExpanderIconSpinner" {...iconProps} />
     )
   }
 
