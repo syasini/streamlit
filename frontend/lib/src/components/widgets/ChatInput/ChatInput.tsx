@@ -166,11 +166,7 @@ function ChatInput({
   }, [chatInputRef])
 
   const { disabled, placeholder, maxChars } = element
-  const lightTheme = hasLightBackgroundColor(theme)
   const { minHeight, maxHeight } = heightGuidance.current
-  const placeholderColor = lightTheme
-    ? theme.colors.gray70
-    : theme.colors.gray80
 
   const isInputExtended =
     scrollHeight > 0 && chatInputRef.current
@@ -219,9 +215,6 @@ function ChatInput({
               style: {
                 lineHeight: theme.lineHeights.inputWidget,
                 backgroundColor: theme.colors.transparent,
-                "::placeholder": {
-                  color: placeholderColor,
-                },
                 height: isInputExtended
                   ? `${scrollHeight + ROUNDING_OFFSET}px`
                   : "auto",
