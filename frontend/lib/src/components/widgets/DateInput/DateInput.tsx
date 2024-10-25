@@ -27,7 +27,10 @@ import { useTheme } from "@emotion/react"
 import { DENSITY, Datepicker as UIDatePicker } from "baseui/datepicker"
 import { PLACEMENT } from "baseui/popover"
 
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import {
+  isNullOrUndefined,
+  labelVisibilityProtoValueToEnum,
+} from "@streamlit/lib/src/util/utils"
 import { DateInput as DateInputProto } from "@streamlit/lib/src/proto"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
@@ -40,7 +43,6 @@ import {
 } from "@streamlit/lib/src/components/widgets/BaseWidget"
 import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
 import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import { labelVisibilityProtoValueToEnum } from "@streamlit/lib/src/util/utils"
 
 export interface Props {
   disabled: boolean
