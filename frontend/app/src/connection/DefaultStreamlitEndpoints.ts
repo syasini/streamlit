@@ -165,6 +165,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     fileUrl: string,
     sessionId: string
   ): Promise<void> {
+    // TODO[kajarenc] do we need to inject same headers for Delete?
     return this.csrfRequest<number>(this.buildFileUploadURL(fileUrl), {
       method: "DELETE",
       data: { sessionId },
