@@ -1,11 +1,12 @@
 diff --git a/node_modules/@protobufjs/inquire/index.js b/node_modules/@protobufjs/inquire/index.js
-index 33778b5..a0963a1 100644
+index 33778b5..e1a3dc5 100644
 --- a/node_modules/@protobufjs/inquire/index.js
 +++ b/node_modules/@protobufjs/inquire/index.js
-@@ -8,6 +8,9 @@ module.exports = inquire;
+@@ -8,6 +8,10 @@ module.exports = inquire;
   * @returns {?Object} Required module if available and not empty, otherwise `null`
   */
  function inquire(moduleName) {
++    // This check ensures that the code below is only run in a non-browser environment.
 +    if (typeof document !== "undefined") {
 +        return null;
 +    }
