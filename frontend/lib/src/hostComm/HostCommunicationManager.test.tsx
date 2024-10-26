@@ -493,6 +493,33 @@ describe("HostCommunicationManager messaging", () => {
     ).toHaveBeenCalledWith(message.data)
   })
 
+  it("can process a received SET_FILE_UPLOAD_CLIENT_CONFIG message", () => {
+    const message = new MessageEvent("message", {
+      data: {
+        stCommVersion: HOST_COMM_VERSION,
+        type: "SET_FILE_UPLOAD_CLIENT_CONFIG",
+        prefix: "https://someprefix.com/hello/",
+        headers: {
+          header1: "header1value",
+          header2: "header2value",
+        },
+      },
+      origin: "https://devel.streamlit.test",
+    })
+    dispatchEvent("message", message)
+
+    expect(
+      // @ts-expect-error - props are private
+      hostCommunicationMgr.props.fileUploadClientConfigChanged
+    ).toHaveBeenCalledWith({
+      prefix: "https://someprefix.com/hello/",
+      headers: {
+        header1: "header1value",
+        header2: "header2value",
+      },
+    })
+  })
+
   it("can process a received RESTART_WEBSOCKET_CONNECTION message", () => {
     const message = new MessageEvent("message", {
       data: {
