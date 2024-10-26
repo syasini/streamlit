@@ -118,6 +118,16 @@ describe("DefaultStreamlitEndpoints", () => {
       )
       expect(uri).toBe("http://example.com/upload_file/file_2")
     })
+
+    it("respects URL prefix from fileUploadClientConfig", () => {
+      endpoints.setFileUploadCliendConfig({
+        prefix: "https://someprefix.com/somepath/",
+        headers: {},
+      })
+
+      const uri = endpoints.buildFileUploadURL("/upload_file/file_2")
+      expect(uri).toBe("https://someprefix.com/somepath/upload_file/file_2")
+    })
   })
 
   describe("buildAppPageURL", () => {
