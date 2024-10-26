@@ -257,6 +257,49 @@ describe("DefaultStreamlitEndpoints", () => {
       })
     })
 
+    it("respects fileUploadClientConfig", async () => {
+      axiosMock
+        .onPut("http://example.com/someprefix/upload_file/file_2")
+        .reply(() => [200, 1])
+
+      const mockOnUploadProgress = (_: any): void => {}
+      const mockCancelToken = axios.CancelToken.source().token
+
+      endpoints.setFileUploadCliendConfig({
+        prefix: "http://example.com/someprefix/",
+        headers: {
+          header1: "header1value",
+          header2: "header2value",
+        },
+      })
+
+      await expect(
+        endpoints.uploadFileUploaderFile(
+          "upload_file/file_2",
+          MOCK_FILE,
+          "mockSessionId",
+          mockOnUploadProgress,
+          mockCancelToken
+        )
+      ).resolves.toBeUndefined()
+
+      const expectedData = new FormData()
+      expectedData.append(MOCK_FILE.name, MOCK_FILE)
+
+      expect(spyRequest).toHaveBeenCalledWith({
+        url: "http://example.com/someprefix/upload_file/file_2",
+        method: "PUT",
+        responseType: "text",
+        data: expectedData,
+        headers: {
+          header1: "header1value",
+          header2: "header2value",
+        },
+        cancelToken: mockCancelToken,
+        onUploadProgress: mockOnUploadProgress,
+      })
+    })
+
     it("errors on bad status", async () => {
       axiosMock
         .onPut("http://streamlit.mock:80/mock/base/path/_stcore/upload_file")
