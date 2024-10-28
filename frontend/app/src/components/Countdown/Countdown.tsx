@@ -20,13 +20,13 @@ import { StyledCountdown } from "./styled-components"
 
 interface Props {
   countdown: number
-  endCallback?: () => void
+  endCallback: () => void
 }
 
-const Countdown: React.FC<Props> = ({ countdown, endCallback = () => {} }) => {
+const Countdown: React.FC<Props> = ({ countdown, endCallback }) => {
   const [currentCountdown, setCurrentCountdown] = useState(countdown)
 
-  const onAnimationEnd = (): void => {
+  const onAnimationEnd = async (): Promise<void> => {
     const newCountdown = currentCountdown - 1
 
     if (newCountdown >= 0) {
