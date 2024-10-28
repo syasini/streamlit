@@ -294,15 +294,8 @@ class StatusWidget extends PureComponent<StatusWidgetProps, State> {
         // In the latter case, the server should get around to actually
         // re-running the script in a second or two, but we can appear
         // more responsive by claiming it's started immemdiately.
-        const params = new URLSearchParams(document.location.search)
-        const delay = params.get("delay")
-        if (delay !== null) {
-          this.showRunningManAfterInitialDelay(parseInt(delay))
-        } else {
-          this.showRunningManAfterInitialDelay(
-            RUNNING_MAN_DISPLAY_DELAY_TIME_MS
-          )
-        }
+
+        this.showRunningManAfterInitialDelay(RUNNING_MAN_DISPLAY_DELAY_TIME_MS)
         return this.renderScriptIsRunning()
       }
       if (this.state.scriptChangedOnDisk) {
