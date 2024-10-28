@@ -146,6 +146,8 @@ interface State {
   userSettings: UserSettings
   dialog?: DialogProps | null
   layout: PageConfig.Layout
+  // Preferred layouts for each page: <page script hash, layout>
+  preferredLayouts: Record<string, PageConfig.Layout>
   initialSidebarState: PageConfig.SidebarState
   menuItems?: PageConfig.IMenuItems | null
   allowRunOnSave: boolean
@@ -276,6 +278,7 @@ export class App extends PureComponent<Props, State> {
         runOnSave: false,
       },
       layout: PageConfig.Layout.CENTERED,
+      preferredLayouts: {},
       initialSidebarState: PageConfig.SidebarState.AUTO,
       menuItems: undefined,
       allowRunOnSave: true,
@@ -748,15 +751,6 @@ export class App extends PureComponent<Props, State> {
   }
 
   handlePageConfigChanged = (pageConfig: PageConfig): void => {
-    // Save current page layout before rerun
-    this.setState((prevState: State) => {
-      const pageLayouts = prevState.pageLayouts
-      pageLayouts[prevState.currentPageScriptHash] = prevState.layout
-      return {
-        pageLayouts: pageLayouts,
-      }
-    })
-
     const { title, favicon, layout, initialSidebarState, menuItems } =
       pageConfig
 
@@ -793,6 +787,15 @@ export class App extends PureComponent<Props, State> {
     }
 
     this.setState({ menuItems })
+
+    // Save current page layout
+    this.setState((prevState: State) => {
+      const newPreferredLayouts = prevState.preferredLayouts
+      newPreferredLayouts[prevState.currentPageScriptHash] = layout
+      return {
+        preferredLayouts: newPreferredLayouts,
+      }
+    })
   }
 
   handlePageInfoChanged = (pageInfo: PageInfo): void => {
@@ -998,7 +1001,11 @@ export class App extends PureComponent<Props, State> {
       this.handleOneTimeInitialization(newSessionProto)
     }
 
-    const { appHash, currentPageScriptHash: prevPageScriptHash } = this.state
+    const {
+      appHash,
+      preferredLayouts,
+      currentPageScriptHash: prevPageScriptHash,
+    } = this.state
     const {
       scriptRunId,
       name: scriptName,
@@ -1080,7 +1087,7 @@ export class App extends PureComponent<Props, State> {
     // Pages using set_page_config(layout=...) will be overriding these values
     this.setState((prevState: State) => {
       const newLayout =
-        pageLayouts[newPageScriptHash] ?? PageConfig.Layout.CENTERED
+        preferredLayouts[newPageScriptHash] ?? PageConfig.Layout.CENTERED
       return {
         layout: newLayout,
         userSettings: {
@@ -1323,6 +1330,18 @@ export class App extends PureComponent<Props, State> {
     const { runOnSave } = newSettings
 
     this.setState({ userSettings: newSettings })
+
+    // Save current page layout
+    this.setState((prevState: State) => {
+      const newPreferredLayouts = prevState.preferredLayouts
+      newPreferredLayouts[prevState.currentPageScriptHash] =
+        newSettings.wideMode
+          ? PageConfig.Layout.WIDE
+          : PageConfig.Layout.CENTERED
+      return {
+        preferredLayouts: newPreferredLayouts,
+      }
+    })
 
     if (prevRunOnSave !== runOnSave && this.isServerConnected()) {
       const backMsg = new BackMsg({ setRunOnSave: runOnSave })
