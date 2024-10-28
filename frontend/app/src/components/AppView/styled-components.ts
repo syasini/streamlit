@@ -102,7 +102,6 @@ export interface StyledAppViewBlockContainerProps {
   isWideMode: boolean
   showPadding: boolean
   addPaddingForHeader: boolean
-  disableFullscreenMode: boolean
   hasBottom: boolean
 }
 
@@ -115,7 +114,6 @@ export const StyledAppViewBlockContainer =
       isWideMode,
       showPadding,
       addPaddingForHeader,
-      disableFullscreenMode,
       theme,
     }) => {
       const littlePadding = "2.1rem"
@@ -132,43 +130,24 @@ export const StyledAppViewBlockContainer =
       const bottomEmbedPadding =
         showPadding && !hasBottom ? "10rem" : theme.spacing.lg
 
-      // Full screen-enabled elements can overflow the page when the screen
-      // size is slightly over the content max width.
-      // 50rem = contentMaxWidth + 2 * 2rem (size of button as margin)
-      // We use 0.5 to give a little extra space for a scrollbar that takes
-      // space like safari and avoid scrollbar jitter.
-      //
-      // See https://github.com/streamlit/streamlit/issues/6990
-      // TODO: Remove this workaround when we migrated to the new fullscreen buttons
-      const shouldHandleFullScreenButton =
-        !isWideMode && !disableFullscreenMode
-      const fullScreenButtonStyles = shouldHandleFullScreenButton
-        ? {
-            [`@media (max-width: 50.5rem)`]: {
-              maxWidth: `calc(100vw - 4.5rem)`,
-            },
-          }
-        : {}
       return {
         width: theme.sizes.full,
-        paddingLeft: theme.spacing.lg,
-        paddingRight: theme.spacing.lg,
-        // Increase side padding, if layout = wide and we're not on mobile
-        [`@media (min-width: ${theme.breakpoints.sm})`]: {
-          paddingLeft: isWideMode
-            ? theme.sizes.wideSidePadding
-            : theme.spacing.lg,
-          paddingRight: isWideMode
-            ? theme.sizes.wideSidePadding
-            : theme.spacing.lg,
-        },
         paddingTop: topEmbedPadding,
         paddingBottom: bottomEmbedPadding,
-        minWidth: isWideMode ? "auto" : undefined,
-        maxWidth: isWideMode ? "initial" : theme.sizes.contentMaxWidth,
-
-        ...fullScreenButtonStyles,
-
+        paddingLeft: theme.spacing.lg,
+        paddingRight: theme.spacing.lg,
+        minWidth: undefined,
+        maxWidth: theme.sizes.contentMaxWidth,
+        ...(isWideMode && {
+          // Increase side padding, if layout = wide and if content is larger than contentMaxWidth
+          [`@media (min-width: calc(${theme.sizes.contentMaxWidth} + 2 * (${theme.sizes.wideSidePadding} - ${theme.spacing.lg})))`]:
+            {
+              paddingLeft: theme.sizes.wideSidePadding,
+              paddingRight: theme.sizes.wideSidePadding,
+              minWidth: "auto",
+              maxWidth: "initial",
+            },
+        }),
         [`@media print`]: {
           paddingTop: littlePadding,
         },
