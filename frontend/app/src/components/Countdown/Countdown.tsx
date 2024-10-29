@@ -26,7 +26,7 @@ interface Props {
 const Countdown: React.FC<Props> = ({ countdown, endCallback }) => {
   const [currentCountdown, setCurrentCountdown] = useState(countdown)
 
-  const onAnimationEnd = async (): Promise<void> => {
+  const onAnimationEnd = (): void => {
     const newCountdown = currentCountdown - 1
 
     if (newCountdown >= 0) {
