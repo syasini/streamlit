@@ -267,9 +267,6 @@ def set_page_config(
     ctx = get_script_run_ctx()
     if ctx is None:
         return
-
-    msg.page_config_changed.page_script_hash = ctx.page_script_hash
-
     ctx.enqueue(msg)
 
 

@@ -18,7 +18,7 @@ import React, { PureComponent, ReactNode } from "react"
 
 import moment from "moment"
 import Hotkeys from "react-hot-keys"
-import { enableAllPlugins as enableImmerPlugins } from "immer"
+import { current, enableAllPlugins as enableImmerPlugins } from "immer"
 import classNames from "classnames"
 import without from "lodash/without"
 
@@ -751,14 +751,8 @@ export class App extends PureComponent<Props, State> {
   }
 
   handlePageConfigChanged = (pageConfig: PageConfig): void => {
-    const {
-      title,
-      favicon,
-      layout,
-      initialSidebarState,
-      menuItems,
-      pageScriptHash,
-    } = pageConfig
+    const { title, favicon, layout, initialSidebarState, menuItems } =
+      pageConfig
 
     this.appNavigation.handlePageConfigChanged(pageConfig)
 
@@ -797,7 +791,7 @@ export class App extends PureComponent<Props, State> {
     // Save current page layout
     this.setState((prevState: State) => {
       const newPreferredLayouts = prevState.preferredLayouts
-      newPreferredLayouts[pageScriptHash] = layout
+      newPreferredLayouts[prevState.currentPageScriptHash] = layout
       return {
         preferredLayouts: newPreferredLayouts,
       }
@@ -840,28 +834,19 @@ export class App extends PureComponent<Props, State> {
   }
 
   handleNavigation = (navigationMsg: Navigation): void => {
+    const { currentPageScriptHash: prevPageScriptHash } = this.state
+
     this.maybeSetState(this.appNavigation.handleNavigation(navigationMsg))
 
-    // When st.set_page_config command is called before st.navigation on app starts,
-    // handlePageConfigChanged will also be called before handleNavigation.
-    // In this case, the pageScriptHash in handlePageConfigChanged != the eventual
-    // currentPageScriptHash state value (which is not set until handleNavigation)
-    // but mainScriptHash.
-    // This causes preferredLayouts to not register the layout for currentPageScriptHash,
-    // which is looked up in handleNewSession.
-    // To fix this, we copy the 1 layout value in preferredLayouts (since this only
-    // happens at the start of the app) to map to currentPageScriptHash.
-    const { mainScriptHash, preferredLayouts } = this.state
+    // Ensures that if the current page's script hash is not already in the preferredLayouts object,
+    // it assigns the layout of the previous page to the current page.
+    const { currentPageScriptHash, preferredLayouts } = this.state
     const keys = Object.keys(preferredLayouts)
-    if (keys.length === 1 && keys[0] === mainScriptHash) {
-      const { currentPageScriptHash } = this.state
-
-      const newPreferredLayouts: Record<string, PageConfig.Layout> = {}
-      newPreferredLayouts[currentPageScriptHash] =
-        preferredLayouts[mainScriptHash]
-
+    if (!keys.includes(currentPageScriptHash)) {
+      preferredLayouts[currentPageScriptHash] =
+        preferredLayouts[prevPageScriptHash]
       this.setState({
-        preferredLayouts: newPreferredLayouts,
+        preferredLayouts: preferredLayouts,
       })
     }
   }

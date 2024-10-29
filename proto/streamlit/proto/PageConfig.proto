@@ -26,8 +26,6 @@ message PageConfig {
   Layout layout = 3;
   SidebarState initial_sidebar_state = 4;
   MenuItems menu_items = 5;
-  // A hash of the script corresponding to the page currently being viewed.
-  string page_script_hash = 6;
 
   message MenuItems {
     string get_help_url = 1;
