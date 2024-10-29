@@ -34,6 +34,10 @@ function createMockForwardMsg(hash: string, cacheable = true): ForwardMsg {
   })
 }
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe("DefaultStreamlitEndpoints", () => {
   const { location: originalLocation } = window
   beforeEach(() => {
@@ -312,6 +316,46 @@ describe("DefaultStreamlitEndpoints", () => {
           "mockSessionId"
         )
       ).rejects.toEqual(new Error("Request failed with status code 400"))
+    })
+  })
+
+  describe("deleteFileAtURL()", () => {
+    let axiosMock: MockAdapter
+    const spyRequest = jest.spyOn(axios, "request")
+    let endpoints: DefaultStreamlitEndpoints
+
+    beforeEach(() => {
+      axiosMock = new MockAdapter(axios)
+      endpoints = new DefaultStreamlitEndpoints({
+        getServerUri: () => MOCK_SERVER_URI,
+        csrfEnabled: false,
+      })
+    })
+
+    afterEach(() => {
+      axiosMock.restore()
+    })
+
+    it("delete properly constructs the correct endpoint when given a relative URL", async () => {
+      axiosMock
+        .onDelete(
+          "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1"
+        )
+        .reply(() => [204])
+
+      await expect(
+        endpoints.deleteFileAtURL(
+          "/_stcore/upload_file/file_1",
+          "mockSessionId"
+        )
+      ).resolves.toBeUndefined()
+
+      expect(spyRequest).toHaveBeenCalledWith({
+        url: "http://streamlit.mock:80/mock/base/path/_stcore/upload_file/file_1",
+        method: "DELETE",
+        headers: {},
+        data: { sessionId: "mockSessionId" },
+      })
     })
   })
 
