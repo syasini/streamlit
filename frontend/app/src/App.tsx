@@ -723,6 +723,7 @@ export class App extends PureComponent<Props, State> {
         navigation: (navigation: Navigation) =>
           this.handleNavigation(navigation),
       })
+      console.log("yoyoyo", this.state, msgProto.type)
     } catch (e) {
       const err = ensureError(e)
       logError(err)
@@ -788,6 +789,7 @@ export class App extends PureComponent<Props, State> {
 
     this.setState({ menuItems })
 
+    console.log("yoyoyo", this.state.currentPageScriptHash)
     // Save current page layout
     this.setState((prevState: State) => {
       const newPreferredLayouts = prevState.preferredLayouts
@@ -835,17 +837,6 @@ export class App extends PureComponent<Props, State> {
 
   handleNavigation = (navigationMsg: Navigation): void => {
     this.maybeSetState(this.appNavigation.handleNavigation(navigationMsg))
-
-    const { mainScriptHash, preferredLayouts } = this.state
-    const keys = Object.keys(preferredLayouts)
-    if (keys.includes(mainScriptHash)) {
-      const { currentPageScriptHash } = this.state
-      preferredLayouts[currentPageScriptHash] =
-        preferredLayouts[mainScriptHash]
-      this.setState({
-        preferredLayouts: preferredLayouts,
-      })
-    }
   }
 
   handlePageProfileMsg = (pageProfile: PageProfile): void => {
