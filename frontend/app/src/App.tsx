@@ -18,7 +18,7 @@ import React, { PureComponent, ReactNode } from "react"
 
 import moment from "moment"
 import Hotkeys from "react-hot-keys"
-import { current, enableAllPlugins as enableImmerPlugins } from "immer"
+import { enableAllPlugins as enableImmerPlugins } from "immer"
 import classNames from "classnames"
 import without from "lodash/without"
 
