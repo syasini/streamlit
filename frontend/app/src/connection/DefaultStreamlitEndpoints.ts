@@ -66,8 +66,10 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     this.jwtHeader = jwtHeader
   }
 
-  public setFileUploadCliendConfig(payload: FileUploadClientConfig): void {
-    const { prefix, headers } = payload
+  public setFileUploadCliendConfig({
+    prefix,
+    headers,
+  }: FileUploadClientConfig): void {
     this.fileUploadClientConfig = {
       prefix,
       headers,
