@@ -723,7 +723,6 @@ export class App extends PureComponent<Props, State> {
         navigation: (navigation: Navigation) =>
           this.handleNavigation(navigation),
       })
-      console.log("yoyoyo", this.state, msgProto.type)
     } catch (e) {
       const err = ensureError(e)
       logError(err)
@@ -752,8 +751,14 @@ export class App extends PureComponent<Props, State> {
   }
 
   handlePageConfigChanged = (pageConfig: PageConfig): void => {
-    const { title, favicon, layout, initialSidebarState, menuItems } =
-      pageConfig
+    const {
+      title,
+      favicon,
+      layout,
+      initialSidebarState,
+      menuItems,
+      pageScriptHash,
+    } = pageConfig
 
     this.appNavigation.handlePageConfigChanged(pageConfig)
 
@@ -789,11 +794,10 @@ export class App extends PureComponent<Props, State> {
 
     this.setState({ menuItems })
 
-    console.log("yoyoyo", this.state.currentPageScriptHash)
     // Save current page layout
     this.setState((prevState: State) => {
       const newPreferredLayouts = prevState.preferredLayouts
-      newPreferredLayouts[prevState.currentPageScriptHash] = layout
+      newPreferredLayouts[pageScriptHash] = layout
       return {
         preferredLayouts: newPreferredLayouts,
       }
@@ -837,6 +841,29 @@ export class App extends PureComponent<Props, State> {
 
   handleNavigation = (navigationMsg: Navigation): void => {
     this.maybeSetState(this.appNavigation.handleNavigation(navigationMsg))
+
+    // When st.set_page_config command is called before st.navigation on app starts,
+    // handlePageConfigChanged will also be called before handleNavigation.
+    // In this case, the pageScriptHash in handlePageConfigChanged != the eventual
+    // currentPageScriptHash state value (which is not set until handleNavigation)
+    // but mainScriptHash.
+    // This causes preferredLayouts to not register the layout for currentPageScriptHash,
+    // which is looked up in handleNewSession.
+    // To fix this, we copy the 1 layout value in preferredLayouts (since this only
+    // happens at the start of the app) to map to currentPageScriptHash.
+    const { mainScriptHash, preferredLayouts } = this.state
+    const keys = Object.keys(preferredLayouts)
+    if (keys.length === 1 && keys[0] === mainScriptHash) {
+      const { currentPageScriptHash } = this.state
+
+      const newPreferredLayouts: Record<string, PageConfig.Layout> = {}
+      newPreferredLayouts[currentPageScriptHash] =
+        preferredLayouts[mainScriptHash]
+
+      this.setState({
+        preferredLayouts: newPreferredLayouts,
+      })
+    }
   }
 
   handlePageProfileMsg = (pageProfile: PageProfile): void => {
@@ -1071,8 +1098,8 @@ export class App extends PureComponent<Props, State> {
       )
     }
 
-    // Use previously saved layout if exists, otherwise default to CENTERED
-    // Pages using set_page_config(layout=...) will be overriding these values
+    // Use previously saved layout if exists, otherwise default to CENTERED.
+    // If page uses set_page_config, layout will be overridden in handlePageConfigChanged.
     this.setState((prevState: State) => {
       const newLayout =
         preferredLayouts[newPageScriptHash] ?? PageConfig.Layout.CENTERED
