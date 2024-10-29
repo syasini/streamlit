@@ -115,7 +115,7 @@ interface State {
   promptHovered: boolean
 
   /**
-   * True if the running man animation should be displayed after an initial delay.
+   * True if the running man animation should be displayed.
    */
   showRunningMan: boolean
 }

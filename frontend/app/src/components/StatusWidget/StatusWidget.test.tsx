@@ -343,7 +343,12 @@ describe("Running Icon", () => {
       />
     )
 
-    const icon = screen.queryByRole("img")
+    let icon = screen.queryByRole("img")
     expect(icon).not.toBeInTheDocument()
+
+    jest.runAllTimers()
+
+    icon = screen.queryByRole("img")
+    expect(icon).toHaveAttribute("src", "icon_running.gif")
   })
 })
