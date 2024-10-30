@@ -357,6 +357,34 @@ describe("DefaultStreamlitEndpoints", () => {
         data: { sessionId: "mockSessionId" },
       })
     })
+
+    it("respects fileUploadClientConfig", async () => {
+      axiosMock
+        .onDelete("http://example.com/someprefix/upload_file/file_1")
+        .reply(() => [204])
+
+      endpoints.setFileUploadCliendConfig({
+        prefix: "http://example.com/someprefix/",
+        headers: {
+          header1: "header1value",
+          header2: "header2value",
+        },
+      })
+
+      await expect(
+        endpoints.deleteFileAtURL("upload_file/file_1", "mockSessionId")
+      ).resolves.toBeUndefined()
+
+      expect(spyRequest).toHaveBeenCalledWith({
+        url: "http://example.com/someprefix/upload_file/file_1",
+        method: "DELETE",
+        headers: {
+          header1: "header1value",
+          header2: "header2value",
+        },
+        data: { sessionId: "mockSessionId" },
+      })
+    })
   })
 
   describe("fetchCachedForwardMsg()", () => {
