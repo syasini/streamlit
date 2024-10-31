@@ -834,17 +834,19 @@ export class App extends PureComponent<Props, State> {
   }
 
   handleNavigation = (navigationMsg: Navigation): void => {
-    const { currentPageScriptHash: prevPageScriptHash } = this.state
-
     this.maybeSetState(this.appNavigation.handleNavigation(navigationMsg))
 
-    // Ensures that if the current page's script hash is not already in the preferredLayouts object,
-    // it assigns the layout of the previous page to the current page.
-    const { currentPageScriptHash, preferredLayouts } = this.state
+    // If the current page script hash is not already in the preferredLayouts object,
+    // we fallback to the entrypoint files layout when available.
+    const { currentPageScriptHash, mainScriptHash, preferredLayouts } =
+      this.state
     const keys = Object.keys(preferredLayouts)
-    if (!keys.includes(currentPageScriptHash)) {
+    if (
+      !keys.includes(currentPageScriptHash) &&
+      keys.includes(mainScriptHash)
+    ) {
       preferredLayouts[currentPageScriptHash] =
-        preferredLayouts[prevPageScriptHash]
+        preferredLayouts[mainScriptHash]
       this.setState({
         preferredLayouts: preferredLayouts,
       })
