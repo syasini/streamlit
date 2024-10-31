@@ -26,7 +26,7 @@ export const StyledFileDropzoneSection = styled.section<StyledFileDropzone>(
   ({ isDisabled, theme }) => ({
     display: "flex",
     alignItems: "center",
-    padding: theme.spacing.lg,
+    padding: theme.spacing.sm,
     backgroundColor: theme.colors.secondaryBg,
     borderRadius: theme.radii.default,
     ":focus": {
@@ -58,18 +58,21 @@ export const StyledFileDropzoneInstructionsStyledSpan = styled.span(
   })
 )
 
-export const StyledFileDropzoneInstructionsColumn = styled.div({
-  display: "flex",
-  flexDirection: "column",
-})
+export const StyledFileDropzoneInstructionsColumn = styled.div(
+  ({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    paddingLeft: theme.spacing.sm,
+  })
+)
 
 export const StyledUploadedFiles = styled.div(({ theme }) => ({
   left: 0,
   right: 0,
   lineHeight: theme.lineHeights.tight,
   paddingTop: theme.spacing.md,
-  paddingLeft: theme.spacing.lg,
-  paddingRight: theme.spacing.lg,
+  paddingLeft: theme.spacing.sm,
+  paddingRight: theme.spacing.sm,
 }))
 
 export const StyledUploadedFilesList = styled.ul(({ theme }) => ({
@@ -110,8 +113,10 @@ export const StyledErrorMessage = styled.span(({ theme }) => ({
 
 export const StyledFileIcon = styled.div(({ theme }) => ({
   display: "flex",
-  padding: theme.spacing.twoXS,
-  color: theme.colors.darkenedBgMix100,
+  padding: theme.spacing.sm,
+  color: theme.colors.textColor,
+  border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+  borderRadius: theme.radii.default,
 }))
 
 export const StyledFileError = styled.small(({ theme }) => ({

@@ -25,7 +25,6 @@ import { Small } from "@streamlit/lib/src/components/shared/TextElements"
 import {
   StyledFileDropzoneInstructions,
   StyledFileDropzoneInstructionsColumn,
-  StyledFileDropzoneInstructionsFileUploaderIcon,
   StyledFileDropzoneInstructionsStyledSpan,
 } from "./styled-components"
 
@@ -41,15 +40,12 @@ const FileDropzoneInstructions = ({
   maxSizeBytes,
 }: Props): React.ReactElement => (
   <StyledFileDropzoneInstructions data-testid="stFileUploaderDropzoneInstructions">
-    <StyledFileDropzoneInstructionsFileUploaderIcon>
-      <Icon content={CloudUpload} size="threeXL" />
-    </StyledFileDropzoneInstructionsFileUploaderIcon>
     <StyledFileDropzoneInstructionsColumn>
-      <StyledFileDropzoneInstructionsStyledSpan>
-        Drag and drop file{multiple ? "s" : ""} here
-      </StyledFileDropzoneInstructionsStyledSpan>
+      {/* <StyledFileDropzoneInstructionsStyledSpan>
+        Or drop here. Limit: {getSizeDisplay(maxSizeBytes, FileSize.Byte, 0)}
+      </StyledFileDropzoneInstructionsStyledSpan> */}
       <Small>
-        {`Limit ${getSizeDisplay(maxSizeBytes, FileSize.Byte, 0)} per file`}
+        {`Limit: ${getSizeDisplay(maxSizeBytes, FileSize.Byte, 0)}`}
         {acceptedExtensions.length
           ? ` • ${acceptedExtensions
               .map(ext => ext.replace(/^\./, "").toUpperCase())

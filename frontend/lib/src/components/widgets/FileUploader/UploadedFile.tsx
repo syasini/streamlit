@@ -16,16 +16,13 @@
 
 import React from "react"
 
-import {
-  Clear,
-  Error,
-  InsertDriveFile,
-} from "@emotion-icons/material-outlined"
+import { Error, InsertDriveFile } from "@emotion-icons/material-outlined"
 
 import BaseButton, {
   BaseButtonKind,
+  DynamicButtonLabel,
 } from "@streamlit/lib/src/components/shared/BaseButton"
-import Icon from "@streamlit/lib/src/components/shared/Icon"
+import Icon, { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
 import ProgressBar, {
   Size,
 } from "@streamlit/lib/src/components/shared/ProgressBar"
@@ -86,7 +83,7 @@ const UploadedFile = ({ fileInfo, onDelete }: Props): React.ReactElement => {
       data-testid="stFileUploaderFile"
     >
       <StyledFileIcon>
-        <Icon content={InsertDriveFile} size="twoXL" />
+        <DynamicIcon iconValue=":material/image:" size="lg" />
       </StyledFileIcon>
       <StyledUploadedFileData className="stFileUploaderFileData">
         <StyledUploadedFileName
@@ -103,7 +100,7 @@ const UploadedFile = ({ fileInfo, onDelete }: Props): React.ReactElement => {
           onClick={() => onDelete(fileInfo.id)}
           kind={BaseButtonKind.MINIMAL}
         >
-          <Icon content={Clear} size="lg" />
+          <DynamicButtonLabel icon={":material/delete:"} label={""} />
         </BaseButton>
       </div>
     </StyledUploadedFile>
