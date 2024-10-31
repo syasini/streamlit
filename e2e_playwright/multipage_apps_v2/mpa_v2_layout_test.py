@@ -87,8 +87,13 @@ def test_page_dynamic_layout(app: Page):
 def test_page_with_fragment_and_dynamic_layout(app: Page):
     """Test that page with fragment and dynamic layout keeps last layout when switched back."""
     # centered layout should be preserved
-    get_page_link(app, "Page E: fragment").click()
+    get_page_link(app, "Page B: wide").click()
     wait_for_app_run(app)
+
+    get_page_link(app, "Page E: fragment").click()
+    # wait for fragment to rerun
+    time.sleep(1)
+    # ensure previous wide layout doesn't carry over with navigation
     expect(app.get_by_test_id("stAppViewContainer")).to_have_attribute(
         "data-layout", "narrow"
     )
