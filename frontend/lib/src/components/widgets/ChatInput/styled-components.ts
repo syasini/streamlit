@@ -63,8 +63,8 @@ export const StyledSendIconButton = styled.button<StyledSendIconButtonProps>(
     return {
       border: "none",
       backgroundColor: theme.colors.transparent,
-      borderTopRightRadius: extended ? theme.radii.none : theme.radii.default,
-      borderTopLeftRadius: extended ? theme.radii.default : theme.radii.none,
+      borderTopRightRadius: extended ? "0" : theme.radii.default,
+      borderTopLeftRadius: extended ? theme.radii.default : "0",
       borderBottomRightRadius: theme.radii.default,
       display: "inline-flex",
       alignItems: "center",
