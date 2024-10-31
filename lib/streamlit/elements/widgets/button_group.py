@@ -802,9 +802,9 @@ class ButtonGroupMixin:
     @gather_metrics("triggers")
     def triggers(
         self,
+        label: str,
         options: OptionSequence[V],
         *,
-        label: str | None = None,
         default: Sequence[V] | V | None = None,
         format_func: Callable[[Any], str] | None = None,
         key: str | int | None = None,
@@ -813,7 +813,7 @@ class ButtonGroupMixin:
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         disabled: bool = False,
-        label_visibility: LabelVisibility = "visible",
+        label_visibility: LabelVisibility = "collapsed",
     ) -> list[V] | V | None:
         return self._internal_button_group(
             options,
