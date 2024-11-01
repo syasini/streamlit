@@ -109,7 +109,8 @@ export interface StreamlitEndpoints {
   setJWTHeader?(jwtHeader: JWTHeader): void
 
   /**
-   * setFileUploadCliendConfig.
+   * setFileUploadClientConfig.
+   * @param config the object that contains prefix and headers object
    */
   setFileUploadClientConfig?(config: FileUploadClientConfig): void
 }

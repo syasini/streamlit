@@ -124,7 +124,7 @@ describe("DefaultStreamlitEndpoints", () => {
     })
 
     it("respects URL prefix from fileUploadClientConfig", () => {
-      endpoints.setFileUploadCliendConfig({
+      endpoints.setFileUploadClientConfig({
         prefix: "https://someprefix.com/somepath/",
         headers: {},
       })
@@ -269,7 +269,7 @@ describe("DefaultStreamlitEndpoints", () => {
       const mockOnUploadProgress = (_: any): void => {}
       const mockCancelToken = axios.CancelToken.source().token
 
-      endpoints.setFileUploadCliendConfig({
+      endpoints.setFileUploadClientConfig({
         prefix: "http://example.com/someprefix/",
         headers: {
           header1: "header1value",
@@ -363,7 +363,7 @@ describe("DefaultStreamlitEndpoints", () => {
         .onDelete("http://example.com/someprefix/upload_file/file_1")
         .reply(() => [204])
 
-      endpoints.setFileUploadCliendConfig({
+      endpoints.setFileUploadClientConfig({
         prefix: "http://example.com/someprefix/",
         headers: {
           header1: "header1value",
