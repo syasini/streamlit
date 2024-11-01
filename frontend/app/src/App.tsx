@@ -344,7 +344,7 @@ export class App extends PureComponent<Props, State> {
         }
       },
       fileUploadClientConfigChanged: config => {
-        if (this.endpoints.setFileUploadCliendConfig !== undefined) {
+        if (this.endpoints.setFileUploadClientConfig !== undefined) {
           this.endpoints.setFileUploadCliendConfig(config)
         }
       },
