@@ -52,6 +52,9 @@ class MarkdownMixin:
               For a list of all supported codes,
               see https://share.streamlit.io/streamlit/emoji-shortcodes.
 
+            * Streamlit logo shortcode. Use ``:streamlit:`` to add a little
+              Streamlit flair to your text.
+
             * A limited set of typographical symbols. ``"<- -> <-> -- >= <= ~="``
               becomes "← → ↔ — ≥ ≤ ≈" when parsed as Markdown.
 
