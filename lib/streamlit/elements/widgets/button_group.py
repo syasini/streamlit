@@ -440,7 +440,7 @@ class ButtonGroupMixin:
         r"""Display a pills widget.
 
         A pills widget is similar to a ``st.selectbox`` or ``st.multiselect``
-        where the ``options`` are displayed as pills-buttons instead of a
+        where the ``options`` are displayed as pill-buttons instead of a
         drop-down list.
 
         Parameters
@@ -641,7 +641,7 @@ class ButtonGroupMixin:
         r"""Display a segmented control widget.
 
         A segmented control widget is a linear set of segments where each of
-        the passed ``options`` functions as a toggle.
+        the passed ``options`` functions like a toggle button.
 
         Parameters
         ----------
