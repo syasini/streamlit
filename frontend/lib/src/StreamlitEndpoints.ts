@@ -111,5 +111,5 @@ export interface StreamlitEndpoints {
   /**
    * setFileUploadCliendConfig.
    */
-  setFileUploadCliendConfig?(config: FileUploadClientConfig): void
+  setFileUploadClientConfig?(config: FileUploadClientConfig): void
 }
