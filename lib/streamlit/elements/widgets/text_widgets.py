@@ -177,7 +177,9 @@ class TextWidgetsMixin:
             masks the user's typed value). Defaults to "default".
 
         help : str
-            An optional tooltip that gets displayed next to the input.
+            An optional tooltip that gets displayed next to the widget label.
+            Streamlit only displays the tooltip when
+            ``label_visibility="visible"``.
 
         autocomplete : str
             An optional value that will be passed to the <input> element's
@@ -450,7 +452,9 @@ class TextWidgetsMixin:
             based on its content. No two widgets may have the same key.
 
         help : str
-            An optional tooltip that gets displayed next to the textarea.
+            An optional tooltip that gets displayed next to the widget label.
+            Streamlit only displays the tooltip when
+            ``label_visibility="visible"``.
 
         on_change : callable
             An optional callback invoked when this text_area's value changes.

@@ -103,6 +103,8 @@ class MetricMixin:
 
         help : str
             An optional tooltip that gets displayed next to the metric label.
+            Streamlit only displays the tooltip when
+            ``label_visibility="visible"``.
 
         label_visibility : "visible", "hidden", or "collapsed"
             The visibility of the label. The default is ``"visible"``. If this

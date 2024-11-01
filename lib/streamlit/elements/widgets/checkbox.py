@@ -106,7 +106,9 @@ class CheckboxMixin:
             based on its content. No two widgets may have the same key.
 
         help : str
-            An optional tooltip that gets displayed next to the checkbox.
+            An optional tooltip that gets displayed next to the widget label.
+            Streamlit only displays the tooltip when
+            ``label_visibility="visible"``.
 
         on_change : callable
             An optional callback invoked when this checkbox's value changes.
@@ -211,7 +213,9 @@ class CheckboxMixin:
             based on its content. No two widgets may have the same key.
 
         help : str
-            An optional tooltip that gets displayed next to the toggle.
+            An optional tooltip that gets displayed next to the widget label.
+            Streamlit only displays the tooltip when
+            ``label_visibility="visible"``.
 
         on_change : callable
             An optional callback invoked when this toggle's value changes.
