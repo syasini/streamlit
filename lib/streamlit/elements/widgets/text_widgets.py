@@ -139,8 +139,9 @@ class TextWidgetsMixin:
         label : str
             A short label explaining to the user what this input is for.
             The label can optionally contain GitHub-flavored Markdown of the
-            following types: Bold, Italics, Strikethroughs, Inline Code, and
-            Links.
+            following types: Bold, Italics, Strikethroughs, Inline Code, Links,
+            and Images. Images display like icons, with a max height equal to
+            the font height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal
@@ -150,9 +151,9 @@ class TextWidgetsMixin:
             See the ``body`` parameter of |st.markdown|_ for additional,
             supported Markdown directives.
 
-            For accessibility reasons, you should never set an empty label (label="")
-            but hide it with label_visibility if needed. In the future, we may disallow
-            empty labels by raising an exception.
+            For accessibility reasons, you should never set an empty label, but
+            you can hide it with ``label_visibility`` if needed. In the future,
+            we may disallow empty labels by raising an exception.
 
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
@@ -410,8 +411,9 @@ class TextWidgetsMixin:
         label : str
             A short label explaining to the user what this input is for.
             The label can optionally contain GitHub-flavored Markdown of the
-            following types: Bold, Italics, Strikethroughs, Inline Code, and
-            Links.
+            following types: Bold, Italics, Strikethroughs, Inline Code, Links,
+            and Images. Images display like icons, with a max height equal to
+            the font height.
 
             Unsupported Markdown elements are unwrapped so only their children
             (text contents) render. Display unsupported elements as literal
@@ -421,13 +423,12 @@ class TextWidgetsMixin:
             See the ``body`` parameter of |st.markdown|_ for additional,
             supported Markdown directives.
 
-            For accessibility reasons, you should never set an empty label (label="")
-            but hide it with label_visibility if needed. In the future, we may disallow
-            empty labels by raising an exception.
+            For accessibility reasons, you should never set an empty label, but
+            you can hide it with ``label_visibility`` if needed. In the future,
+            we may disallow empty labels by raising an exception.
 
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
-
 
         value : object or None
             The text value of this widget when it first renders. This will be
@@ -435,8 +436,10 @@ class TextWidgetsMixin:
             return ``None`` until the user provides input. Defaults to empty string.
 
         height : int or None
-            Desired height of the UI element expressed in pixels. If None, a
-            default height is used. Height must be at least 68 pixels (4.25rem).
+            Desired height of the UI element expressed in pixels. If this is
+            ``None`` (default), the widget height fits three lines. The height
+            must be at least 68 pixels, which fits two lines. For any value of
+            ``height``, the user can resize the widget within their session.
 
         max_chars : int or None
             Maximum number of characters allowed in text area.
