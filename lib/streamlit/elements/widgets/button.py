@@ -160,8 +160,8 @@ class ButtonMixin:
               font library.
 
         disabled : bool
-            An optional boolean, which disables the button if set to True. The
-            default is False.
+            An optional boolean that disables the button if set to ``True``.
+            The default is ``False``.
 
         use_container_width : bool
             Whether to expand the button's width to fill its parent container.
@@ -342,8 +342,8 @@ class ButtonMixin:
               font library.
 
         disabled : bool
-            An optional boolean, which disables the download button if set to
-            True. The default is False.
+            An optional boolean that disables the download button if set to
+            ``True``. The default is ``False``.
 
         use_container_width : bool
             Whether to expand the button's width to fill its parent container.
@@ -504,8 +504,8 @@ class ButtonMixin:
               font library.
 
         disabled : bool
-            An optional boolean, which disables the link button if set to
-            True. The default is False.
+            An optional boolean that disables the link button if set to
+            ``True``. The default is ``False``.
 
         use_container_width : bool
             Whether to expand the button's width to fill its parent container.
@@ -612,8 +612,8 @@ class ButtonMixin:
             hovered over.
 
         disabled : bool
-            An optional boolean, which disables the page link if set to
-            ``True``. The default is ``False``.
+            An optional boolean that disables the page link if set to ``True``.
+            The default is ``False``.
 
         use_container_width : bool
             Whether to expand the link's width to fill its parent container.

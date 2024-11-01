@@ -300,9 +300,8 @@ class ButtonGroupMixin:
             based on its content. No two widgets may have the same key.
 
         disabled : bool
-            An optional boolean, which disables the feedback widget if set
-            to True. The default is False. This argument can only be supplied
-            by keyword.
+            An optional boolean that disables the feedback widget if set
+            to ``True``. The default is ``False``.
 
         on_change : callable
             An optional callback invoked when this feedback widget's value
@@ -440,12 +439,13 @@ class ButtonGroupMixin:
     ) -> list[V] | V | None:
         r"""Display a pills widget.
 
-        A pills widget is similar to a single- or multiselect widget where the
-        ``options`` are displayed as pills-buttons.
+        A pills widget is similar to a ``st.selectbox`` or ``st.multiselect``
+        where the ``options`` are displayed as pills-buttons instead of a
+        drop-down list.
 
         Parameters
         ----------
-        label : str
+        label: str
             A short label explaining to the user what this widget is for.
             The label can optionally contain GitHub-flavored Markdown of the
             following types: Bold, Italics, Strikethroughs, Inline Code, Links,
@@ -467,99 +467,107 @@ class ButtonGroupMixin:
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
 
-        selection_mode: "single" or "multi"
-            The selection mode for the widget. If "single", only one option can be
-            selected. If "multi", multiple options can be selected.
-
         options: Iterable of V
             Labels for the select options in an ``Iterable``. This can be a
             ``list``, ``set``, or anything supported by ``st.dataframe``. If
             ``options`` is dataframe-like, the first column will be used. Each
             label will be cast to ``str`` internally by default.
 
-        default: Iterable of V, V, or None
-            List of default value or a single value. If the ``selection_mode``
-            is "single", only a single value is allowed to be passed.
+        selection_mode: "single" or "multi"
+            The selection mode for the widget. If this is ``"single"``
+            (default), only one option can be selected. If this is ``"multi"``,
+            multiple options can be selected.
 
-        format_func : function
+        default: Iterable of V, V, or None
+            The value of the widget when it first renders. If the
+            ``selection_mode`` is ``multi``, this can be a list of values, a
+            single value, or ``None``. If the ``selection_mode`` is
+            ``"single"``, this can be a single value or ``None``.
+
+        format_func: function
             Function to modify the display of the options. It receives
             the raw option as an argument and should output the label to be
             shown for that option. This has no impact on the return value of
             the command.
 
-        key : str or int
+        key: str or int
             An optional string or integer to use as the unique key for the widget.
             If this is omitted, a key will be generated for the widget
             based on its content. Multiple widgets of the same type may
             not share the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the multiselect.
+        help: str
+            An optional tooltip that gets displayed next to the widget.
 
-        on_change : callable
-            An optional callback invoked when this feedback widget's value
-            changes.
+        on_change: callable
+            An optional callback invoked when this widget's value changes.
 
-        args : tuple
+        args: tuple
             An optional tuple of args to pass to the callback.
 
-        kwargs : dict
+        kwargs: dict
             An optional dict of kwargs to pass to the callback.
 
-        disabled : bool
-            An optional boolean, which disables the widget if set
-            to True. The default is False. This argument can only be supplied
-            by keyword.
+        disabled: bool
+            An optional boolean that disables the widget if set to ``True``.
+            The default is ``False``.
 
-        label_visibility : "visible", "hidden", or "collapsed"
-            The visibility of the label. If "hidden", the label doesn't show but there
-            is still empty space for it above the widget (equivalent to label="").
-            If "collapsed", both the label and the space are removed. Default is
-            "visible".
+        label_visibility: "visible", "hidden", or "collapsed"
+            The visibility of the label. The default is ``"visible"``. If this
+            is ``"hidden"``, Streamlit displays an empty spacer instead of the
+            label, which can help keep the widget alligned with other widgets.
+            If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
         Returns
         -------
-        list of V or V or None
-            A list of selected options or an empty list if the ``selection_mode`` is
-            "multi".
-            If the "selection_mode" is "single", the return value is the selected option
-            or None.
+        list of V, V, or None
+            If the ``selection_mode`` is ``multi``, this is a list of selected
+            options or an empty list. If the ``selection_mode`` is
+            ``"single"``, this is a selected option or ``None``.
 
         Examples
         --------
-        Display a pills widget with multi select, and show the option:
+
+        **Example 1: Multi-select pills**
+
+        Display a multi-select pills widget, and show the selection:
 
         >>> import streamlit as st
         >>>
-        >>> options = ["one", "two", "three", "four", "five"]
-        >>> selection = st.pills(label="Numbered pills",
-                                options, selection_mode="multi")
-        >>> st.markdown(f"You selected option: '{selection}'.")
+        >>> options = ["North", "East", "South", "West"]
+        >>> selection = st.pills("Directions", options, selection_mode="multi")
+        >>> st.markdown(f"Your selected options: {selection}.")
 
-        .. output ::
-            TBD
+        .. output::
+           https://doc-pills-multi.streamlit.app/
+           height: 200px
 
+        **Example 2: Single-select pills with icons**
 
-        Display a pills widget that renders icons-only:
+        Display a single-select pills widget with icons:
 
         >>> import streamlit as st
         >>>
-        >>> option_to_icon_map = {
-        >>>     0: ":material/add:",
-        >>>     1: ":material/zoom_in:",
-        >>>     2: ":material/zoom_out:",
-        >>>     3: ":material/zoom_out_map:",
-        >>> }
+        >>> option_map = {
+        ...     0: ":material/add:",
+        ...     1: ":material/zoom_in:",
+        ...     2: ":material/zoom_out:",
+        ...     3: ":material/zoom_out_map:",
+        ... }
         >>> selection = st.pills(
-        >>>     "Icon-only pills",
-        >>>     options=option_to_icon_map.keys(),
-        >>>     format_func=lambda option: option_to_icon_map[option],
-        >>>     selection_mode="single",
-        >>> )
-        >>> st.write(f"Single selection: {selection}")
+        ...     "Tool",
+        ...     options=option_map.keys(),
+        ...     format_func=lambda option: option_map[option],
+        ...     selection_mode="single",
+        ... )
+        >>> st.write(
+        ...     "Your selected option: "
+        ...     f"{None if selection is None else option_map[selection]}"
+        ... )
 
-        .. output ::
-            TBD
+        .. output::
+           https://doc-pills-single.streamlit.app/
+           height: 200px
 
         """
         return self._internal_button_group(
@@ -633,7 +641,7 @@ class ButtonGroupMixin:
         r"""Display a segmented control widget.
 
         A segmented control widget is a linear set of segments where each of
-        the passed ``options`` functions as a button.
+        the passed ``options`` functions as a toggle.
 
         Parameters
         ----------
@@ -659,99 +667,110 @@ class ButtonGroupMixin:
             .. |st.markdown| replace:: ``st.markdown``
             .. _st.markdown: https://docs.streamlit.io/develop/api-reference/text/st.markdown
 
-        selection_mode: "single" or "multi"
-            The selection mode for the widget. If "single", only one option can be
-            selected. If "multi", multiple options can be selected.
-
         options: Iterable of V
             Labels for the select options in an ``Iterable``. This can be a
             ``list``, ``set``, or anything supported by ``st.dataframe``. If
             ``options`` is dataframe-like, the first column will be used. Each
             label will be cast to ``str`` internally by default.
 
-        default: Iterable of V, V, or None
-            List of default value or a single value. If the ``selection_mode``
-            is "single", only a single value is allowed to be passed.
+        selection_mode: "single" or "multi"
+            The selection mode for the widget. If this is ``"single"``
+            (default), only one option can be selected. If this is ``"multi"``,
+            multiple options can be selected.
 
-        format_func : function
+        default: Iterable of V, V, or None
+            The value of the widget when it first renders. If the
+            ``selection_mode`` is ``multi``, this can be a list of values, a
+            single value, or ``None``. If the ``selection_mode`` is
+            ``"single"``, this can be a single value or ``None``.
+
+        format_func: function
             Function to modify the display of the options. It receives
             the raw option as an argument and should output the label to be
             shown for that option. This has no impact on the return value of
             the command.
 
-        key : str or int
+        key: str or int
             An optional string or integer to use as the unique key for the widget.
             If this is omitted, a key will be generated for the widget
             based on its content. Multiple widgets of the same type may
             not share the same key.
 
-        help : str
-            An optional tooltip that gets displayed next to the multiselect.
+        help: str
+            An optional tooltip that gets displayed next to the widget.
 
-        on_change : callable
-            An optional callback invoked when this feedback widget's value
-            changes.
+        on_change: callable
+            An optional callback invoked when this widget's value changes.
 
-        args : tuple
+        args: tuple
             An optional tuple of args to pass to the callback.
 
-        kwargs : dict
+        kwargs: dict
             An optional dict of kwargs to pass to the callback.
 
-        disabled : bool
-            An optional boolean, which disables the widget if set
-            to True. The default is False. This argument can only be supplied
-            by keyword.
+        disabled: bool
+            An optional boolean that disables the widget if set to ``True``.
+            The default is ``False``.
 
-        label_visibility : "visible", "hidden", or "collapsed"
-            The visibility of the label. If "hidden", the label doesn't show but there
-            is still empty space for it above the widget (equivalent to label="").
-            If "collapsed", both the label and the space are removed. Default is
-            "visible".
+        label_visibility: "visible", "hidden", or "collapsed"
+            The visibility of the label. The default is ``"visible"``. If this
+            is ``"hidden"``, Streamlit displays an empty spacer instead of the
+            label, which can help keep the widget alligned with other widgets.
+            If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
         Returns
         -------
-        list of V or V or None
-            A list of selected options or an empty list if the ``selection_mode`` is
-            "multi".
-            If the "selection_mode" is "single", the return value is the selected option
-            or None.
+        list of V, V, or None
+            If the ``selection_mode`` is ``multi``, this is a list of selected
+            options or an empty list. If the ``selection_mode`` is
+            ``"single"``, this is a selected option or ``None``.
 
         Examples
         --------
-        Display a segmented control widget with multi select, and show the option:
+
+        **Example 1: Multi-select segmented control**
+
+        Display a multi-select segmented control widget, and show the
+        selection:
 
         >>> import streamlit as st
         >>>
         >>> options = ["North", "East", "South", "West"]
-        >>> selection = st.segmented_control(label="Directions",
-                                options, selection_mode="multi")
-        >>> st.markdown(f"You selected options: '{selection}'.")
+        >>> selection = st.segmented_control(
+        ...     "Directions", options, selection_mode="multi"
+        ... )
+        >>> st.markdown(f"Your selected options: {selection}.")
 
-        .. output ::
-            TBD
+        .. output::
+           https://doc-segmented-control-multi.streamlit.app/
+           height: 200px
 
+        **Example 2: Single-select segmented control with icons**
 
-        Display a segmented control widget that renders icons-only:
+        Display a single-select segmented control widget with icons:
 
         >>> import streamlit as st
         >>>
-        >>> option_to_icon_map = {
-        >>>     0: ":material/add:",
-        >>>     1: ":material/zoom_in:",
-        >>>     2: ":material/zoom_out:",
-        >>>     3: ":material/zoom_out_map:",
-        >>> }
+        >>> option_map = {
+        ...     0: ":material/add:",
+        ...     1: ":material/zoom_in:",
+        ...     2: ":material/zoom_out:",
+        ...     3: ":material/zoom_out_map:",
+        ... }
         >>> selection = st.segmented_control(
-        >>>     "Icon-only segmented control",
-        >>>     options=option_to_icon_map.keys(),
-        >>>     format_func=lambda option: option_to_icon_map[option],
-        >>>     selection_mode="single",
-        >>> )
-        >>> st.write(f"Single selection: {selection}")
+        ...     "Tool",
+        ...     options=option_map.keys(),
+        ...     format_func=lambda option: option_map[option],
+        ...     selection_mode="single",
+        ... )
+        >>> st.write(
+        ...     "Your selected option: "
+        ...     f"{None if selection is None else option_map[selection]}"
+        ... )
 
-        .. output ::
-            TBD
+        .. output::
+           https://doc-segmented-control-single.streamlit.app/
+           height: 200px
 
         """
         return self._internal_button_group(

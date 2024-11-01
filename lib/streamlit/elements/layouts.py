@@ -635,8 +635,8 @@ class LayoutsMixin:
               font library.
 
         disabled : bool
-            An optional boolean, which disables the popover button if set to
-            True. The default is False.
+            An optional boolean that disables the popover button if set to
+            ``True``. The default is ``False``.
 
         use_container_width : bool
             Whether to expand the button's width to fill its parent container.

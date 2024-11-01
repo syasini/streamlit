@@ -165,8 +165,10 @@ class SelectboxMixin:
             Defaults to 0 (the first option).
 
         format_func : function
-            Function to modify the display of the labels. It receives the option
-            as an argument and its output will be cast to str.
+            Function to modify the display of the options. It receives
+            the raw option as an argument and should output the label to be
+            shown for that option. This has no impact on the return value of
+            the command.
 
         key : str or int
             An optional string or integer to use as the unique key for the widget.
@@ -190,14 +192,14 @@ class SelectboxMixin:
             Defaults to "Choose an option".
 
         disabled : bool
-            An optional boolean, which disables the selectbox if set to True.
-            The default is False.
+            An optional boolean that disables the selectbox if set to ``True``.
+            The default is ``False``.
 
         label_visibility : "visible", "hidden", or "collapsed"
-            The visibility of the label. If "hidden", the label doesn't show but there
-            is still empty space for it above the widget (equivalent to label="").
-            If "collapsed", both the label and the space are removed. Default is
-            "visible".
+            The visibility of the label. The default is ``"visible"``. If this
+            is ``"hidden"``, Streamlit displays an empty spacer instead of the
+            label, which can help keep the widget alligned with other widgets.
+            If this is ``"collapsed"``, Streamlit displays no label or spacer.
 
         Returns
         -------
