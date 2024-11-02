@@ -439,9 +439,8 @@ class TextWidgetsMixin:
 
         height : int or None
             Desired height of the UI element expressed in pixels. If this is
-            ``None`` (default), the widget height fits three lines. The height
-            must be at least 68 pixels, which fits two lines. For any value of
-            ``height``, the user can resize the widget within their session.
+            ``None`` (default), the widget's initial height fits three lines.
+            The height must be at least 68 pixels, which fits two lines.
 
         max_chars : int or None
             Maximum number of characters allowed in text area.
