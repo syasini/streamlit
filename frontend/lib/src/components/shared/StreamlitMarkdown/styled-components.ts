@@ -43,32 +43,38 @@ function getMarkdownHeadingDefinitions(theme: Theme): any {
   return {
     "h1, h2, h3, h4, h5, h6": {
       fontFamily: theme.genericFonts.headingFont,
-      lineHeight: theme.lineHeights.tight,
+      lineHeight: theme.lineHeights.headings,
       margin: 0,
     },
     h1: {
+      fontSize: theme.fontSizes.fourXL,
       fontWeight: theme.fontWeights.extrabold,
       padding: `${theme.spacing.xl} 0 ${theme.spacing.lg} 0`,
+    },
+    "h2, h3": {
+      letterSpacing: "-0.005em",
     },
     "h2, h3, h4, h5, h6": {
       fontWeight: theme.fontWeights.bold,
     },
-    "h3, h4, h5, h6": {
-      letterSpacing: "-0.005em",
-    },
     h2: {
+      fontSize: theme.fontSizes.threeXL,
       padding: `${theme.spacing.lg} 0 ${theme.spacing.lg} 0`,
     },
     h3: {
+      fontSize: theme.fontSizes.twoXL,
       padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
     },
     h4: {
+      fontSize: theme.fontSizes.xl,
       padding: `${theme.spacing.md} 0 ${theme.spacing.lg} 0`,
     },
     h5: {
+      fontSize: theme.fontSizes.lg,
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
     h6: {
+      fontSize: theme.fontSizes.md,
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
   }
@@ -241,6 +247,7 @@ export const StyledHeadingWithActionElements = styled.div(({ theme }) => ({
     scrollMarginTop: theme.sizes.headerHeight,
   },
   ...sharedMarkdownStyle(theme),
+  // ...getMarkdownHeadingDefinitions(theme),
 
   // break-word & pretty makes most headings break in a nicer way than break-all while still
   // preventing overflowing of the container to the side. Long headings without whitespaces or hyphens might still look weird
