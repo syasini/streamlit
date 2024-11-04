@@ -81,6 +81,14 @@ export const StyledStreamlitMarkdown =
           fontWeight: theme.fontWeights.bold,
         },
 
+        ul: {
+          margin: "0 0 1em 0",
+          padding: 0,
+          ul: {
+            marginBottom: 0,
+          },
+        },
+
         li: {
           // TODO(lukasmasuch): We might want to refactor
           // these settings to use our spacing props instead.
