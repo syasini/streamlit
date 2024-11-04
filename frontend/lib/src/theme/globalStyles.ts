@@ -156,6 +156,14 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     line-height: 1.2;
   }
 
+  // Strong
+  //
+  // Add the correct font weight in Chrome, Edge, and Safari
+  b,
+  strong {
+    font-weight: ${theme.fontWeights.bold};
+  }
+
   // Override h1 font weight to default weight
   h1 b,
   h1 strong {
