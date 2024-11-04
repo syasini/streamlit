@@ -19,7 +19,7 @@ import styled from "@emotion/styled"
 
 export interface StyledStreamlitMarkdownProps {
   isCaption: boolean
-  isInSidebar: boolean
+  isInSidebarOrDialog: boolean
   isLabel?: boolean
   boldLabel?: boolean
   largerLabel?: boolean
@@ -39,42 +39,53 @@ function sharedMarkdownStyle(theme: Theme): any {
   }
 }
 
-function getMarkdownHeadingDefinitions(theme: Theme): any {
+function getMarkdownHeadingDefinitions(
+  theme: Theme,
+  useSmallerHeadings: boolean
+): any {
   return {
     "h1, h2, h3, h4, h5, h6": {
       fontFamily: theme.genericFonts.headingFont,
+      fontWeight: theme.fontWeights.bold,
       lineHeight: theme.lineHeights.headings,
       margin: 0,
     },
     h1: {
-      fontSize: theme.fontSizes.fourXL,
-      fontWeight: theme.fontWeights.extrabold,
+      fontSize: useSmallerHeadings
+        ? theme.fontSizes.xl
+        : theme.fontSizes.fourXL,
+      fontWeight: useSmallerHeadings
+        ? theme.fontWeights.bold
+        : theme.fontWeights.extrabold,
       padding: `${theme.spacing.xl} 0 ${theme.spacing.lg} 0`,
     },
     "h2, h3": {
       letterSpacing: "-0.005em",
     },
-    "h2, h3, h4, h5, h6": {
-      fontWeight: theme.fontWeights.bold,
-    },
     h2: {
-      fontSize: theme.fontSizes.threeXL,
+      fontSize: useSmallerHeadings
+        ? theme.fontSizes.lg
+        : theme.fontSizes.threeXL,
       padding: `${theme.spacing.lg} 0 ${theme.spacing.lg} 0`,
     },
     h3: {
-      fontSize: theme.fontSizes.twoXL,
+      fontSize: useSmallerHeadings
+        ? theme.fontSizes.mdLg
+        : theme.fontSizes.twoXL,
       padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
     },
     h4: {
-      fontSize: theme.fontSizes.xl,
+      fontSize: useSmallerHeadings ? theme.fontSizes.md : theme.fontSizes.xl,
       padding: `${theme.spacing.md} 0 ${theme.spacing.lg} 0`,
     },
     h5: {
-      fontSize: theme.fontSizes.lg,
+      fontSize: useSmallerHeadings ? theme.fontSizes.sm : theme.fontSizes.lg,
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
     h6: {
-      fontSize: theme.fontSizes.md,
+      fontSize: useSmallerHeadings
+        ? theme.fontSizes.twoSm
+        : theme.fontSizes.md,
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
   }
@@ -85,7 +96,7 @@ export const StyledStreamlitMarkdown =
     ({
       theme,
       isCaption,
-      isInSidebar,
+      isInSidebarOrDialog,
       isLabel,
       boldLabel,
       largerLabel,
@@ -98,7 +109,7 @@ export const StyledStreamlitMarkdown =
         fontFamily: theme.genericFonts.bodyFont,
         marginBottom: isLabel ? "" : `-${theme.spacing.lg}`,
         ...sharedMarkdownStyle(theme),
-        ...getMarkdownHeadingDefinitions(theme),
+        ...getMarkdownHeadingDefinitions(theme, isInSidebarOrDialog),
 
         p: {
           wordBreak: "break-word",
@@ -183,7 +194,7 @@ export const StyledStreamlitMarkdown =
 
         ...(isCaption
           ? {
-              color: isInSidebar
+              color: isInSidebarOrDialog
                 ? theme.colors.gray
                 : theme.colors.fadedText60,
               fontSize: theme.fontSizes.sm,
@@ -198,17 +209,17 @@ export const StyledStreamlitMarkdown =
               // sizes taken from default styles, but using em instead of rem, so it
               // inherits the <small>'s shrunk size
               h1: {
-                fontSize: isInSidebar
+                fontSize: isInSidebarOrDialog
                   ? convertRemToEm(theme.fontSizes.xl)
                   : convertRemToEm(theme.fontSizes.threeXL),
               },
               h2: {
-                fontSize: isInSidebar
+                fontSize: isInSidebarOrDialog
                   ? convertRemToEm(theme.fontSizes.lg)
                   : convertRemToEm(theme.fontSizes.twoXL),
               },
               h3: {
-                fontSize: isInSidebar
+                fontSize: isInSidebarOrDialog
                   ? convertRemToEm(theme.fontSizes.mdLg)
                   : convertRemToEm(theme.fontSizes.lg),
               },
