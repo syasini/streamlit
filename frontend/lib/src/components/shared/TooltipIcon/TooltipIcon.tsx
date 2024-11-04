@@ -44,7 +44,7 @@ export interface TooltipIconProps {
 
 function TooltipIcon({
   placement = Placement.AUTO,
-  iconSize = "16",
+  iconSize = "1rem",
   isLatex = false,
   content,
   children,
