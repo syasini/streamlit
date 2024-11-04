@@ -69,6 +69,7 @@ export const StyledPre = styled.pre(({ theme }) => ({
   borderRadius: theme.radii.default,
   color: theme.colors.bodyText,
   fontSize: theme.fontSizes.twoSm,
+  fontFamily: theme.genericFonts.codeFont,
   display: "block",
   // Remove browser default top margin
   margin: 0,
