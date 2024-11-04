@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import threading
+from unittest.mock import MagicMock, patch
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
@@ -28,6 +29,15 @@ from streamlit.runtime.scriptrunner import (
 )
 from streamlit.runtime.state import SafeSessionState, SessionState
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
+
+SECRETS_MOCK = {
+    "redirect_uri": "http://localhost:8501/oauth2callback",
+    "google": {
+        "client_id": "CLIENT_ID",
+        "client_secret": "CLIENT_SECRET",
+        "server_metadata_url": "https://accounts.google.com/.well-known/openid-configuration",
+    },
+}
 
 
 class UserInfoProxyTest(DeltaGeneratorTestCase):
@@ -118,3 +128,30 @@ class UserInfoProxyTest(DeltaGeneratorTestCase):
             raise e
         finally:
             add_script_run_ctx(threading.current_thread(), orig_report_ctx)
+
+
+@patch(
+    "streamlit.user_info.secrets_singleton",
+    MagicMock(
+        load_if_toml_exists=MagicMock(return_value=True),
+        get=MagicMock(return_value=SECRETS_MOCK),
+    ),
+)
+class UserInfoAuthTest(DeltaGeneratorTestCase):
+    """Test UserInfoProxy Auth functionality."""
+
+    def test_user_login(self):
+        """Test that st.experimental_user.login sends correct proto message."""
+        st.experimental_user.login("google")
+
+        c = self.get_message_from_queue().auth_redirect
+
+        assert c.url.startswith("/auth/login?provider=")
+
+    def test_user_logout(self):
+        """Test that st.experimental_user.login sends correct proto message."""
+        st.experimental_user.logout()
+
+        c = self.get_message_from_queue().auth_redirect
+
+        assert c.url.startswith("/auth/logout")
