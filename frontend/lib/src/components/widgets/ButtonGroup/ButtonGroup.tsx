@@ -123,7 +123,13 @@ export function getContentElement(
     element: (
       <>
         {icon && <DynamicIcon size={iconSize} iconValue={icon} />}
-        {content && <StreamlitMarkdown source={content} allowHTML={false} />}
+        {content && (
+          <StreamlitMarkdown
+            isLabel={true}
+            source={content}
+            allowHTML={false}
+          />
+        )}
       </>
     ),
     kind: kind,
