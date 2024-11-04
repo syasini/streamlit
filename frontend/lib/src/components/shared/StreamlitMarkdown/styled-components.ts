@@ -61,6 +61,9 @@ export const StyledStreamlitMarkdown =
         p: {
           wordBreak: "break-word",
           marginBottom: isLabel ? theme.spacing.none : "",
+          marginTop: theme.spacing.none,
+          marginLeft: theme.spacing.none,
+          marginRight: theme.spacing.none,
           fontWeight: boldLabel ? theme.fontWeights.bold : "",
           ...(labelFontSize ? { fontSize: theme.fontSizes.sm } : {}),
         },

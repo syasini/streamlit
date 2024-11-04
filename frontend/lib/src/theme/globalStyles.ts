@@ -15,7 +15,7 @@
  */
 
 import { css, SerializedStyles } from "@emotion/react"
-import { darken, transparentize } from "color2k"
+import { transparentize } from "color2k"
 
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
@@ -40,10 +40,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     border: none;
     padding: 0;
     margin: 0;
-  }
-
-  .disabled {
-    color: ${theme.colors.disabled};
   }
 
   // Embedded Overflow Management
@@ -91,24 +87,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   [tabindex="-1"]:focus:not(:focus-visible) {
     outline: 0 !important;
-  }
-
-  // Content grouping
-  //
-  // 1. Reset Firefox's gray color
-  // 2. Set correct height and prevent the size attribute to make the hr look like an input field
-
-  hr {
-    margin: 2em 0;
-    padding: 0;
-    color: inherit; // 1
-    background-color: transparent;
-    border: none;
-    border-bottom: ${theme.sizes.borderWidth} solid ${theme.colors.borderColor};
-  }
-
-  hr:not([size]) {
-    height: 1px; // 2
   }
 
   h1 {
@@ -178,103 +156,10 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     line-height: 1.2;
   }
 
-  // Abbreviations
-  //
-  // 1. Duplicate behavior to the data-* attribute for our tooltip plugin
-  // 2. Add the correct text decoration in Chrome, Edge, Opera, and Safari.
-  // 3. Add explicit cursor to indicate changed behavior.
-  // 4. Prevent the text-decoration to be skipped.
-
-  abbr[title],
-  abbr[data-original-title] {
-    // 1
-    text-decoration: underline; // 2
-    text-decoration: underline dotted; // 2
-    cursor: help; // 3
-    text-decoration-skip-ink: none; // 4
-  }
-
-  // Address
-
-  address {
-    margin-bottom: 1rem;
-    font-style: normal;
-    line-height: inherit;
-  }
-
-  // Lists
-  // Reset margins on paragraphs
-  //
-  // Similarly, the top margin on <p>s get reset. However, we also reset the
-  // bottom margin to use rem units instead of em.
-  p,
-  ol,
-  ul,
-  dl {
-    margin: 0 0 1rem 0;
-    padding: 0;
-    font-size: 1rem;
-    font-weight: 400;
-  }
-
-  ol ol,
-  ul ul,
-  ol ul,
-  ul ol {
-    margin-bottom: 0;
-  }
-
-  dt {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 1em 0 0.2em 0;
-    padding: 0;
-  }
-
-  // 1. Undo browser default
-
-  dd {
-    margin: 0 0 0.2em 1.2em;
-    font-size: 1rem;
-  }
-
-  // Strong
-  //
-  // Add the correct font weight in Chrome, Edge, and Safari
-
-  b,
-  strong {
-    font-weight: ${theme.fontWeights.bold};
-  }
-
   // Override h1 font weight to default weight
   h1 b,
   h1 strong {
     font-weight: ${theme.fontWeights.extrabold};
-  }
-
-  // Small
-
-  small {
-    font-size: ${theme.fontSizes.sm};
-  }
-
-  // Mark
-
-  mark {
-    padding: 0.2em;
-    background-color: ${theme.colors.secondaryBg};
-  }
-
-  // Links
-
-  a {
-    color: ${theme.colors.primary};
-    text-decoration: underline;
-
-    &:hover {
-      color: ${darken(theme.colors.primary, 0.15)};
-    }
   }
 
   // And undo these styles for placeholder links/named anchors (without href).
@@ -288,87 +173,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
       color: inherit;
       text-decoration: none;
     }
-  }
-
-  // Code
-
-  pre,
-  code,
-  kbd {
-    font-size: 1em;
-    font-family: ${theme.genericFonts.codeFont};
-  }
-
-  kbd {
-    padding: 0.2rem 0.4rem;
-    color: ${theme.colors.codeTextColor};
-    background-color: ${theme.colors.codeHighlightColor};
-    font-size: ${theme.fontSizes.sm};
-    border-radius: ${theme.radii.md};
-
-    kbd {
-      padding: 0;
-      font-weight: ${theme.fontWeights.bold};
-      font-size: 1em;
-    }
-  }
-
-  // Images and content
-
-  img,
-  svg {
-    vertical-align: middle;
-  }
-
-  // Tables
-  //
-  // Prevent double borders
-
-  table {
-    caption-side: bottom;
-    border-collapse: collapse;
-  }
-
-  table caption {
-    padding-top: ${theme.spacing.sm};
-    padding-bottom: 0;
-    color: ${theme.colors.gray60};
-    text-align: left;
-  }
-
-  // 1. Matches default <td> alignment by inheriting text-align.
-  // 2. Fix alignment for Safari
-
-  th {
-    text-align: inherit; // 1
-    text-align: -webkit-match-parent; // 2
-  }
-
-  thead,
-  tbody,
-  tfoot,
-  tr,
-  td,
-  th {
-    border-color: inherit;
-    border-style: solid;
-    border-width: 0;
-  }
-
-  // Forms
-  //
-  // 1. Allow labels to use margin for spacing.
-
-  label {
-    display: inline-block; // 1
-  }
-
-  // Remove the default border-radius that macOS Chrome adds.
-  // See https://github.com/twbs/bootstrap/issues/24093
-
-  button {
-    // stylelint-disable-next-line property-blacklist
-    border-radius: 0;
   }
 
   // Work around a Firefox bug where the transparent button background
@@ -421,13 +225,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     }
   }
 
-  // Remove the inheritance of word-wrap in Safari.
-  // See https://github.com/twbs/bootstrap/issues/24990
-
-  select {
-    word-wrap: normal;
-  }
-
   // Remove the dropdown arrow in Chrome from inputs built with datalists.
   // See https://stackoverflow.com/a/54997118
 
@@ -460,40 +257,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     resize: vertical; // 1
   }
 
-  // 1. Browsers set a default min-width: min-content; on fieldsets,
-  //    unlike e.g. <div>s, which have min-width: 0; by default.
-  //    So we reset that to ensure fieldsets behave more like a standard block element.
-  //    See https://github.com/twbs/bootstrap/issues/12359
-  //    and https://html.spec.whatwg.org/multipage/#the-fieldset-and-legend-elements
-  // 2. Reset the default outline behavior of fieldsets so they don't affect page layout.
-
-  fieldset {
-    min-width: 0; // 1
-    padding: 0; // 2
-    margin: 0; // 2
-    border: 0; // 2
-  }
-
-  // 1. By using float: left, the legend will behave like a block element.
-  //    This way the border of a fieldset wraps around the legend if present.
-  // 2. Correct the text wrapping in Edge.
-  // 3. Fix wrapping bug.
-  //    See https://github.com/twbs/bootstrap/issues/29712
-
-  legend {
-    float: left; // 1
-    width: 100%;
-    padding: 0;
-    margin-bottom: ${theme.spacing.sm};
-    font-size: inherit;
-    line-height: inherit;
-    white-space: normal; // 2
-
-    + * {
-      clear: left; // 3
-    }
-  }
-
   // Fix height of inputs with a type of datetime-local, date, month, week, or time
   // See https://github.com/twbs/bootstrap/issues/18842
 
@@ -509,17 +272,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   ::-webkit-inner-spin-button {
     height: auto;
-  }
-
-  // 1. Correct the outline style in Safari.
-  // 2. This overrides the extra rounded corners on search inputs in iOS so that our
-  //    .form-control class can properly style them. Note that this cannot simply
-  //    be added to .form-control as it's not specific enough. For details, see
-  //    https://github.com/twbs/bootstrap/issues/11586.
-
-  [type="search"] {
-    outline-offset: -2px; // 1
-    -webkit-appearance: textfield; // 2
   }
 
   // Remove the inner padding in Chrome and Safari on macOS.
@@ -540,21 +292,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   ::-webkit-file-upload-button {
     font: inherit; // 1
     -webkit-appearance: button; // 2
-  }
-
-  // Correct element displays
-
-  output {
-    display: inline-block;
-  }
-
-  // Summary
-  //
-  // 1. Add the correct display in all browsers
-
-  summary {
-    display: list-item; // 1
-    cursor: pointer;
   }
 
   // Hidden attribute
