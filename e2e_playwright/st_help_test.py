@@ -13,18 +13,33 @@
 # limitations under the License.
 
 
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
-from e2e_playwright.shared.app_utils import check_top_level_class
+from e2e_playwright.shared.app_utils import check_top_level_class, get_element_by_key
+
+
+def _get_keyed_help_element(app: Page, key: str) -> Locator:
+    """Get a help element in a keyed container."""
+    return get_element_by_key(app, key).get_by_test_id("stHelp").first
 
 
 def test_help_display(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that st.header renders correctly with dividers."""
     help_elements = app.get_by_test_id("stHelp")
-
-    for i, element in enumerate(help_elements.all()):
-        assert_snapshot(element, name=f"st_help-{i}")
+    expect(help_elements).to_have_count(3)
+    assert_snapshot(
+        _get_keyed_help_element(app, "help-no-docs"),
+        name="st_help-class_no_docs",
+    )
+    assert_snapshot(
+        _get_keyed_help_element(app, "help-globals"),
+        name="st_help-globals",
+    )
+    assert_snapshot(
+        _get_keyed_help_element(app, "help-long-docs"),
+        name="st_help-long_docs",
+    )
 
 
 def test_check_top_level_class(app: Page):
