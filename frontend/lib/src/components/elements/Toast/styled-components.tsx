@@ -21,6 +21,8 @@ export const StyledViewButton = styled.button(({ theme }) => ({
   lineHeight: theme.lineHeights.base,
   color: theme.colors.fadedText60,
   backgroundColor: theme.colors.transparent,
+  fontFamily: "inherit",
+  margin: 0,
   border: "none",
   boxShadow: "none",
   padding: theme.spacing.none,
