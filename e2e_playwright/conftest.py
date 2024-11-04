@@ -645,6 +645,14 @@ def assert_snapshot(
                 f"Expected size: {img_b.size}, actual size: {img_a.size}. "
                 f"Error: {ex}"
             )
+            print(
+                "Writing snapshot 1",
+                snapshot_updates_file_path,
+                sum(
+                    len(files)
+                    for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
+                ),
+            )
             return
         total_pixels = img_a.size[0] * img_a.size[1]
         max_diff_pixels = int(image_threshold * total_pixels)
@@ -656,8 +664,8 @@ def assert_snapshot(
         snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
         snapshot_updates_file_path.write_bytes(img_bytes)
         print(
-            "Writing snapshot",
-            snapshot_updates_file_path.parent,
+            "Writing snapshot 2",
+            snapshot_updates_file_path,
             sum(
                 len(files)
                 for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
