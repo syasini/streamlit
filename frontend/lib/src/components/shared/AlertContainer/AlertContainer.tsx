@@ -22,6 +22,7 @@ import { useTheme } from "@emotion/react"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 import { StyledAlertContent } from "./styled-components"
+import { te } from "date-fns/locale"
 
 export enum Kind {
   ERROR = "error",
@@ -91,6 +92,10 @@ export default function AlertContainer({
             borderBottomRightRadius: theme.radii.default,
             borderTopLeftRadius: theme.radii.default,
             borderBottomLeftRadius: theme.radii.default,
+            paddingTop: theme.spacing.lg,
+            paddingBottom: theme.spacing.lg,
+            paddingRight: theme.spacing.lg,
+            paddingLeft: theme.spacing.lg,
           },
           props: {
             "data-testid": "stAlertContainer",
