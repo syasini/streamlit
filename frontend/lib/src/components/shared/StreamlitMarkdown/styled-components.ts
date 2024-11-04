@@ -55,12 +55,12 @@ export const StyledStreamlitMarkdown =
       const labelFontSize = (isLabel && !largerLabel) || isToast
       return {
         fontFamily: theme.genericFonts.bodyFont,
-        marginBottom: isLabel ? "" : `-${theme.spacing.lg}`,
+        marginBottom: isLabel ? theme.spacing.none : "-1em",
         ...sharedMarkdownStyle(theme),
 
         p: {
           wordBreak: "break-word",
-          marginBottom: isLabel ? theme.spacing.none : "",
+          marginBottom: isLabel ? theme.spacing.none : "1em",
           marginTop: theme.spacing.none,
           marginLeft: theme.spacing.none,
           marginRight: theme.spacing.none,
@@ -104,9 +104,20 @@ export const StyledStreamlitMarkdown =
           borderLeft: `${theme.sizes.borderWidth} solid ${theme.colors.lightGray}`,
         },
 
+        hr: {
+          margin: "2em 0",
+          padding: 0,
+          color: "inherit",
+          backgroundColor: "transparent",
+          border: "none",
+          borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+        },
+
         table: {
           // Add some space below the markdown tables
           marginBottom: theme.spacing.lg,
+          // Prevent double borders
+          borderCollapse: "collapse",
         },
 
         tr: {
