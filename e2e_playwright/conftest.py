@@ -23,7 +23,6 @@ import hashlib
 import os
 import re
 import shlex
-import shutil
 import socket
 import subprocess
 import sys
@@ -606,9 +605,9 @@ def assert_snapshot(
         snapshot_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         test_failures_dir = module_snapshot_failures_dir / snapshot_file_name
-        if test_failures_dir.exists():
-            # Remove the past runs failure dir for this specific screenshot
-            shutil.rmtree(test_failures_dir)
+        # if test_failures_dir.exists():
+        #     # Remove the past runs failure dir for this specific screenshot
+        #     shutil.rmtree(test_failures_dir)
 
         if not snapshot_file_path.exists():
             snapshot_file_path.write_bytes(img_bytes)
@@ -656,6 +655,14 @@ def assert_snapshot(
         # Update this in updates folder:
         snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
         snapshot_updates_file_path.write_bytes(img_bytes)
+        print(
+            "Writing snapshot",
+            snapshot_updates_file_path.parent,
+            sum(
+                len(files)
+                for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
+            ),
+        )
 
         # Create new failures folder for this test:
         test_failures_dir.mkdir(parents=True, exist_ok=True)
@@ -667,6 +674,7 @@ def assert_snapshot(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
             f" {mismatch/total_pixels * 100:.2f}%)"
         )
+        return
 
     yield compare
 
