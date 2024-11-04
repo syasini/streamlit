@@ -395,6 +395,7 @@ export const StyledViewButton = styled.button(({ theme }) => {
 
   return {
     fontSize: theme.fontSizes.sm,
+    fontFamily: "inherit",
     lineHeight: theme.lineHeights.base,
     color,
     backgroundColor: theme.colors.transparent,
@@ -402,6 +403,8 @@ export const StyledViewButton = styled.button(({ theme }) => {
     borderRadius: theme.radii.default,
     marginTop: theme.spacing.twoXS,
     marginLeft: theme.spacing.xl,
+    marginBottom: theme.spacing.none,
+    marginRight: theme.spacing.none,
     padding: `${theme.spacing.threeXS} ${theme.spacing.sm}`,
     "&:hover, &:active, &:focus": {
       border: "none",
