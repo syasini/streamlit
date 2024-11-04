@@ -22,7 +22,6 @@ import { useTheme } from "@emotion/react"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 import { StyledAlertContent } from "./styled-components"
-import { te } from "date-fns/locale"
 
 export enum Kind {
   ERROR = "error",
