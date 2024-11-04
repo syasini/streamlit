@@ -68,13 +68,17 @@ export const StyledStreamlitMarkdown =
           ...(labelFontSize ? { fontSize: theme.fontSizes.sm } : {}),
         },
 
-        "img, svg": {
+        img: {
           // Images in markdown should never be wider
           // than the content area.
           maxWidth: "100%",
           // In labels, widgets should never be taller than the text.
           maxHeight: isLabel ? "1em" : undefined,
           verticalAlign: "middle",
+        },
+
+        "b, strong": {
+          fontWeight: theme.fontWeights.bold,
         },
 
         li: {
