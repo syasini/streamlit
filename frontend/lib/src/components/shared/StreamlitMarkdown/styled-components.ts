@@ -39,9 +39,30 @@ function sharedMarkdownStyle(theme: Theme): any {
   }
 }
 
+/**
+ * Caption sizes taken from default styles, but using em instead of rem, so it
+ * inherits the <small>'s shrunk size
+ *
+ */
+function convertFontSizes(
+  fontSize: string,
+  smallFontSize: string,
+  captionFontSize: string,
+  smallCaptionFontSize: string,
+  useSmallerHeadings: boolean,
+  isCaption: boolean
+): string {
+  if (useSmallerHeadings) {
+    return isCaption ? convertRemToEm(smallCaptionFontSize) : smallFontSize
+  }
+
+  return isCaption ? convertRemToEm(captionFontSize) : fontSize
+}
+
 function getMarkdownHeadingDefinitions(
   theme: Theme,
-  useSmallerHeadings: boolean
+  useSmallerHeadings: boolean,
+  isCaption: boolean
 ): any {
   return {
     "h1, h2, h3, h4, h5, h6": {
@@ -49,11 +70,17 @@ function getMarkdownHeadingDefinitions(
       fontWeight: theme.fontWeights.bold,
       lineHeight: theme.lineHeights.headings,
       margin: 0,
+      ...(isCaption && { color: "inherit" }),
     },
     h1: {
-      fontSize: useSmallerHeadings
-        ? theme.fontSizes.xl
-        : theme.fontSizes.fourXL,
+      fontSize: convertFontSizes(
+        theme.fontSizes.fourXL,
+        theme.fontSizes.xl,
+        theme.fontSizes.threeXL,
+        theme.fontSizes.xl,
+        useSmallerHeadings,
+        isCaption
+      ),
       fontWeight: useSmallerHeadings
         ? theme.fontWeights.bold
         : theme.fontWeights.extrabold,
@@ -63,29 +90,58 @@ function getMarkdownHeadingDefinitions(
       letterSpacing: "-0.005em",
     },
     h2: {
-      fontSize: useSmallerHeadings
-        ? theme.fontSizes.lg
-        : theme.fontSizes.threeXL,
+      fontSize: convertFontSizes(
+        theme.fontSizes.threeXL,
+        theme.fontSizes.lg,
+        theme.fontSizes.twoXL,
+        theme.fontSizes.lg,
+        useSmallerHeadings,
+        isCaption
+      ),
       padding: `${theme.spacing.lg} 0 ${theme.spacing.lg} 0`,
     },
     h3: {
-      fontSize: useSmallerHeadings
-        ? theme.fontSizes.mdLg
-        : theme.fontSizes.twoXL,
+      fontSize: convertFontSizes(
+        theme.fontSizes.twoXL,
+        theme.fontSizes.mdLg,
+        theme.fontSizes.lg,
+        theme.fontSizes.mdLg,
+        useSmallerHeadings,
+        isCaption
+      ),
       padding: `${theme.spacing.sm} 0 ${theme.spacing.lg} 0`,
     },
     h4: {
-      fontSize: useSmallerHeadings ? theme.fontSizes.md : theme.fontSizes.xl,
+      fontSize: convertFontSizes(
+        theme.fontSizes.xl,
+        theme.fontSizes.md,
+        theme.fontSizes.md,
+        theme.fontSizes.md,
+        useSmallerHeadings,
+        isCaption
+      ),
       padding: `${theme.spacing.md} 0 ${theme.spacing.lg} 0`,
     },
     h5: {
-      fontSize: useSmallerHeadings ? theme.fontSizes.sm : theme.fontSizes.lg,
+      fontSize: convertFontSizes(
+        theme.fontSizes.lg,
+        theme.fontSizes.sm,
+        theme.fontSizes.md,
+        theme.fontSizes.md,
+        useSmallerHeadings,
+        isCaption
+      ),
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
     h6: {
-      fontSize: useSmallerHeadings
-        ? theme.fontSizes.twoSm
-        : theme.fontSizes.md,
+      fontSize: convertFontSizes(
+        theme.fontSizes.md,
+        theme.fontSizes.twoSm,
+        theme.fontSizes.md,
+        theme.fontSizes.md,
+        useSmallerHeadings,
+        isCaption
+      ),
       padding: `0 0 ${theme.spacing.lg} 0`,
     },
   }
@@ -109,7 +165,11 @@ export const StyledStreamlitMarkdown =
         fontFamily: theme.genericFonts.bodyFont,
         marginBottom: isLabel ? "" : `-${theme.spacing.lg}`,
         ...sharedMarkdownStyle(theme),
-        ...getMarkdownHeadingDefinitions(theme, isInSidebarOrDialog),
+        ...getMarkdownHeadingDefinitions(
+          theme,
+          isInSidebarOrDialog,
+          isCaption
+        ),
 
         p: {
           wordBreak: "break-word",
@@ -201,34 +261,6 @@ export const StyledStreamlitMarkdown =
               "p, ol, ul, dl, li": {
                 fontSize: "inherit",
               },
-
-              "h1, h2, h3, h4, h5, h6": {
-                color: "inherit",
-              },
-
-              // sizes taken from default styles, but using em instead of rem, so it
-              // inherits the <small>'s shrunk size
-              h1: {
-                fontSize: isInSidebarOrDialog
-                  ? convertRemToEm(theme.fontSizes.xl)
-                  : convertRemToEm(theme.fontSizes.threeXL),
-              },
-              h2: {
-                fontSize: isInSidebarOrDialog
-                  ? convertRemToEm(theme.fontSizes.lg)
-                  : convertRemToEm(theme.fontSizes.twoXL),
-              },
-              h3: {
-                fontSize: isInSidebarOrDialog
-                  ? convertRemToEm(theme.fontSizes.mdLg)
-                  : convertRemToEm(theme.fontSizes.lg),
-              },
-
-              // these are normally shrunk further to 0.8rem, but since we're already
-              // inside a small, just make them 1em.
-              "h4, h5, h6": {
-                fontSize: convertRemToEm(theme.fontSizes.md),
-              },
             }
           : {}),
       }
@@ -258,7 +290,6 @@ export const StyledHeadingWithActionElements = styled.div(({ theme }) => ({
     scrollMarginTop: theme.sizes.headerHeight,
   },
   ...sharedMarkdownStyle(theme),
-  // ...getMarkdownHeadingDefinitions(theme),
 
   // break-word & pretty makes most headings break in a nicer way than break-all while still
   // preventing overflowing of the container to the side. Long headings without whitespaces or hyphens might still look weird
