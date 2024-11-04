@@ -648,6 +648,7 @@ def assert_snapshot(
             print(
                 "Writing snapshot 1",
                 snapshot_updates_file_path,
+                snapshot_updates_file_path.exists(),
                 sum(
                     len(files)
                     for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
@@ -666,6 +667,7 @@ def assert_snapshot(
         print(
             "Writing snapshot 2",
             snapshot_updates_file_path,
+            snapshot_updates_file_path.exists(),
             sum(
                 len(files)
                 for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
