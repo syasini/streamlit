@@ -175,42 +175,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     }
   }
 
-  // Work around a Firefox bug where the transparent button background
-  // results in a loss of the default button focus styles.
-  // Credit https://github.com/suitcss/base/
-
-  button:focus {
-    outline: 1px dotted;
-    outline: 5px auto -webkit-focus-ring-color;
-  }
-
-  // 1. Remove the margin in Firefox and Safari
-
-  input,
-  button,
-  select,
-  optgroup,
-  textarea {
-    margin: 0; // 1
-    font-family: inherit;
-    line-height: inherit;
-    font-size: inherit;
-  }
-
-  // Show the overflow in Edge
-
-  button,
-  input {
-    overflow: visible;
-  }
-
-  // Remove the inheritance of text transform in Firefox
-
-  button,
-  select {
-    text-transform: none;
-  }
-
   // Set the cursor for non-<button> buttons
   //
   // Details at https://github.com/twbs/bootstrap/pull/30562
@@ -223,13 +187,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     &:not(:disabled) {
       cursor: pointer;
     }
-  }
-
-  // Remove the dropdown arrow in Chrome from inputs built with datalists.
-  // See https://stackoverflow.com/a/54997118
-
-  [list]::-webkit-calendar-picker-indicator {
-    display: none;
   }
 
   // 1. Prevent a WebKit bug where (2) destroys native audio and video
@@ -249,49 +206,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   ::-moz-focus-inner {
     padding: 0;
     border-style: none;
-  }
-
-  // 1. Textareas should really only resize vertically so they don't break their (horizontal) containers.
-
-  textarea {
-    resize: vertical; // 1
-  }
-
-  // Fix height of inputs with a type of datetime-local, date, month, week, or time
-  // See https://github.com/twbs/bootstrap/issues/18842
-
-  ::-webkit-datetime-edit-fields-wrapper,
-  ::-webkit-datetime-edit-text,
-  ::-webkit-datetime-edit-minute,
-  ::-webkit-datetime-edit-hour-field,
-  ::-webkit-datetime-edit-day-field,
-  ::-webkit-datetime-edit-month-field,
-  ::-webkit-datetime-edit-year-field {
-    padding: 0;
-  }
-
-  ::-webkit-inner-spin-button {
-    height: auto;
-  }
-
-  // Remove the inner padding in Chrome and Safari on macOS.
-
-  ::-webkit-search-decoration {
-    -webkit-appearance: none;
-  }
-
-  // Remove padding around color pickers in webkit browsers
-
-  ::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
-
-  // 1. Change font properties to inherit in Safari.
-  // 2. Correct the inability to style clickable types in iOS and Safari.
-
-  ::-webkit-file-upload-button {
-    font: inherit; // 1
-    -webkit-appearance: button; // 2
   }
 
   // Hidden attribute
