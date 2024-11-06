@@ -84,7 +84,7 @@ requests-mock==1.12.1
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.9.4
-rpds-py==0.20.1
+rpds-py==0.21.0
 ruff==0.5.7
 seaborn==0.13.2
 SecretStorage==3.3.3
@@ -113,6 +113,6 @@ urllib3==2.2.3
 uv==0.4.30
 vega-datasets==0.9.0
 virtualenv==20.27.1
-watchdog==5.0.3
+watchdog==6.0.0
 wheel==0.44.0
 zipp==3.20.2
