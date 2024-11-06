@@ -129,6 +129,10 @@ export const StyledStreamlitMarkdown =
           border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
         },
 
+        th: {
+          textAlign: "inherit",
+        },
+
         "span.has-background-color": {
           padding: `${theme.spacing.threeXS} ${theme.spacing.twoXS}`,
           margin: theme.spacing.none,
