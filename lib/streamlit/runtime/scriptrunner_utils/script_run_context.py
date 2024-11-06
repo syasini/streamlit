@@ -148,7 +148,6 @@ class ScriptRunContext:
         self.tracked_commands = []
         self.tracked_commands_counter = collections.Counter()
         self.current_fragment_id = None
-        self.user_info = {}
         self.current_fragment_delta_path: list[int] = []
         self.fragment_ids_this_run = fragment_ids_this_run
         self.new_fragment_ids = set()
