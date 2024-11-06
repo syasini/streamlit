@@ -43,7 +43,7 @@ def encode_provider_token(provider: str) -> str:
         from authlib.jose import jwt  # type: ignore[import-untyped]
     except ImportError:
         raise StreamlitAPIException(
-            "To use Auth you need to install the 'authlib' package."
+            "To use Auth you need to install the 'Authlib' package."
         ) from None
 
     header = {"alg": "HS256"}
@@ -60,7 +60,7 @@ def decode_provider_token(provider_token: str):
         from authlib.jose import JoseError, JWTClaims, jwt
     except ImportError:
         raise StreamlitAPIException(
-            "To use Auth you need to install the 'authlib' package."
+            "To use Auth you need to install the 'Authlib' package."
         ) from None
 
     claim_options = {"exp": {"essential": True}, "provider": {"essential": True}}
