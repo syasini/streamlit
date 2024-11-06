@@ -302,6 +302,10 @@ describe("AppView element", () => {
   })
 
   it("does render the wide class when specified", () => {
+    // Set the viewport to a bigger width to trigger the wide mode setting
+    window.innerWidth = 1200
+    window.dispatchEvent(new Event("resize"))
+
     const realUseContext = React.useContext
     jest.spyOn(React, "useContext").mockImplementation(input => {
       if (input === AppContext) {
