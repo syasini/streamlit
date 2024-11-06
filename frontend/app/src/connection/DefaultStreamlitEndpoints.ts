@@ -138,17 +138,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     const form = new FormData()
     form.append(file.name, file)
 
-    let headers: Record<string, string> = {}
-    if (this.jwtHeader !== undefined) {
-      headers[this.jwtHeader.jwtHeaderName] = this.jwtHeader.jwtHeaderValue
-    }
-
-    if (this.fileUploadClientConfig) {
-      headers = {
-        ...headers,
-        ...this.fileUploadClientConfig.headers,
-      }
-    }
+    const headers: Record<string, string> = this.getAdditionalHeaders()
 
     return this.csrfRequest<number>(this.buildFileUploadURL(fileUploadUrl), {
       cancelToken,
@@ -160,13 +150,7 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
     }).then(() => undefined) // If the request succeeds, we don't care about the response body
   }
 
-  /**
-   * Send an HTTP DELETE request to the given URL.
-   */
-  public async deleteFileAtURL(
-    fileUrl: string,
-    sessionId: string
-  ): Promise<void> {
+  private getAdditionalHeaders(): Record<string, string> {
     let headers: Record<string, string> = {}
     if (this.jwtHeader !== undefined) {
       headers[this.jwtHeader.jwtHeaderName] = this.jwtHeader.jwtHeaderValue
@@ -178,6 +162,17 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
         ...this.fileUploadClientConfig.headers,
       }
     }
+    return headers
+  }
+
+  /**
+   * Send an HTTP DELETE request to the given URL.
+   */
+  public async deleteFileAtURL(
+    fileUrl: string,
+    sessionId: string
+  ): Promise<void> {
+    const headers: Record<string, string> = this.getAdditionalHeaders()
     return this.csrfRequest<number>(this.buildFileUploadURL(fileUrl), {
       method: "DELETE",
       data: { sessionId },
