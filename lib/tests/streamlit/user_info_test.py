@@ -14,8 +14,12 @@
 
 from __future__ import annotations
 
+import base64
+import json
 import threading
 from unittest.mock import MagicMock, patch
+
+from parameterized import parameterized
 
 import streamlit as st
 from streamlit.errors import StreamlitAPIException
@@ -36,6 +40,16 @@ SECRETS_MOCK = {
         "client_id": "CLIENT_ID",
         "client_secret": "CLIENT_SECRET",
         "server_metadata_url": "https://accounts.google.com/.well-known/openid-configuration",
+    },
+    "microsoft": {
+        "client_id": "CLIENT_ID",
+        "client_secret": "CLIENT_SECRET",
+        "server_metadata_url": "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+    },
+    "auth0": {
+        "client_id": "CLIENT_ID",
+        "client_secret": "CLIENT_SECRET",
+        "server_metadata_url": "https://YOUR_DOMAIN/.well-known/openid-configuration",
     },
 }
 
@@ -140,13 +154,43 @@ class UserInfoProxyTest(DeltaGeneratorTestCase):
 class UserInfoAuthTest(DeltaGeneratorTestCase):
     """Test UserInfoProxy Auth functionality."""
 
-    def test_user_login(self):
+    @parameterized.expand(["google", "microsoft", "auth0"])
+    def test_user_login(self, provider):
         """Test that st.experimental_user.login sends correct proto message."""
-        st.experimental_user.login("google")
+        st.experimental_user.login(provider)
 
         c = self.get_message_from_queue().auth_redirect
 
         assert c.url.startswith("/auth/login?provider=")
+
+        jwt_token = c.url.split("=")[1]
+        raw_payload = jwt_token.split(".")[1]
+        parsed_payload = json.loads(base64.b64decode(raw_payload + "==="))
+
+        assert parsed_payload["provider"] == provider
+
+    def test_user_login_with_invalid_provider(self):
+        """Test that st.experimental_user.login sends correct proto message."""
+        with self.assertRaises(StreamlitAPIException) as ex:
+            st.experimental_user.login("invalid_provider")
+
+        assert "Auth credentials are missing *'invalid_provider'*" in str(ex.exception)
+
+    def test_user_login_redirect_uri_missing(self):
+        with patch(
+            "streamlit.user_info.secrets_singleton",
+            MagicMock(
+                load_if_toml_exists=MagicMock(return_value=True),
+                get=MagicMock(return_value={"google": {}}),
+            ),
+        ):
+            with self.assertRaises(StreamlitAPIException) as ex:
+                st.experimental_user.login("google")
+
+            assert (
+                "Auth credentials are missing 'redirect_uri'. Please check your configuration."
+                in str(ex.exception)
+            )
 
     def test_user_logout(self):
         """Test that st.experimental_user.login sends correct proto message."""
