@@ -82,7 +82,7 @@ class AuthLoginHandler(tornado.web.RequestHandler):
             self.redirect("/")
             return
         client, redirect_uri = create_oauth_client(payload["provider"])
-        return client.authorize_redirect(self, redirect_uri)
+        client.authorize_redirect(self, redirect_uri)
 
 
 class AuthHandlerMixin(tornado.web.RequestHandler):
