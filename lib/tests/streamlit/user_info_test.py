@@ -192,6 +192,27 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 in str(ex.exception)
             )
 
+    def test_user_login_required_fields_missing(self):
+        with patch(
+            "streamlit.user_info.secrets_singleton",
+            MagicMock(
+                load_if_toml_exists=MagicMock(return_value=True),
+                get=MagicMock(
+                    return_value={
+                        "redirect_uri": "http://localhost:8501/oauth2callback",
+                        "google": {},
+                    }
+                ),
+            ),
+        ):
+            with self.assertRaises(StreamlitAPIException) as ex:
+                st.experimental_user.login("google")
+
+            assert (
+                "Auth credentials for 'google' are missing the following keys: ['client_id', 'client_secret', 'server_metadata_url']. Please check your configuration."
+                in str(ex.exception)
+            )
+
     def test_user_logout(self):
         """Test that st.experimental_user.login sends correct proto message."""
         st.experimental_user.logout()
