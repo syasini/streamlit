@@ -15,17 +15,13 @@
  */
 
 const formatTime = (timeMs: number): string => {
-  const date = new Date(timeMs)
+  const totalSeconds = Math.floor(timeMs / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
 
-  // Create a new date object with only the UTC minutes and seconds
-  const utcDate = new Date(
-    Date.UTC(1970, 0, 1, 0, date.getUTCMinutes(), date.getUTCSeconds())
-  )
-
-  return utcDate.toLocaleTimeString(undefined, {
-    minute: "2-digit",
-    second: "2-digit",
-  })
+  return `${minutes.toString().padStart(2, "0")}:${seconds
+    .toString()
+    .padStart(2, "0")}`
 }
 
 export default formatTime

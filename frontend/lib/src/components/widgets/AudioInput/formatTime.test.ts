@@ -32,16 +32,12 @@ describe("formatTime", () => {
       expect(formatTime(0)).toBe("00:00")
     })
 
-    it('should format 60000 milliseconds as "00:01" in Pacific Time', () => {
-      expect(formatTime(60000)).toBe("00:01")
+    it('should format 1000 milliseconds as "00:01" in Pacific Time', () => {
+      expect(formatTime(1000)).toBe("00:01")
     })
 
-    it('should format 1800000 milliseconds as "00:30" in Pacific Time', () => {
-      expect(formatTime(1800000)).toBe("00:30")
-    })
-
-    it('should format 5400000 milliseconds as "01:30" in Pacific Time', () => {
-      expect(formatTime(5400000)).toBe("01:30")
+    it('should format 90000 milliseconds as "01:30" in Pacific Time', () => {
+      expect(formatTime(90000)).toBe("01:30")
     })
   })
 
@@ -58,16 +54,12 @@ describe("formatTime", () => {
       expect(formatTime(0)).toBe("00:00")
     })
 
-    it('should format 60000 milliseconds as "00:01" in Eastern Time', () => {
-      expect(formatTime(60000)).toBe("00:01")
+    it('should format 1000 milliseconds as "00:01" in Eastern Time', () => {
+      expect(formatTime(1000)).toBe("00:01")
     })
 
-    it('should format 1800000 milliseconds as "00:30" in Eastern Time', () => {
-      expect(formatTime(1800000)).toBe("00:30")
-    })
-
-    it('should format 5400000 milliseconds as "01:30" in Eastern Time', () => {
-      expect(formatTime(5400000)).toBe("01:30")
+    it('should format 90000 milliseconds as "01:30" in Eastern Time', () => {
+      expect(formatTime(90000)).toBe("01:30")
     })
   })
 
@@ -84,16 +76,12 @@ describe("formatTime", () => {
       expect(formatTime(0)).toBe("00:00")
     })
 
-    it('should format 60000 milliseconds as "00:01" in Adelaide Time', () => {
-      expect(formatTime(60000)).toBe("00:01")
+    it('should format 1000 milliseconds as "00:01" in Adelaide Time', () => {
+      expect(formatTime(1000)).toBe("00:01")
     })
 
-    it('should format 1800000 milliseconds as "00:30" in Adelaide Time', () => {
-      expect(formatTime(1800000)).toBe("00:30")
-    })
-
-    it('should format 5400000 milliseconds as "01:30" in Adelaide Time', () => {
-      expect(formatTime(5400000)).toBe("01:30")
+    it('should format 90000 milliseconds as "01:30" in Adelaide Time', () => {
+      expect(formatTime(90000)).toBe("01:30")
     })
   })
 })
