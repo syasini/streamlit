@@ -17,7 +17,12 @@
 const formatTime = (timeMs: number): string => {
   const date = new Date(timeMs)
 
-  return date.toLocaleTimeString(undefined, {
+  // Create a new date object with only the UTC minutes and seconds
+  const utcDate = new Date(
+    Date.UTC(1970, 0, 1, 0, date.getUTCMinutes(), date.getUTCSeconds())
+  )
+
+  return utcDate.toLocaleTimeString(undefined, {
     minute: "2-digit",
     second: "2-digit",
   })
