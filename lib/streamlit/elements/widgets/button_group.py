@@ -202,7 +202,7 @@ def _build_proto(
     selection_visualization: ButtonGroupProto.SelectionVisualization.ValueType = (
         ButtonGroupProto.SelectionVisualization.ONLY_SELECTED
     ),
-    style: Literal["borderless", "pills", "segmented_control"] = "pills",
+    style: Literal["borderless", "pills", "segmented_control", "triggers"] = "pills",
     label: str | None = None,
     label_visibility: LabelVisibility = "visible",
     help: str | None = None,
@@ -802,9 +802,9 @@ class ButtonGroupMixin:
     @gather_metrics("triggers")
     def triggers(
         self,
-        label: str,
         options: OptionSequence[V],
         *,
+        label: str | None = None,
         default: Sequence[V] | V | None = None,
         format_func: Callable[[Any], str] | None = None,
         key: str | int | None = None,
@@ -813,7 +813,7 @@ class ButtonGroupMixin:
         args: WidgetArgs | None = None,
         kwargs: WidgetKwargs | None = None,
         disabled: bool = False,
-        label_visibility: LabelVisibility = "collapsed",
+        label_visibility: LabelVisibility = "visible",
     ) -> list[V] | V | None:
         return self._internal_button_group(
             options,
