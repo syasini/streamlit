@@ -77,11 +77,12 @@ function handleSelection(
     return handleMultiSelection(index, currentSelection ?? [])
   }
 
+  if (style === ButtonGroupProto.Style.TRIGGERS) {
+    return [index]
+  }
+
   // unselect if item is already selected
-  return style !== ButtonGroupProto.Style.TRIGGERS &&
-    currentSelection?.includes(index)
-    ? []
-    : [index]
+  return currentSelection?.includes(index) ? [] : [index]
 }
 
 function getSingleSelection(currentSelection: number[]): number {
@@ -97,21 +98,19 @@ function syncWithWidgetManager(
   valueWithSource: ValueWithSource<ButtonGroupValue>,
   fragmentId?: string
 ): void {
-  console.log(valueWithSource.value)
-  if (
-    element.style === ButtonGroupProto.Style.TRIGGERS &&
-    valueWithSource.value?.length
-  ) {
+  const value = valueWithSource.value
+
+  if (element.style === ButtonGroupProto.Style.TRIGGERS && value?.length) {
     widgetMgr.setStringTriggerValue(
       element,
-      String(valueWithSource.value),
+      String(value),
       { fromUi: valueWithSource.fromUi },
       fragmentId
     )
   } else {
     widgetMgr.setIntArrayValue(
       element,
-      valueWithSource.value,
+      value,
       { fromUi: valueWithSource.fromUi },
       fragmentId
     )
@@ -136,6 +135,7 @@ export function getContentElement(
       break
     case ButtonGroupProto.Style.TRIGGERS:
       kind = BaseButtonKind.TRIGGERS
+      break
   }
   const size =
     style === ButtonGroupProto.Style.BORDERLESS
