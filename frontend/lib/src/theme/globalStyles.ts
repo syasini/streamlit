@@ -372,33 +372,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     resize: vertical; // 1
   }
 
-  ::-webkit-inner-spin-button {
-    height: auto;
-  }
-
-  // 1. Correct the outline style in Safari.
-  // 2. This overrides the extra rounded corners on search inputs in iOS so that our
-  //    .form-control class can properly style them. Note that this cannot simply
-  //    be added to .form-control as it's not specific enough. For details, see
-  //    https://github.com/twbs/bootstrap/issues/11586.
-
-  [type="search"] {
-    outline-offset: -2px; // 1
-    -webkit-appearance: textfield; // 2
-  }
-
-  // Remove the inner padding in Chrome and Safari on macOS.
-
-  ::-webkit-search-decoration {
-    -webkit-appearance: none;
-  }
-
-  // Remove padding around color pickers in webkit browsers
-
-  ::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
-
   // Summary
   //
   // 1. Add the correct display in all browsers
