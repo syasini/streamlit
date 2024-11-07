@@ -29,10 +29,10 @@ class FooWithNoDocs:
     my_static_var_1 = 123
 
 
-st.container(key="help-no-docs").help(FooWithNoDocs)
+st.container(key="help_no-docs").help(FooWithNoDocs)
 
 # Testing case where there are no members.
-st.container(key="help-globals").help(globals)
+st.container(key="help_globals").help(globals)
 
 
 # Test case where there the docs need to scroll,
@@ -81,4 +81,4 @@ class FooWithLongDocs:
 
 f = FooWithLongDocs()
 
-st.container(key="help-long-docs").help(f)
+st.container(key="help_long_docs").help(f)

@@ -29,15 +29,15 @@ def test_help_display(app: Page, assert_snapshot: ImageCompareFunction):
     help_elements = app.get_by_test_id("stHelp")
     expect(help_elements).to_have_count(3)
     assert_snapshot(
-        _get_keyed_help_element(app, "help-no-docs"),
+        _get_keyed_help_element(app, "help_no_docs"),
         name="st_help-class_no_docs",
     )
     assert_snapshot(
-        _get_keyed_help_element(app, "help-globals"),
+        _get_keyed_help_element(app, "help_globals"),
         name="st_help-globals",
     )
     assert_snapshot(
-        _get_keyed_help_element(app, "help-long-docs"),
+        _get_keyed_help_element(app, "help_long_docs"),
         name="st_help-long_docs",
     )
 
