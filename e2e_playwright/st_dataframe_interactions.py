@@ -23,9 +23,11 @@ import streamlit as st
 np.random.seed(0)
 random.seed(0)
 
+DF_SIZE = 30
+
 random_df = pd.DataFrame(
-    np.random.randn(5, 5),
-    columns=["Column A", "Column B", "Column C", "Column D", "Column E"],
+    np.random.randn(DF_SIZE, DF_SIZE),
+    columns=[f"Column {i}" for i in range(DF_SIZE)],
 )
 
 st.dataframe(random_df)
