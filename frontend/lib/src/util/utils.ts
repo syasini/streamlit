@@ -352,7 +352,10 @@ export function isValidElementId(
   if (!elementId) {
     return false
   }
-  return elementId.startsWith(GENERATED_ELEMENT_ID_PREFIX)
+  return (
+    elementId.startsWith(GENERATED_ELEMENT_ID_PREFIX) &&
+    elementId.split("-").length >= 2
+  )
 }
 
 /**
