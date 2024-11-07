@@ -178,30 +178,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     line-height: 1.2;
   }
 
-  // Abbreviations
-  //
-  // 1. Duplicate behavior to the data-* attribute for our tooltip plugin
-  // 2. Add the correct text decoration in Chrome, Edge, Opera, and Safari.
-  // 3. Add explicit cursor to indicate changed behavior.
-  // 4. Prevent the text-decoration to be skipped.
-
-  abbr[title],
-  abbr[data-original-title] {
-    // 1
-    text-decoration: underline; // 2
-    text-decoration: underline dotted; // 2
-    cursor: help; // 3
-    text-decoration-skip-ink: none; // 4
-  }
-
-  // Address
-
-  address {
-    margin-bottom: 1rem;
-    font-style: normal;
-    line-height: inherit;
-  }
-
   // Lists
   // Reset margins on paragraphs
   //
@@ -257,13 +233,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   small {
     font-size: ${theme.fontSizes.sm};
-  }
-
-  // Mark
-
-  mark {
-    padding: 0.2em;
-    background-color: ${theme.colors.secondaryBg};
   }
 
   // Links
@@ -378,13 +347,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     word-wrap: normal;
   }
 
-  // Remove the dropdown arrow in Chrome from inputs built with datalists.
-  // See https://stackoverflow.com/a/54997118
-
-  [list]::-webkit-calendar-picker-indicator {
-    display: none;
-  }
-
   // 1. Prevent a WebKit bug where (2) destroys native audio and video
   //    controls in Android 4.
   // 2. Correct the inability to style clickable types in iOS and Safari.
@@ -408,53 +370,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   textarea {
     resize: vertical; // 1
-  }
-
-  // 1. Browsers set a default min-width: min-content; on fieldsets,
-  //    unlike e.g. <div>s, which have min-width: 0; by default.
-  //    So we reset that to ensure fieldsets behave more like a standard block element.
-  //    See https://github.com/twbs/bootstrap/issues/12359
-  //    and https://html.spec.whatwg.org/multipage/#the-fieldset-and-legend-elements
-  // 2. Reset the default outline behavior of fieldsets so they don't affect page layout.
-
-  fieldset {
-    min-width: 0; // 1
-    padding: 0; // 2
-    margin: 0; // 2
-    border: 0; // 2
-  }
-
-  // 1. By using float: left, the legend will behave like a block element.
-  //    This way the border of a fieldset wraps around the legend if present.
-  // 2. Correct the text wrapping in Edge.
-  // 3. Fix wrapping bug.
-  //    See https://github.com/twbs/bootstrap/issues/29712
-
-  legend {
-    float: left; // 1
-    width: 100%;
-    padding: 0;
-    margin-bottom: ${theme.spacing.sm};
-    font-size: inherit;
-    line-height: inherit;
-    white-space: normal; // 2
-
-    + * {
-      clear: left; // 3
-    }
-  }
-
-  // Fix height of inputs with a type of datetime-local, date, month, week, or time
-  // See https://github.com/twbs/bootstrap/issues/18842
-
-  ::-webkit-datetime-edit-fields-wrapper,
-  ::-webkit-datetime-edit-text,
-  ::-webkit-datetime-edit-minute,
-  ::-webkit-datetime-edit-hour-field,
-  ::-webkit-datetime-edit-day-field,
-  ::-webkit-datetime-edit-month-field,
-  ::-webkit-datetime-edit-year-field {
-    padding: 0;
   }
 
   ::-webkit-inner-spin-button {
@@ -482,20 +397,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   ::-webkit-color-swatch-wrapper {
     padding: 0;
-  }
-
-  // 1. Change font properties to inherit in Safari.
-  // 2. Correct the inability to style clickable types in iOS and Safari.
-
-  ::-webkit-file-upload-button {
-    font: inherit; // 1
-    -webkit-appearance: button; // 2
-  }
-
-  // Correct element displays
-
-  output {
-    display: inline-block;
   }
 
   // Summary
