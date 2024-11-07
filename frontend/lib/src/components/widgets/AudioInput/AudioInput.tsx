@@ -203,16 +203,24 @@ const AudioInput: React.FC<Props> = ({
   )
 
   const handleClear = useCallback(
-    ({ updateWidgetManager }: { updateWidgetManager?: boolean }) => {
+    ({
+      updateWidgetManager,
+      deleteFile,
+    }: {
+      updateWidgetManager?: boolean
+      deleteFile?: boolean
+    }) => {
       if (isNullOrUndefined(wavesurfer) || isNullOrUndefined(deleteFileUrl)) {
         return
       }
       setRecordingUrl(null)
       wavesurfer.empty()
-      uploadClient.deleteFile(deleteFileUrl)
+      if (deleteFile) {
+        uploadClient.deleteFile(deleteFileUrl)
+        setDeleteFileUrl(null)
+      }
       setProgressTime(STARTING_TIME_STRING)
       setRecordingTime(STARTING_TIME_STRING)
-      setDeleteFileUrl(null)
       if (updateWidgetManager) {
         widgetMgr.setFileUploaderStateValue(
           element,
@@ -245,7 +253,7 @@ const AudioInput: React.FC<Props> = ({
 
     const formClearHelper = new FormClearHelper()
     formClearHelper.manageFormClearListener(widgetMgr, widgetFormId, () =>
-      setTimeout(() => handleClear({ updateWidgetManager: true }), 50)
+      handleClear({ updateWidgetManager: true, deleteFile: false })
     )
 
     return () => formClearHelper.disconnect()
@@ -362,7 +370,7 @@ const AudioInput: React.FC<Props> = ({
     })
 
     if (recordingUrl) {
-      handleClear({ updateWidgetManager: false })
+      handleClear({ updateWidgetManager: false, deleteFile: true })
     }
 
     recordPlugin.startRecording({ deviceId: audioDeviceId }).then(() => {
@@ -445,7 +453,9 @@ const AudioInput: React.FC<Props> = ({
             <ToolbarAction
               label="Clear recording"
               icon={Delete}
-              onClick={() => handleClear({ updateWidgetManager: true })}
+              onClick={() =>
+                handleClear({ updateWidgetManager: true, deleteFile: true })
+              }
             />
           )}
         </Toolbar>
@@ -459,7 +469,7 @@ const AudioInput: React.FC<Props> = ({
           stopRecording={stopRecording}
           onClickPlayPause={onClickPlayPause}
           onClear={() => {
-            handleClear({ updateWidgetManager: false })
+            handleClear({ updateWidgetManager: false, deleteFile: true })
             setIsError(false)
           }}
           disabled={isDisabled}
