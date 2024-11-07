@@ -354,7 +354,8 @@ export function isValidElementId(
   }
   return (
     elementId.startsWith(GENERATED_ELEMENT_ID_PREFIX) &&
-    elementId.split("-").length >= 2
+    // There must be at least 3 parts: $$ID-<hash>-<userKey>
+    elementId.split("-").length >= 3
   )
 }
 
