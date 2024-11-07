@@ -244,9 +244,9 @@ const AudioInput: React.FC<Props> = ({
     if (isNullOrUndefined(widgetFormId)) return
 
     const formClearHelper = new FormClearHelper()
-    formClearHelper.manageFormClearListener(widgetMgr, widgetFormId, () => {
-      handleClear({ updateWidgetManager: true })
-    })
+    formClearHelper.manageFormClearListener(widgetMgr, widgetFormId, () =>
+      setTimeout(() => handleClear({ updateWidgetManager: true }), 50)
+    )
 
     return () => formClearHelper.disconnect()
   }, [widgetFormId, handleClear, widgetMgr])
