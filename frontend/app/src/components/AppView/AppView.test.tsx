@@ -17,13 +17,7 @@
 import React from "react"
 
 import "@testing-library/jest-dom"
-import {
-  act,
-  fireEvent,
-  renderHook,
-  screen,
-  within,
-} from "@testing-library/react"
+import { screen, within } from "@testing-library/react"
 
 import {
   AppRoot,
