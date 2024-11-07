@@ -53,6 +53,7 @@ st.button("Expanded Sidebar", on_click=expanded_sidebar)
 
 def wide_layout():
     st.set_page_config(page_title="Wide Layout", layout="wide")
+    st.success("Showing wide layout")
 
 
 st.button("Wide Layout", on_click=wide_layout)
@@ -60,6 +61,7 @@ st.button("Wide Layout", on_click=wide_layout)
 
 def centered_layout():
     st.set_page_config(page_title="Centered Layout", layout="centered")
+    st.success("Showing centered layout")
 
 
 st.button("Centered Layout", on_click=centered_layout)

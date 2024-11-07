@@ -17,7 +17,13 @@
 import React from "react"
 
 import "@testing-library/jest-dom"
-import { screen, within } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  renderHook,
+  screen,
+  within,
+} from "@testing-library/react"
 
 import {
   AppRoot,
@@ -299,6 +305,26 @@ describe("AppView element", () => {
       screen.getByTestId("stMainBlockContainer")
     )
     expect(style.maxWidth).not.toEqual("initial")
+    expect(screen.getByTestId("stAppViewContainer")).not.toHaveAttribute(
+      "data-layout",
+      "wide"
+    )
+  })
+
+  it("does render the wide class when specified", () => {
+    const realUseContext = React.useContext
+    jest.spyOn(React, "useContext").mockImplementation(input => {
+      if (input === AppContext) {
+        return getContextOutput({ wideMode: true, embedded: false })
+      }
+
+      return realUseContext(input)
+    })
+    render(<AppView {...getProps()} />)
+    expect(screen.getByTestId("stAppViewContainer")).toHaveAttribute(
+      "data-layout",
+      "wide"
+    )
   })
 
   describe("handles padding an embedded app", () => {
