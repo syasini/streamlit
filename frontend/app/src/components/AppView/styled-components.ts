@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import styled from "@emotion/styled"
+import styled, { CSSObject } from "@emotion/styled"
+
+import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 export const StyledAppViewContainer = styled.div({
   display: "flex",
@@ -47,6 +49,7 @@ export const StyledAppViewMain = styled.section<StyledAppViewMainProps>(
     width: theme.sizes.full,
     overflow: disableScrolling ? "hidden" : "auto",
     alignItems: "center",
+    containerType: "inline-size",
 
     "&:focus": {
       outline: "none",
@@ -105,6 +108,25 @@ export interface StyledAppViewBlockContainerProps {
   hasBottom: boolean
 }
 
+/**
+ * Adds the CSS query for wide mode.
+ */
+const applyWideModePadding = (theme: EmotionTheme): CSSObject => {
+  return {
+    // Increase side padding, if the current container width is greater than the contentMaxWidth
+    // + the wide mode padding - the the centered padding (lg). This allows a smooth transition
+    // when switching between centered to wide mode when resizing the window.
+    // And makes sure that wide mode always has the same or larger width than centered mode.
+    [`@container (min-width: calc(${theme.sizes.contentMaxWidth} + 2 * (${theme.sizes.wideSidePadding} - ${theme.spacing.lg})))`]:
+      {
+        paddingLeft: theme.sizes.wideSidePadding,
+        paddingRight: theme.sizes.wideSidePadding,
+        minWidth: "auto",
+        maxWidth: "initial",
+      },
+  }
+}
+
 export const StyledAppViewBlockContainer =
   styled.div<StyledAppViewBlockContainerProps>(
     ({
@@ -138,16 +160,7 @@ export const StyledAppViewBlockContainer =
         paddingRight: theme.spacing.lg,
         minWidth: undefined,
         maxWidth: theme.sizes.contentMaxWidth,
-        ...(isWideMode && {
-          // Increase side padding, if layout = wide and if content is larger than contentMaxWidth
-          [`@media (min-width: calc(${theme.sizes.contentMaxWidth} + 2 * (${theme.sizes.wideSidePadding} - ${theme.spacing.lg})))`]:
-            {
-              paddingLeft: theme.sizes.wideSidePadding,
-              paddingRight: theme.sizes.wideSidePadding,
-              minWidth: "auto",
-              maxWidth: "initial",
-            },
-        }),
+        ...(isWideMode && applyWideModePadding(theme)),
         [`@media print`]: {
           paddingTop: littlePadding,
         },
@@ -175,22 +188,13 @@ export const StyledBottomBlockContainer =
     ({ isWideMode, showPadding, theme }) => {
       return {
         width: theme.sizes.full,
-        paddingLeft: theme.spacing.lg,
-        paddingRight: theme.spacing.lg,
-        // Increase side padding, if layout = wide and we're not on mobile
-        [`@media (min-width: ${theme.breakpoints.sm})`]: {
-          paddingLeft: isWideMode
-            ? theme.sizes.wideSidePadding
-            : theme.spacing.lg,
-          paddingRight: isWideMode
-            ? theme.sizes.wideSidePadding
-            : theme.spacing.lg,
-        },
         paddingTop: theme.spacing.lg,
         paddingBottom: showPadding ? "55px" : theme.spacing.threeXL,
-        minWidth: isWideMode ? "auto" : undefined,
-        maxWidth: isWideMode ? "initial" : theme.sizes.contentMaxWidth,
-
+        paddingLeft: theme.spacing.lg,
+        paddingRight: theme.spacing.lg,
+        minWidth: undefined,
+        maxWidth: theme.sizes.contentMaxWidth,
+        ...(isWideMode && applyWideModePadding(theme)),
         [`@media print`]: {
           paddingTop: theme.spacing.none,
         },

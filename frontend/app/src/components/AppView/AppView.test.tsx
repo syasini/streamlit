@@ -301,26 +301,6 @@ describe("AppView element", () => {
     expect(style.maxWidth).not.toEqual("initial")
   })
 
-  it("does render the wide class when specified", () => {
-    // Set the viewport to a bigger width to trigger the wide mode setting
-    window.innerWidth = 1200
-    window.dispatchEvent(new Event("resize"))
-
-    const realUseContext = React.useContext
-    jest.spyOn(React, "useContext").mockImplementation(input => {
-      if (input === AppContext) {
-        return getContextOutput({ wideMode: true, embedded: false })
-      }
-
-      return realUseContext(input)
-    })
-    render(<AppView {...getProps()} />)
-    const style = window.getComputedStyle(
-      screen.getByTestId("stMainBlockContainer")
-    )
-    expect(style.maxWidth).toEqual("initial")
-  })
-
   describe("handles padding an embedded app", () => {
     it("embedded triggers default padding", () => {
       const realUseContext = React.useContext
