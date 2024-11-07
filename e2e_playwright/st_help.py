@@ -29,7 +29,7 @@ class FooWithNoDocs:
     my_static_var_1 = 123
 
 
-st.container(key="help_no-docs").help(FooWithNoDocs)
+st.container(key="help_no_docs").help(FooWithNoDocs)
 
 # Testing case where there are no members.
 st.container(key="help_globals").help(globals)
