@@ -207,8 +207,8 @@ const AudioInput: React.FC<Props> = ({
       updateWidgetManager,
       deleteFile,
     }: {
-      updateWidgetManager?: boolean
-      deleteFile?: boolean
+      updateWidgetManager: boolean
+      deleteFile: boolean
     }) => {
       if (isNullOrUndefined(wavesurfer) || isNullOrUndefined(deleteFileUrl)) {
         return
