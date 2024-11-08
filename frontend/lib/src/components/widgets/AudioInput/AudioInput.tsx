@@ -217,8 +217,8 @@ const AudioInput: React.FC<Props> = ({
       wavesurfer.empty()
       if (deleteFile) {
         uploadClient.deleteFile(deleteFileUrl)
-        setDeleteFileUrl(null)
       }
+      setDeleteFileUrl(null)
       setProgressTime(STARTING_TIME_STRING)
       setRecordingTime(STARTING_TIME_STRING)
       if (updateWidgetManager) {
