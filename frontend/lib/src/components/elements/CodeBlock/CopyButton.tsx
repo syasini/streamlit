@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { useEffect, useRef } from "react"
+import React, { memo, useEffect, useRef } from "react"
 
 import Clipboard from "clipboard"
 import { Copy as CopyIcon } from "react-feather"
@@ -63,4 +63,4 @@ const CopyButton: React.FC<Props> = ({ text }) => {
   )
 }
 
-export default CopyButton
+export default memo(CopyButton)

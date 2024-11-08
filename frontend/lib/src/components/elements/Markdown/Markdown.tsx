@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
 import { Markdown as MarkdownProto } from "@streamlit/lib/src/proto"
@@ -32,10 +32,7 @@ export interface MarkdownProps {
 /**
  * Functional element representing Markdown formatted text.
  */
-export default function Markdown({
-  width,
-  element,
-}: Readonly<MarkdownProps>): ReactElement {
+function Markdown({ width, element }: Readonly<MarkdownProps>): ReactElement {
   const styleProp = { width }
 
   return (
@@ -64,3 +61,5 @@ export default function Markdown({
     </div>
   )
 }
+
+export default memo(Markdown)

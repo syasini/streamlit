@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import {
   CompactSelection,
@@ -989,4 +989,4 @@ function DataFrame({
   )
 }
 
-export default withFullScreenWrapper(DataFrame)
+export default memo(withFullScreenWrapper(DataFrame))

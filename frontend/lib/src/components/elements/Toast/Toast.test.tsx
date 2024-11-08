@@ -28,10 +28,10 @@ import { PLACEMENT, ToasterContainer } from "baseui/toast"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { Toast as ToastProto } from "@streamlit/lib/src/proto"
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import ThemeProvider from "@streamlit/lib/src/components/core/ThemeProvider"
 import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
 
-import { shortenMessage, Toast, ToastProps } from "./Toast"
+import Toast, { shortenMessage, ToastProps } from "./Toast"
 
 // A Toaster Container is required to render Toasts
 // Don't import the actual one from EventContainer as that lives on app side
@@ -50,16 +50,9 @@ const createContainer = (): ReactElement => (
   />
 )
 
-const getProps = (
-  elementProps: Partial<ToastProto> = {},
-  themeProps: Partial<EmotionTheme> = {}
-): ToastProps => ({
+const getProps = (elementProps: Partial<ToastProto> = {}): ToastProps => ({
   body: "This is a toast message",
   icon: "🐶",
-  theme: {
-    ...mockTheme.emotion,
-    ...themeProps,
-  },
   width: 0,
   ...elementProps,
 })
@@ -158,8 +151,16 @@ describe("Toast Component", () => {
   })
 
   test("throws an error when called via st.sidebar.toast", async () => {
-    const props = getProps({}, { inSidebar: true })
-    renderComponent(props)
+    const props = getProps({})
+    render(
+      <ThemeProvider
+        theme={{ ...mockTheme.emotion, inSidebar: true }}
+        baseuiTheme={mockTheme.basewebTheme}
+      >
+        {createContainer()}
+        <Toast {...props} />
+      </ThemeProvider>
+    )
 
     const toastError = screen.getByRole("alert")
     expect(toastError).toBeInTheDocument()

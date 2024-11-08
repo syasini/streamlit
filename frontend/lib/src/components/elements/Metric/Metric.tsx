@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import { useTheme } from "@emotion/react"
 import { ArrowDownward, ArrowUpward } from "@emotion-icons/material-outlined"
@@ -39,9 +39,7 @@ export interface MetricProps {
   element: MetricProto
 }
 
-export default function Metric({
-  element,
-}: Readonly<MetricProps>): ReactElement {
+function Metric({ element }: Readonly<MetricProps>): ReactElement {
   const { colors }: EmotionTheme = useTheme()
   const { MetricColor, MetricDirection } = MetricProto
 
@@ -124,3 +122,5 @@ export default function Metric({
     </div>
   )
 }
+
+export default memo(Metric)

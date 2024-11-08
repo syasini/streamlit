@@ -23,7 +23,7 @@ import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
 import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 
-import { Form, Props } from "./Form"
+import Form, { Props } from "./Form"
 
 describe("Form", () => {
   function getProps(props: Partial<Props> = {}): Props {

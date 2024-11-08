@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useCallback, useEffect } from "react"
+import React, { memo, ReactElement, useCallback, useEffect } from "react"
 
 import { BokehChart as BokehChartProto } from "@streamlit/lib/src/proto"
 // We import Bokeh from a vendored source file, because it doesn't play well with Babel (https://github.com/bokeh/bokeh/issues/10658)
@@ -127,4 +127,4 @@ export function BokehChart({
   )
 }
 
-export default BokehChart
+export default memo(BokehChart)

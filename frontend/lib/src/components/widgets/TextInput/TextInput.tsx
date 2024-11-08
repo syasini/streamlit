@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useCallback, useEffect, useState } from "react"
+import React, {
+  memo,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+} from "react"
 
 import uniqueId from "lodash/uniqueId"
 import { Input as UIInput } from "baseui/input"
@@ -276,4 +282,4 @@ function getTypeString(element: TextInputProto): string {
   return element.type === TextInputProto.Type.PASSWORD ? "password" : "text"
 }
 
-export default TextInput
+export default memo(TextInput)

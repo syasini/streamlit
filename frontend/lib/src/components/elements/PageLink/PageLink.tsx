@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import { useTheme } from "@emotion/react"
 
@@ -120,4 +120,4 @@ function PageLink(props: Readonly<Props>): ReactElement {
   )
 }
 
-export default PageLink
+export default memo(PageLink)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useEffect, useMemo, useRef } from "react"
+import React, { memo, ReactElement, useEffect, useMemo, useRef } from "react"
 
 import { Video as VideoProto } from "@streamlit/lib/src/proto"
 import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
@@ -35,7 +35,7 @@ export interface Subtitle {
   url: string
 }
 
-export default function Video({
+function Video({
   element,
   width,
   endpoints,
@@ -243,3 +243,5 @@ export default function Video({
     </video>
   )
 }
+
+export default memo(Video)

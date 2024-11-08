@@ -20,7 +20,7 @@ import { act, renderHook } from "@testing-library/react-hooks"
 import { fireEvent, render, screen } from "@testing-library/react"
 
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { Form } from "@streamlit/lib/src/components/widgets/Form"
+import Form from "@streamlit/lib/src/components/widgets/Form"
 import { ScriptRunState } from "@streamlit/lib/src/ScriptRunState"
 import { RootStyleProvider } from "@streamlit/lib/src/RootStyleProvider"
 import { getDefaultTheme } from "@streamlit/lib/src/theme"

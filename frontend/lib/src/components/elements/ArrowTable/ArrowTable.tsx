@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import range from "lodash/range"
 
@@ -163,4 +163,4 @@ function generateTableCell(
   }
 }
 
-export default ArrowTable
+export default memo(ArrowTable)

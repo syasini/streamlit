@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useEffect, useState } from "react"
+import React, { memo, ReactElement, useEffect, useState } from "react"
 
 import Modal, {
   ModalBody,
@@ -76,4 +76,4 @@ function DialogWithProvider(
   )
 }
 
-export default DialogWithProvider
+export default memo(DialogWithProvider)

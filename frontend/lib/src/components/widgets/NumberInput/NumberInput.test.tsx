@@ -25,13 +25,11 @@ import {
 } from "@streamlit/lib/src/proto"
 import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
 
-import {
+import NumberInput, {
   canDecrement,
   canIncrement,
   formatValue,
-  NumberInput,
   Props,
 } from "./NumberInput"
 
@@ -45,7 +43,6 @@ const getProps = (elementProps: Partial<NumberInputProto> = {}): Props => ({
   }),
   width: 300,
   disabled: false,
-  theme: mockTheme.emotion,
   widgetMgr: new WidgetStateManager({
     sendRerunBackMsg: jest.fn(),
     formsDataChanged: jest.fn(),

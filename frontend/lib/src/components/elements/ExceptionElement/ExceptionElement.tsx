@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
 import AlertContainer, {
@@ -99,7 +99,7 @@ function StackTrace({ stackTrace }: Readonly<StackTraceProps>): ReactElement {
 /**
  * Functional element representing formatted text.
  */
-export default function ExceptionElement({
+function ExceptionElement({
   element,
   width,
 }: Readonly<ExceptionElementProps>): ReactElement {
@@ -123,3 +123,5 @@ export default function ExceptionElement({
     </div>
   )
 }
+
+export default memo(ExceptionElement)

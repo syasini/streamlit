@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { CSSProperties, ReactElement } from "react"
+import React, { CSSProperties, memo, ReactElement } from "react"
 
 import {
   isNullOrUndefined,
@@ -25,12 +25,21 @@ import {
   DEFAULT_IFRAME_SANDBOX_POLICY,
 } from "@streamlit/lib/src/util/IFrameUtil"
 
+/**
+ * Return a string property from an element. If the string is
+ * null or empty, return undefined instead.
+ */
+function getNonEmptyString(
+  value: string | null | undefined
+): string | undefined {
+  return isNullOrUndefined(value) || value === "" ? undefined : value
+}
 export interface IFrameProps {
   element: IFrameProto
   width: number
 }
 
-export default function IFrame({
+function IFrame({
   element,
   width: propWidth,
 }: Readonly<IFrameProps>): ReactElement {
@@ -75,12 +84,4 @@ export default function IFrame({
   )
 }
 
-/**
- * Return a string property from an element. If the string is
- * null or empty, return undefined instead.
- */
-function getNonEmptyString(
-  value: string | null | undefined
-): string | undefined {
-  return isNullOrUndefined(value) || value === "" ? undefined : value
-}
+export default memo(IFrame)

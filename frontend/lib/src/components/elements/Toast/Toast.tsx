@@ -15,6 +15,7 @@
  */
 
 import React, {
+  memo,
   ReactElement,
   useCallback,
   useEffect,
@@ -22,7 +23,7 @@ import React, {
   useState,
 } from "react"
 
-import { withTheme } from "@emotion/react"
+import { useTheme } from "@emotion/react"
 import { toaster, ToastOverrides } from "baseui/toast"
 
 import {
@@ -41,7 +42,6 @@ import {
 } from "./styled-components"
 
 export interface ToastProps {
-  theme: EmotionTheme
   body: string
   icon?: string
   width: number
@@ -115,12 +115,8 @@ export function shortenMessage(fullMessage: string): string {
   return fullMessage
 }
 
-export function Toast({
-  theme,
-  body,
-  icon,
-  width,
-}: Readonly<ToastProps>): ReactElement {
+function Toast({ body, icon, width }: Readonly<ToastProps>): ReactElement {
+  const theme: EmotionTheme = useTheme()
   const displayMessage = shortenMessage(body)
   const shortened = body !== displayMessage
 
@@ -212,4 +208,4 @@ export function Toast({
   )
 }
 
-export default withTheme(Toast)
+export default memo(Toast)

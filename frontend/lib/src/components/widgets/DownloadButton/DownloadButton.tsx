@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import createDownloadLinkElement from "@streamlit/lib/src/util/createDownloadLinkElement"
 import { DownloadButton as DownloadButtonProto } from "@streamlit/lib/src/proto"
@@ -98,4 +98,4 @@ function DownloadButton(props: Props): ReactElement {
   )
 }
 
-export default DownloadButton
+export default memo(DownloadButton)

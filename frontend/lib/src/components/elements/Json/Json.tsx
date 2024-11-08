@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, useRef } from "react"
+import React, { memo, ReactElement, useRef } from "react"
 
 import JSON5 from "json5"
 import Clipboard from "clipboard"
@@ -38,10 +38,7 @@ export interface JsonProps {
 /**
  * Functional element representing JSON structured text.
  */
-export default function Json({
-  width,
-  element,
-}: Readonly<JsonProps>): ReactElement {
+function Json({ width, element }: Readonly<JsonProps>): ReactElement {
   const theme: EmotionTheme = useTheme()
 
   const elementRef = useRef<HTMLDivElement>(null)
@@ -100,3 +97,5 @@ export default function Json({
     </StyledJsonWrapper>
   )
 }
+
+export default memo(Json)

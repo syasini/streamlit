@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { memo, ReactElement } from "react"
 
 import { Button as ButtonProto } from "@streamlit/lib/src/proto"
 import BaseButton, {
@@ -65,4 +65,4 @@ function Button(props: Props): ReactElement {
   )
 }
 
-export default Button
+export default memo(Button)
