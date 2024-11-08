@@ -162,12 +162,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     font-weight: ${theme.fontWeights.bold};
   }
 
-  // Override h1 font weight to default weight
-  h1 b,
-  h1 strong {
-    font-weight: ${theme.fontWeights.extrabold};
-  }
-
   // Small
 
   small {

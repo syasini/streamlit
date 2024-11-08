@@ -70,7 +70,7 @@ function getMarkdownHeadingDefinitions(
       fontWeight: theme.fontWeights.bold,
       lineHeight: theme.lineHeights.headings,
       margin: 0,
-      ...(isCaption && { color: "inherit" }),
+      color: "inherit",
     },
     h1: {
       fontSize: convertFontSizes(
@@ -85,6 +85,9 @@ function getMarkdownHeadingDefinitions(
         ? theme.fontWeights.bold
         : theme.fontWeights.extrabold,
       padding: `${theme.spacing.xl} 0 ${theme.spacing.lg} 0`,
+    },
+    "h1 b, h1 strong": {
+      fontWeight: theme.fontWeights.extrabold,
     },
     "h2, h3": {
       letterSpacing: "-0.005em",
