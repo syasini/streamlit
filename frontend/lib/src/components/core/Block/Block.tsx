@@ -33,7 +33,7 @@ import {
   getElementId,
   notNullOrUndefined,
 } from "@streamlit/lib/src/util/utils"
-import { Form } from "@streamlit/lib/src/components/widgets/Form"
+import Form from "@streamlit/lib/src/components/widgets/Form"
 import Tabs, { TabProps } from "@streamlit/lib/src/components/elements/Tabs"
 import Popover from "@streamlit/lib/src/components/elements/Popover"
 import ChatMessage from "@streamlit/lib/src/components/elements/ChatMessage"
