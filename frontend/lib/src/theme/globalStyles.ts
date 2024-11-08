@@ -42,10 +42,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     margin: 0;
   }
 
-  .disabled {
-    color: ${theme.colors.disabled};
-  }
-
   // Embedded Overflow Management
   body.embedded {
     overflow: hidden;
@@ -235,15 +231,9 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     text-transform: none;
   }
 
-  // Set the cursor for non-<button> buttons
-  //
-  // Details at https://github.com/twbs/bootstrap/pull/30562
+  // Set the cursor for all buttons or button-like elements
+  button,
   [role="button"] {
-    cursor: pointer;
-  }
-
-  // Set the cursor for all buttons buttons
-  button {
     &:not(:disabled) {
       cursor: pointer;
     }
