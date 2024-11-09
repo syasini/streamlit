@@ -29,8 +29,12 @@ export const StyledTable = styled.table(({ theme }) => ({
   width: theme.sizes.full,
   marginBottom: theme.spacing.lg,
   color: theme.colors.bodyText,
-  // Prevent double borders
-  borderCollapse: "collapse",
+  // This is required to add border radius but introduces double borders at the bottom
+  // and on the right. We're removing them below by making the bottom and right-most
+  // cells have no border.
+  borderCollapse: "separate",
+  borderRadius: theme.radii.default,
+  borderSpacing: 0,
   captionSide: "bottom",
   border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
   "& caption": {
@@ -42,11 +46,17 @@ export const StyledTable = styled.table(({ theme }) => ({
 }))
 
 const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
-  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
   borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
   verticalAlign: "middle",
   padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
   fontWeight: theme.fontWeights.normal,
+  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  "&:last-child": {
+    borderRight: "none",
+  },
+  "tbody tr:last-child &": {
+    borderBottom: "none",
+  },
 })
 
 export const StyledTableCell = styled.td(({ theme }) =>
