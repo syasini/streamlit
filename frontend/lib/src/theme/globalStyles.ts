@@ -111,20 +111,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     margin-bottom: 0;
   }
 
-  dt {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 1em 0 0.2em 0;
-    padding: 0;
-  }
-
-  // 1. Undo browser default
-
-  dd {
-    margin: 0 0 0.2em 1.2em;
-    font-size: 1rem;
-  }
-
   // Strong
   //
   // Add the correct font weight in Chrome, Edge, and Safari
