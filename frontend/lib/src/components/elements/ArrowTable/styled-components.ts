@@ -46,17 +46,17 @@ export const StyledTable = styled.table(({ theme }) => ({
 }))
 
 const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
-  borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
-  verticalAlign: "middle",
-  padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
-  fontWeight: theme.fontWeights.normal,
   borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
-  "&:last-child": {
-    borderRight: "none",
-  },
   "tbody tr:last-child &": {
     borderBottom: "none",
   },
+  borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+  "&:last-child": {
+    borderRight: "none",
+  },
+  verticalAlign: "middle",
+  padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
+  fontWeight: theme.fontWeights.normal,
 })
 
 export const StyledTableCell = styled.td(({ theme }) =>
