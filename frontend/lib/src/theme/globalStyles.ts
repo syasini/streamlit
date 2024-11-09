@@ -251,12 +251,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     border-style: none;
   }
 
-  // 1. Textareas should really only resize vertically so they don't break their (horizontal) containers.
-
-  textarea {
-    resize: vertical; // 1
-  }
-
   // Summary
   //
   // 1. Add the correct display in all browsers
