@@ -214,7 +214,6 @@ function ChatInput({
               style: {
                 lineHeight: theme.lineHeights.inputWidget,
                 backgroundColor: theme.colors.transparent,
-                resize: "vertical",
                 "::placeholder": {
                   opacity: "0.7",
                 },
