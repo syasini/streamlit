@@ -97,6 +97,11 @@ function TextInput({
   const [id] = useState(() => uniqueId("text_input_"))
   const { placeholder, formId } = element
 
+  const commitWidgetValue = useCallback((): void => {
+    setDirty(false)
+    setValueWithSource({ value: uiValue, fromUi: true })
+  }, [uiValue, setValueWithSource])
+
   // Show "Please enter" instructions if in a form & allowed, or not in form and state is dirty.
   const allowEnterToSubmit = isInForm({ formId })
     ? widgetMgr.allowFormEnterToSubmit(formId)
@@ -108,10 +113,10 @@ function TextInput({
 
   const onBlur = useCallback((): void => {
     if (dirty) {
-      setValueWithSource({ value: uiValue, fromUi: true })
+      commitWidgetValue()
     }
     setFocused(false)
-  }, [dirty, uiValue])
+  }, [dirty, commitWidgetValue])
 
   const onFocus = useCallback((): void => {
     setFocused(true)
@@ -151,14 +156,14 @@ function TextInput({
       }
 
       if (dirty) {
-        setValueWithSource({ value: uiValue, fromUi: true })
+        commitWidgetValue()
       }
 
       if (widgetMgr.allowFormEnterToSubmit(element.formId)) {
         widgetMgr.submitForm(element.formId, fragmentId)
       }
     },
-    [uiValue, element, fragmentId]
+    [element, fragmentId, dirty, commitWidgetValue]
   )
 
   return (
