@@ -18,10 +18,11 @@ import React from "react"
 
 import { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
 import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
-
+import { IconSize } from "@streamlit/lib/src/theme"
 export interface DynamicButtonLabelProps {
-  icon: string
-  label: string
+  icon?: string
+  label?: string
+  iconSize?: IconSize
 }
 
 export const DynamicButtonLabel = ({
@@ -29,7 +30,7 @@ export const DynamicButtonLabel = ({
   label,
 }: DynamicButtonLabelProps): React.ReactElement | null => {
   // Material icons need to be larger to render similar size of emojis, emojis need addtl margin
-  const isMaterialIcon = icon.startsWith(":material")
+  const isMaterialIcon = icon?.startsWith(":material")
   const iconMargin = isMaterialIcon ? "0 sm 0 0" : "0 md 0 0"
 
   return (
