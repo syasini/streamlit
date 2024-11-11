@@ -20,11 +20,6 @@ import { darken, transparentize } from "color2k"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
-  a,
-  a:visited {
-    color: ${theme.colors.primary};
-  }
-
   // Override the base font-size value here.
   // This overrides the value set in reboot.scss.
   html {
@@ -39,12 +34,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
-  }
-
-  a:hover,
-  a:active {
-    color: ${theme.colors.primary};
-    text-decoration: underline;
   }
 
   iframe {
@@ -102,91 +91,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   [tabindex="-1"]:focus:not(:focus-visible) {
     outline: 0 !important;
-  }
-
-  // Content grouping
-  //
-  // 1. Reset Firefox's gray color
-  // 2. Set correct height and prevent the size attribute to make the hr look like an input field
-
-  hr {
-    margin: 2em 0;
-    padding: 0;
-    color: inherit; // 1
-    background-color: transparent;
-    border: none;
-    border-bottom: ${theme.sizes.borderWidth} solid ${theme.colors.borderColor};
-  }
-
-  hr:not([size]) {
-    height: 1px; // 2
-  }
-
-  h1 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.extrabold};
-    font-size: 2.75rem;
-    // Use rem so we can remove it when first child, knowing that the
-    // element-container above always adds 1rem.
-    padding: 1.25rem 0 1rem 0;
-    margin: 0;
-
-    line-height: 1.2;
-  }
-
-  h2 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
-    font-size: 2.25rem;
-    letter-spacing: -0.005em;
-
-    // Use rem so we can remove it when first child, knowing that the
-    // element-container above always adds 1rem.
-    padding: 1rem 0 1rem 0;
-    margin: 0;
-
-    line-height: 1.2;
-  }
-
-  h3 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
-    font-size: 1.75rem;
-    letter-spacing: -0.005em;
-
-    // Use rem so we can remove it when first child, knowing that the
-    // element-container above always adds 1rem.
-    padding: 0.5rem 0 1rem 0;
-    margin: 0;
-
-    line-height: 1.2;
-  }
-
-  h4 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
-    font-size: 1.5rem;
-    padding: 0.75rem 0 1rem 0;
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  h5 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
-    font-size: 1.25rem;
-    padding: 0 0 1rem 0;
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  h6 {
-    font-family: ${theme.genericFonts.headingFont};
-    font-weight: ${theme.fontWeights.bold};
-    font-size: 1rem;
-    padding: 0 0 1rem 0;
-    margin: 0;
-    line-height: 1.2;
   }
 
   // Abbreviations
@@ -258,12 +162,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     font-weight: ${theme.fontWeights.bold};
   }
 
-  // Override h1 font weight to default weight
-  h1 b,
-  h1 strong {
-    font-weight: ${theme.fontWeights.extrabold};
-  }
-
   // Small
 
   small {
@@ -304,45 +202,9 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   // Code
 
   pre,
-  code,
-  kbd {
+  code {
     font-size: 1em;
     font-family: ${theme.genericFonts.codeFont};
-  }
-
-  samp {
-    font-family: ${theme.genericFonts.codeFont};
-  }
-
-  // Blockquote
-  samp,
-  blockquote {
-    margin: 1em 0 1em -1px;
-    padding: 0 0 0 1.2em;
-    font-size: 1rem;
-    border-left: ${theme.sizes.borderWidth} solid ${theme.colors.lightGray};
-  }
-
-  kbd {
-    padding: 0.2rem 0.4rem;
-    color: ${theme.colors.codeTextColor};
-    background-color: ${theme.colors.codeHighlightColor};
-    font-size: ${theme.fontSizes.sm};
-    border-radius: ${theme.radii.md};
-
-    kbd {
-      padding: 0;
-      font-weight: ${theme.fontWeights.bold};
-      font-size: 1em;
-    }
-  }
-
-  // Figures
-  //
-  // Apply a consistent margin strategy (matches our type styles).
-
-  figure {
-    margin: 0 0 1rem;
   }
 
   // Images and content
@@ -350,41 +212,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   img,
   svg {
     vertical-align: middle;
-  }
-
-  // Tables
-  //
-  // Prevent double borders
-
-  table {
-    caption-side: bottom;
-    border-collapse: collapse;
-  }
-
-  table caption {
-    padding-top: ${theme.spacing.sm};
-    padding-bottom: 0;
-    color: ${theme.colors.gray60};
-    text-align: left;
-  }
-
-  // 1. Matches default <td> alignment by inheriting text-align.
-  // 2. Fix alignment for Safari
-
-  th {
-    text-align: inherit; // 1
-    text-align: -webkit-match-parent; // 2
-  }
-
-  thead,
-  tbody,
-  tfoot,
-  tr,
-  td,
-  th {
-    border-color: inherit;
-    border-style: solid;
-    border-width: 0;
   }
 
   // Forms
@@ -580,12 +407,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     display: inline-block;
   }
 
-  // Remove border from iframe
-
-  iframe {
-    border: 0;
-  }
-
   // Summary
   //
   // 1. Add the correct display in all browsers
@@ -593,14 +414,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
   summary {
     display: list-item; // 1
     cursor: pointer;
-  }
-
-  // Progress
-  //
-  // Add the correct vertical alignment in Chrome, Firefox, and Opera.
-
-  progress {
-    vertical-align: baseline;
   }
 
   // Hidden attribute
