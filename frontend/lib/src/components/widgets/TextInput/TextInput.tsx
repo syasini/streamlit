@@ -85,13 +85,15 @@ function TextInput({
   const [uiValue, setUiValue] = useState<string | null>(value)
 
   useEffect(() => {
+    // the UI did not sync its value
+    if (dirty) {
+      return
+    }
+    // If the incoming value changes, update the UI value (e.g. set via state)
     if (value !== uiValue) {
       setUiValue(value)
     }
-    // Don't include `uiValue` in the deps below or the slider will become
-    // jittery.
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [value])
+  }, [value, uiValue, dirty])
 
   const theme = useTheme()
   const [id] = useState(() => uniqueId("text_input_"))
@@ -111,7 +113,7 @@ function TextInput({
       setValueWithSource({ value: uiValue, fromUi: true })
     }
     setFocused(false)
-  }, [dirty, uiValue])
+  }, [dirty, uiValue, setValueWithSource])
 
   const onFocus = useCallback((): void => {
     setFocused(true)
@@ -141,7 +143,7 @@ function TextInput({
       // update its value in the WidgetMgr. This means that individual keypresses
       // won't trigger a script re-run.
     },
-    [element]
+    [element, setValueWithSource]
   )
 
   const onKeyPress = useCallback(
@@ -158,7 +160,7 @@ function TextInput({
         widgetMgr.submitForm(element.formId, fragmentId)
       }
     },
-    [uiValue, element, fragmentId]
+    [element, fragmentId, widgetMgr, dirty, uiValue, setValueWithSource]
   )
 
   return (
