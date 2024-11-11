@@ -77,7 +77,7 @@ def test_text_area_has_correct_initial_values(app: Page):
 
 
 def test_text_area_shows_state_value(app: Page):
-    expect(app.get_by_test_id("stTextAreaRootElement").nth(13)).to_have_text("xyz")
+    expect(app.get_by_test_id("stTextAreaRootElement").nth(12)).to_have_text("xyz")
 
 
 def test_text_area_shows_instructions_when_dirty(
