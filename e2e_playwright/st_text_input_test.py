@@ -204,6 +204,12 @@ def test_empty_text_input_behaves_correctly(app: Page):
     )
 
 
+def test_text_input_shows_state_value(app: Page):
+    expect(app.get_by_test_id("stTextInput").nth(11).locator("input")).to_have_value(
+        "xyz"
+    )
+
+
 def test_calls_callback_on_change(app: Page):
     """Test that it correctly calls the callback on change."""
     text_input_field = app.get_by_test_id("stTextInput").nth(8).locator("input").first
