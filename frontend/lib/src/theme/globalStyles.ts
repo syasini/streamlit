@@ -15,7 +15,7 @@
  */
 
 import { css, SerializedStyles } from "@emotion/react"
-import { darken, transparentize } from "color2k"
+import { transparentize } from "color2k"
 
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
@@ -124,17 +124,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
 
   small {
     font-size: ${theme.fontSizes.sm};
-  }
-
-  // Links
-
-  a {
-    color: ${theme.colors.primary};
-    text-decoration: underline;
-
-    &:hover {
-      color: ${darken(theme.colors.primary, 0.15)};
-    }
   }
 
   // And undo these styles for placeholder links/named anchors (without href).
