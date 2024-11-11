@@ -154,31 +154,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     vertical-align: middle;
   }
 
-  // Forms
-  //
-  // 1. Allow labels to use margin for spacing.
-
-  label {
-    display: inline-block; // 1
-  }
-
-  // Remove the default border-radius that macOS Chrome adds.
-  // See https://github.com/twbs/bootstrap/issues/24093
-
-  button {
-    // stylelint-disable-next-line property-blacklist
-    border-radius: 0;
-  }
-
-  // Work around a Firefox bug where the transparent button background
-  // results in a loss of the default button focus styles.
-  // Credit https://github.com/suitcss/base/
-
-  button:focus {
-    outline: 1px dotted;
-    outline: 5px auto -webkit-focus-ring-color;
-  }
-
   // 1. Remove the margin in Firefox and Safari
 
   input,
@@ -192,69 +167,12 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     font-size: inherit;
   }
 
-  // Show the overflow in Edge
-
-  button,
-  input {
-    overflow: visible;
-  }
-
-  // Remove the inheritance of text transform in Firefox
-
-  button,
-  select {
-    text-transform: none;
-  }
-
   // Set the cursor for all buttons or button-like elements
   button,
   [role="button"] {
     &:not(:disabled) {
       cursor: pointer;
     }
-  }
-
-  // Remove the inheritance of word-wrap in Safari.
-  // See https://github.com/twbs/bootstrap/issues/24990
-
-  select {
-    word-wrap: normal;
-  }
-
-  // 1. Prevent a WebKit bug where (2) destroys native audio and video
-  //    controls in Android 4.
-  // 2. Correct the inability to style clickable types in iOS and Safari.
-  // 3. Opinionated: add "hand" cursor to non-disabled button elements.
-
-  button,
-  [type="button"], // 1
-  [type="reset"],
-  [type="submit"] {
-    -webkit-appearance: button; // 2
-  }
-
-  // Remove inner border and padding from Firefox, but don't restore the outline like Normalize.
-
-  ::-moz-focus-inner {
-    padding: 0;
-    border-style: none;
-  }
-
-  // Summary
-  //
-  // 1. Add the correct display in all browsers
-
-  summary {
-    display: list-item; // 1
-    cursor: pointer;
-  }
-
-  // Hidden attribute
-  //
-  // Always hide an element with the hidden HTML attribute.
-
-  [hidden] {
-    display: none !important;
   }
 
   // Make scrollbars awesome in Chrome
