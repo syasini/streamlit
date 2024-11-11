@@ -266,6 +266,10 @@ def _is_probably_plotly_dict(obj: object) -> TypeGuard[dict[str, Any]]:
 
 
 def is_delta_generator(obj: object) -> TypeGuard[DeltaGenerator]:
+    """True if input looks like a DeltaGenerator."""
+
+    # We are using a string here to avoid circular import warnings
+    # when importing DeltaGenerator.
     return is_type(obj, "streamlit.delta_generator.DeltaGenerator")
 
 
