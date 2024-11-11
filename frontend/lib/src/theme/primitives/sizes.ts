@@ -46,4 +46,7 @@ export const sizes = {
   // Used for the clear icon used by some Input elements
   clearIconSize: "1.5em",
   numberInputControlsWidth: "2rem",
+  emptyDropdownHeight: "5.625rem",
+  dropdownItemHeight: "1.5rem",
+  maxDropdownHeight: "18.75rem",
 }
