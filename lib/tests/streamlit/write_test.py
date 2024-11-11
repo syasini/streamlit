@@ -254,8 +254,8 @@ class StreamlitWriteTest(unittest.TestCase):
             p.assert_called_once()
 
     def test_delta_generator_input(self):
-        """Test st.write with DeltaGenerator as input uses st.html."""
-        with patch("streamlit.delta_generator.DeltaGenerator.html") as p:
+        """Test st.write with DeltaGenerator as input uses st.help."""
+        with patch("streamlit.delta_generator.DeltaGenerator.help") as p:
             st.write(st.container())
 
             p.assert_called_once()
