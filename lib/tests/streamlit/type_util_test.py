@@ -182,3 +182,10 @@ class TypeUtilTest(unittest.TestCase):
     def test_is_custom_dict(self, dict_obj: Any, is_custom_dict: bool):
         """Test that `is_custom_dict` returns True for all Streamlit custom dicts."""
         assert type_util.is_custom_dict(dict_obj) is is_custom_dict
+
+    def test_is_delta_generator(self):
+        """Test that `is_delta_generator` returns True for DeltaGenerator."""
+        from streamlit.delta_generator import DeltaGenerator
+
+        assert type_util.is_delta_generator(DeltaGenerator()) is True
+        assert type_util.is_delta_generator("not a DeltaGenerator") is False
