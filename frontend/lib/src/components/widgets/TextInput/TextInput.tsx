@@ -55,6 +55,24 @@ function TextInput({
   width,
   fragmentId,
 }: Props): ReactElement {
+  /**
+   * The value specified by the user via the UI. If the user didn't touch this
+   * widget's UI, the default value is used.
+   */
+  const [uiValue, setUiValue] = useState<string | null>(
+    getStateFromWidgetMgr(widgetMgr, element) ?? null
+  )
+
+  /**
+   * True if the user-specified state.value has not yet been synced to the WidgetStateManager.
+   */
+  const [dirty, setDirty] = useState(false)
+
+  const onFormCleared = useCallback(() => {
+    setUiValue(element.default ?? null)
+    setDirty(true)
+  }, [element.default])
+
   const [value, setValueWithSource] = useBasicWidgetState<
     string | null,
     TextInputProto
@@ -66,32 +84,24 @@ function TextInput({
     element,
     widgetMgr,
     fragmentId,
+    onFormCleared,
   })
 
-  /**
-   * True if the user-specified state.value has not yet been synced to the WidgetStateManager.
-   */
-  const [dirty, setDirty] = useState(false)
+  useEffect(() => {
+    // the UI did not sync its value
+    if (dirty) {
+      return
+    }
+    // If the incoming value changes, update the UI value (e.g. set via state)
+    if (value !== uiValue) {
+      setUiValue(value)
+    }
+  }, [value, uiValue, dirty])
 
   /**
    * Whether the input is currently focused.
    */
   const [focused, setFocused] = useState(false)
-
-  /**
-   * The value specified by the user via the UI. If the user didn't touch this
-   * widget's UI, the default value is used.
-   */
-  const [uiValue, setUiValue] = useState<string | null>(value)
-
-  useEffect(() => {
-    if (value !== uiValue) {
-      setUiValue(value)
-    }
-    // Don't include `uiValue` in the deps below or the slider will become
-    // jittery.
-    /* eslint-disable react-hooks/exhaustive-deps */
-  }, [value])
 
   const theme = useTheme()
   const [id] = useState(() => uniqueId("text_input_"))
@@ -146,7 +156,7 @@ function TextInput({
       // update its value in the WidgetMgr. This means that individual keypresses
       // won't trigger a script re-run.
     },
-    [element]
+    [element, setValueWithSource]
   )
 
   const onKeyPress = useCallback(
@@ -163,7 +173,7 @@ function TextInput({
         widgetMgr.submitForm(element.formId, fragmentId)
       }
     },
-    [element, fragmentId, dirty, commitWidgetValue]
+    [element, fragmentId, dirty, commitWidgetValue, widgetMgr]
   )
 
   return (
