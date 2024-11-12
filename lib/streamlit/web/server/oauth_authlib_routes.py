@@ -96,7 +96,7 @@ class AuthHandlerMixin(tornado.web.RequestHandler):
         self.clear_cookie(AUTH_COOKIE_NAME)
 
 
-class LogoutHandler(AuthHandlerMixin, tornado.web.RequestHandler):
+class AuthLogoutHandler(AuthHandlerMixin, tornado.web.RequestHandler):
     def get(self):
         self.clear_auth_cookie()
         self.redirect("/")

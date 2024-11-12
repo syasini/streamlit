@@ -22,7 +22,10 @@ import tornado.web
 import tornado.websocket
 
 from streamlit.user_info import encode_provider_token
-from streamlit.web.server.oauth_authlib_routes import AuthLoginHandler
+from streamlit.web.server.oauth_authlib_routes import (
+    AuthLoginHandler,
+    AuthLogoutHandler,
+)
 
 
 class SecretMock(dict):
@@ -134,3 +137,22 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/auth/login", follow_redirects=False)
         assert response.code == 302
         assert response.headers["Location"] == "/"
+
+
+class LogoutHandlerTest(tornado.testing.AsyncHTTPTestCase):
+    def get_app(self):
+        return tornado.web.Application(
+            [
+                (
+                    r"/auth/logout",
+                    AuthLogoutHandler,
+                )
+            ]
+        )
+
+    def test_logout_success(self):
+        """Test logout handler success clear cookie."""
+        response = self.fetch("/auth/logout", follow_redirects=False)
+        assert response.code == 302
+        assert response.headers["Location"] == "/"
+        assert '_streamlit_user="";' in response.headers["Set-Cookie"]

@@ -46,7 +46,7 @@ from streamlit.web.server.media_file_handler import MediaFileHandler
 from streamlit.web.server.oauth_authlib_routes import (
     AuthCallbackHandler,
     AuthLoginHandler,
-    LogoutHandler,
+    AuthLogoutHandler,
 )
 from streamlit.web.server.routes import (
     AddSlashHandler,
@@ -313,7 +313,7 @@ class Server:
             ),
             (
                 make_url_path_regex(base, AUTH_LOGOUT_ENDPOINT),
-                LogoutHandler,
+                AuthLogoutHandler,
             ),
             (
                 make_url_path_regex(base, STREAM_ENDPOINT),
