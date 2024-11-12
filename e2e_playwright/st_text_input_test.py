@@ -28,7 +28,7 @@ def test_text_input_widget_rendering(
 ):
     """Test that the st.text_input widgets are correctly rendered via screenshot matching."""
     text_input_widgets = themed_app.get_by_test_id("stTextInput")
-    expect(text_input_widgets).to_have_count(12)
+    expect(text_input_widgets).to_have_count(13)
 
     assert_snapshot(text_input_widgets.nth(0), name="st_text_input-default")
     assert_snapshot(text_input_widgets.nth(1), name="st_text_input-value_some_text")
