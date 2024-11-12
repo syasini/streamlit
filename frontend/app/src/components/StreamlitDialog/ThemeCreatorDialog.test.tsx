@@ -29,8 +29,6 @@ import {
 } from "@streamlit/lib"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 import { customRenderLibContext } from "@streamlit/lib/src/test_util"
-import * as Utils from "@streamlit/lib/src/theme/utils"
-import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
 
 import ThemeCreatorDialog, {
   Props as ThemeCreatorDialogProps,
@@ -66,14 +64,6 @@ Object.assign(navigator, {
 })
 
 describe("Renders ThemeCreatorDialog", () => {
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  beforeEach(() => {
-    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
-  })
-
   it("renders theme creator dialog", () => {
     const availableThemes = [lightTheme, darkTheme]
     const props = getProps()
