@@ -49,4 +49,5 @@ export const sizes = {
   emptyDropdownHeight: "5.625rem",
   dropdownItemHeight: "2.5rem",
   maxDropdownHeight: "18.75rem",
+  appDefaultBottomPadding: "3.5rem",
 }
