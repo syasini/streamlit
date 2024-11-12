@@ -42,6 +42,13 @@ SECRETS_MOCK = SecretMock(
 )
 
 
+@patch(
+    "streamlit.web.server.oauth_authlib_routes.secrets_singleton",
+    MagicMock(
+        load_if_toml_exists=MagicMock(return_value=True),
+        get=MagicMock(return_value=SECRETS_MOCK),
+    ),
+)
 class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
     def get_app(self):
         return tornado.web.Application(
@@ -53,13 +60,6 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
             ]
         )
 
-    @patch(
-        "streamlit.web.server.oauth_authlib_routes.secrets_singleton",
-        MagicMock(
-            load_if_toml_exists=MagicMock(return_value=True),
-            get=MagicMock(return_value=SECRETS_MOCK),
-        ),
-    )
     @patch(
         "streamlit.web.server.oidc_mixin.TornadoOAuth2App.client_cls.request",
         MagicMock(
@@ -73,6 +73,7 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
         ),
     )
     def test_login_handler_success(self):
+        """Test login handler success, when .well-known contains authorization_endpoint."""
         token = encode_provider_token("google")
         response = self.fetch(f"/auth/login?provider={token}", follow_redirects=False)
 
@@ -91,3 +92,39 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
             "&redirect_uri=http%3A%2F%2Flocalhost%3A8501%2Foauth2callback"
             in authorization_url
         )
+
+    @patch(
+        "streamlit.web.server.oidc_mixin.TornadoOAuth2App.client_cls.request",
+        MagicMock(
+            return_value=MagicMock(
+                json=MagicMock(
+                    return_value={
+                        "invalid": "payload",
+                    }
+                )
+            )
+        ),
+    )
+    def test_login_handler_fail_on_malformed_wellknown(self):
+        """Test login handler fail, when .well-known does not contain authorization_endpoint."""
+        token = encode_provider_token("google")
+        response = self.fetch(f"/auth/login?provider={token}", follow_redirects=False)
+        assert response.code == 400
+        assert b'400: Missing "authorize_url" value' in response.body
+        assert "Location" not in response.headers
+
+    @patch(
+        "streamlit.web.server.oidc_mixin.TornadoOAuth2App.client_cls.request",
+        MagicMock(
+            return_value=MagicMock(
+                raise_for_status=MagicMock(side_effect=Exception("Bad status")),
+            )
+        ),
+    )
+    def test_login_handler_fail_on_bad_status(self):
+        """Test login handler fail, when .well-known request fails."""
+        token = encode_provider_token("google")
+        response = self.fetch(f"/auth/login?provider={token}", follow_redirects=False)
+        assert response.code == 400
+        assert b"400: Bad status" in response.body
+        assert "Location" not in response.headers
