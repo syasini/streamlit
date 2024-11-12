@@ -22,12 +22,9 @@ import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { Selectbox as SelectboxProto } from "@streamlit/lib/src/proto"
 import * as Utils from "@streamlit/lib/src/theme/utils"
+import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
 
 import Selectbox, { Props } from "./Selectbox"
-
-const mockConvertRemToPx = (scssVar: string): number => {
-  return Number(scssVar.replace("rem", "")) * 16
-}
 
 const getProps = (
   elementProps: Partial<SelectboxProto> = {},
