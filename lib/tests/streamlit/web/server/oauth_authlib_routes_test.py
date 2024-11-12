@@ -128,3 +128,9 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
         assert response.code == 400
         assert b"400: Bad status" in response.body
         assert "Location" not in response.headers
+
+    def test_login_handler_fail_on_missing_provider(self):
+        """Test login handler fail, when provider is missing."""
+        response = self.fetch("/auth/login", follow_redirects=False)
+        assert response.code == 302
+        assert response.headers["Location"] == "/"
