@@ -21,7 +21,10 @@ from e2e_playwright.shared.app_utils import check_top_level_class, get_element_b
 
 def _get_keyed_help_element(app: Page, key: str) -> Locator:
     """Get a help element in a keyed container."""
-    return get_element_by_key(app, key).get_by_test_id("stHelp").first
+    element = get_element_by_key(app, key).get_by_test_id("stHelp").first
+    expect(element).to_be_visible()
+    element.scroll_into_view_if_needed()
+    return element
 
 
 def test_help_display(app: Page, assert_snapshot: ImageCompareFunction):
