@@ -43,6 +43,10 @@ def test_help_display(app: Page, assert_snapshot: ImageCompareFunction):
         _get_keyed_help_element(app, "help_long_docs"),
         name="st_help-long_docs",
     )
+    assert_snapshot(
+        _get_keyed_help_element(app, "help_mixed_docs"),
+        name="st_help-mixed_docs",
+    )
 
 
 def test_check_top_level_class(app: Page):
