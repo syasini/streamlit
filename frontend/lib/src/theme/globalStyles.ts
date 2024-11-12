@@ -232,14 +232,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     border-style: none;
   }
 
-  // Hidden attribute
-  //
-  // Always hide an element with the hidden HTML attribute.
-
-  [hidden] {
-    display: none !important;
-  }
-
   // Make scrollbars awesome in Chrome
 
   ::-webkit-scrollbar {
