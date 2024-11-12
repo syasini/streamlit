@@ -17,21 +17,27 @@
 import { waitFor } from "@testing-library/react"
 import { renderHook } from "@testing-library/react-hooks"
 
+import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import useSubmitFormViaEnterKey from "./useSubmitFormViaEnterKey"
 
+const widgetMgr = new WidgetStateManager({
+  sendRerunBackMsg: vi.fn(),
+  formsDataChanged: vi.fn(),
+})
 describe("useSubmitFormViaEnterKey", () => {
   it("should call commitWidgetValue and submitForm when Enter is pressed", async () => {
     const commitWidgetValue = vi.fn()
     const allowFormEnterToSubmit = vi.fn((_: string) => true)
     const submitForm = vi.fn()
+    widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+    widgetMgr.submitForm = submitForm
 
     const { result: onInputChange } = renderHook(() =>
       useSubmitFormViaEnterKey(
         "someFormId",
         commitWidgetValue,
         true,
-        allowFormEnterToSubmit,
-        submitForm,
+        widgetMgr,
         "someFragmentId",
         false
       )
@@ -58,14 +64,15 @@ describe("useSubmitFormViaEnterKey", () => {
     const commitWidgetValue = vi.fn()
     const allowFormEnterToSubmit = vi.fn((_: string) => true)
     const submitForm = vi.fn()
+    widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+    widgetMgr.submitForm = submitForm
 
     const { result: onInputChange } = renderHook(() =>
       useSubmitFormViaEnterKey(
         "someFormId",
         commitWidgetValue,
         true,
-        allowFormEnterToSubmit,
-        submitForm,
+        widgetMgr,
         "someFragmentId",
         false
       )
@@ -92,14 +99,15 @@ describe("useSubmitFormViaEnterKey", () => {
     const commitWidgetValue = vi.fn()
     const allowFormEnterToSubmit = vi.fn((_: string) => true)
     const submitForm = vi.fn()
+    widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+    widgetMgr.submitForm = submitForm
 
     const { result: onInputChange } = renderHook(() =>
       useSubmitFormViaEnterKey(
         "someFormId",
         commitWidgetValue,
         true,
-        allowFormEnterToSubmit,
-        submitForm,
+        widgetMgr,
         "someFragmentId",
         true
       )
@@ -132,14 +140,15 @@ describe("useSubmitFormViaEnterKey", () => {
       const commitWidgetValue = vi.fn()
       const allowFormEnterToSubmit = vi.fn((_: string) => true)
       const submitForm = vi.fn()
+      widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+      widgetMgr.submitForm = submitForm
 
       const { result: onInputChange } = renderHook(() =>
         useSubmitFormViaEnterKey(
           "someFormId",
           commitWidgetValue,
           true,
-          allowFormEnterToSubmit,
-          submitForm,
+          widgetMgr,
           "someFragmentId",
           true
         )
@@ -167,14 +176,15 @@ describe("useSubmitFormViaEnterKey", () => {
     const commitWidgetValue = vi.fn()
     const allowFormEnterToSubmit = vi.fn((_: string) => false)
     const submitForm = vi.fn()
+    widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+    widgetMgr.submitForm = submitForm
 
     const { result: onInputChange } = renderHook(() =>
       useSubmitFormViaEnterKey(
         "someFormId",
         commitWidgetValue,
         true,
-        allowFormEnterToSubmit,
-        submitForm,
+        widgetMgr,
         "",
         false
       )
@@ -201,14 +211,15 @@ describe("useSubmitFormViaEnterKey", () => {
     const commitWidgetValue = vi.fn()
     const allowFormEnterToSubmit = vi.fn((_: string) => false)
     const submitForm = vi.fn()
+    widgetMgr.allowFormEnterToSubmit = allowFormEnterToSubmit
+    widgetMgr.submitForm = submitForm
 
     const { result: onInputChange } = renderHook(() =>
       useSubmitFormViaEnterKey(
         "",
         commitWidgetValue,
         false,
-        allowFormEnterToSubmit,
-        submitForm,
+        widgetMgr,
         "",
         false
       )

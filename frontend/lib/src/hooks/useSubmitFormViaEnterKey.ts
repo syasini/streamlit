@@ -16,6 +16,8 @@
 
 import { useCallback } from "react"
 
+import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+
 const isEnterKeyPressed = (
   event: Partial<React.KeyboardEvent<HTMLElement>> & {
     metaKey: boolean
@@ -43,8 +45,7 @@ const isEnterKeyPressed = (
  * @param formId of the form to submit
  * @param commitWidgetValue callback to call
  * @param callCommitWidgetValue whether to call commitWidgetValue
- * @param allowFormEnterToSubmit callback to check if the form should be submitted via Enter key
- * @param submitForm callback to submit the form
+ * @param widgetMgr used to handle form submission
  * @param fragmentId
  * @param requireCommandKey if true, the metaKey or ctrlKey must be pressed to trigger the callback
  * @returns memoized callback
@@ -53,8 +54,7 @@ export default function useSubmitFormViaEnterKey(
   formId: string,
   commitWidgetValue: () => void,
   callCommitWidgetValue: boolean,
-  allowFormEnterToSubmit: (formId: string) => boolean,
-  submitForm: (formId: string, fragmentId?: string) => void,
+  widgetMgr: WidgetStateManager,
   fragmentId?: string,
   requireCommandKey = false
 ): (
@@ -77,6 +77,10 @@ export default function useSubmitFormViaEnterKey(
       const isCommandKeyPressed = requireCommandKey
         ? e.metaKey || e.ctrlKey
         : true
+      console.log(
+        "useSubmitFormViaEnterKey. isCommandKeyPressed",
+        isCommandKeyPressed
+      )
       if (!isEnterKeyPressed(e) || !isCommandKeyPressed) {
         return
       }
@@ -86,8 +90,8 @@ export default function useSubmitFormViaEnterKey(
         commitWidgetValue()
       }
 
-      if (allowFormEnterToSubmit(formId)) {
-        submitForm(formId, fragmentId)
+      if (widgetMgr.allowFormEnterToSubmit(formId)) {
+        widgetMgr.submitForm(formId, fragmentId)
       }
     },
     [
@@ -95,8 +99,7 @@ export default function useSubmitFormViaEnterKey(
       fragmentId,
       callCommitWidgetValue,
       commitWidgetValue,
-      allowFormEnterToSubmit,
-      submitForm,
+      widgetMgr,
       requireCommandKey,
     ]
   )

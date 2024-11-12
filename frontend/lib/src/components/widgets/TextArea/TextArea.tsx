@@ -154,12 +154,12 @@ const TextArea: FC<Props> = ({
     setValueWithSource
   )
 
+  console.log("widgetMgr", widgetMgr)
   const onKeyDown = useSubmitFormViaEnterKey(
     element.formId,
     commitWidgetValue,
     dirty,
-    widgetMgr.allowFormEnterToSubmit,
-    widgetMgr.submitForm,
+    widgetMgr,
     fragmentId,
     true
   )

@@ -138,8 +138,7 @@ function TextInput({
     element.formId,
     commitWidgetValue,
     dirty,
-    widgetMgr.allowFormEnterToSubmit,
-    widgetMgr.submitForm,
+    widgetMgr,
     fragmentId
   )
 
