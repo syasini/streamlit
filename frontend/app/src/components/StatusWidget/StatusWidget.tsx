@@ -358,7 +358,9 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
         </StyledAppStatusLabel>
         {stopButton}
       </StyledAppStatus>
-    ) : null
+    ) : (
+      <></>
+    )
   }, [
     handleStopScriptClick,
     isNewYears,
