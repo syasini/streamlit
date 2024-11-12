@@ -126,13 +126,13 @@ function TextInput({
     setFocused(true)
   }, [])
 
-  const onChange = useOnInputChange(
-    element.formId,
-    element.maxChars,
+  const onChange = useOnInputChange({
+    formId: element.formId,
+    maxChars: element.maxChars,
     setDirty,
     setUiValue,
-    setValueWithSource
-  )
+    setValueWithSource,
+  })
 
   const onKeyPress = useSubmitFormViaEnterKey(
     element.formId,

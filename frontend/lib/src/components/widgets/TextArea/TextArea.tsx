@@ -146,13 +146,13 @@ const TextArea: FC<Props> = ({
     setFocused(true)
   }, [])
 
-  const onChange = useOnInputChange(
-    element.formId,
-    element.maxChars,
+  const onChange = useOnInputChange({
+    formId: element.formId,
+    maxChars: element.maxChars,
     setDirty,
     setUiValue,
-    setValueWithSource
-  )
+    setValueWithSource,
+  })
 
   const onKeyDown = useSubmitFormViaEnterKey(
     element.formId,

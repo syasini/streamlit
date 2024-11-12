@@ -23,6 +23,16 @@ type OnInputChangeEventType = {
   target: { value: string }
 } & Partial<HTMLInputElement>
 
+interface OnInputChangeProps {
+  formId: string | undefined
+  maxChars: number
+  setDirty: (dirty: boolean) => void
+  setUiValue: (value: string) => void
+  setValueWithSource: Dispatch<
+    SetStateAction<ValueWithSource<string | null> | null>
+  >
+}
+
 /**
  * Will return a memoized function that accepts an HTMLInputElement and will call
  * commitWidgetValue and setDirty with its value, unless the value is longer than
@@ -35,15 +45,13 @@ type OnInputChangeEventType = {
  * @param setValueWithSource calls setValueWithSource with the input element's value
  * @return memoized callback
  */
-export default function useOnInputChange(
-  formId: string | undefined,
-  maxChars: number,
-  setDirty: (dirty: boolean) => void,
-  setUiValue: (value: string) => void,
-  setValueWithSource: Dispatch<
-    SetStateAction<ValueWithSource<string | null> | null>
-  >
-): (e: OnInputChangeEventType) => void {
+export default function useOnInputChange({
+  formId,
+  maxChars,
+  setDirty,
+  setUiValue,
+  setValueWithSource,
+}: OnInputChangeProps): (e: OnInputChangeEventType) => void {
   return useCallback(
     (e: OnInputChangeEventType): void => {
       const { value: newValue } = e.target

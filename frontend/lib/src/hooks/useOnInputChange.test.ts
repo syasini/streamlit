@@ -26,13 +26,13 @@ describe("useOnInputChange", () => {
     const setValueWithSource = vi.fn()
 
     const { result: onInputChange } = renderHook(() =>
-      useOnInPutChange(
-        "someFormId",
-        0,
-        setDirtyCallback,
-        setUiValueCallback,
-        setValueWithSource
-      )
+      useOnInPutChange({
+        formId: "someFormId",
+        maxChars: 0,
+        setDirty: setDirtyCallback,
+        setUiValue: setUiValueCallback,
+        setValueWithSource,
+      })
     )
 
     onInputChange.current({ target: { value: "someValue" } })
@@ -56,13 +56,13 @@ describe("useOnInputChange", () => {
     const setValueWithSource = vi.fn()
 
     const { result: onInputChange } = renderHook(() =>
-      useOnInPutChange(
-        undefined,
-        0,
-        setDirtyCallback,
-        setUiValueCallback,
-        setValueWithSource
-      )
+      useOnInPutChange({
+        formId: undefined,
+        maxChars: 0,
+        setDirty: setDirtyCallback,
+        setUiValue: setUiValueCallback,
+        setValueWithSource,
+      })
     )
 
     onInputChange.current({ target: { value: "someValue" } })
@@ -84,13 +84,13 @@ describe("useOnInputChange", () => {
     const setValueWithSource = vi.fn()
 
     const { result: onInputChange } = renderHook(() =>
-      useOnInPutChange(
-        undefined,
-        1,
-        setDirtyCallback,
-        setUiValueCallback,
-        setValueWithSource
-      )
+      useOnInPutChange({
+        formId: undefined,
+        maxChars: 1,
+        setDirty: setDirtyCallback,
+        setUiValue: setUiValueCallback,
+        setValueWithSource,
+      })
     )
 
     onInputChange.current({ target: { value: "someValue" } })

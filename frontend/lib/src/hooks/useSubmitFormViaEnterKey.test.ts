@@ -162,7 +162,7 @@ describe("useSubmitFormViaEnterKey", () => {
         keyCode: 0,
       })
       await waitFor(() => {
-        expect(commitWidgetValue).toHaveBeenCalled()
+        expect(commitWidgetValue).toHaveBeenCalledTimes(1)
       })
       await waitFor(() => {
         expect(allowFormEnterToSubmit).toHaveBeenCalledWith("someFormId")
@@ -198,7 +198,7 @@ describe("useSubmitFormViaEnterKey", () => {
       keyCode: 0,
     })
     await waitFor(() => {
-      expect(commitWidgetValue).toHaveBeenCalled()
+      expect(commitWidgetValue).toHaveBeenCalledTimes(1)
     })
     await waitFor(() => {
       expect(allowFormEnterToSubmit).toHaveBeenCalledWith("someFormId")
