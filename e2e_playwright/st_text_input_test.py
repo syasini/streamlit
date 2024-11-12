@@ -248,6 +248,17 @@ def test_calls_callback_on_change(app: Page):
     )
 
 
+def test_text_input_in_form_with_submit_by_enter(app: Page):
+    """Test that text area in form can be submitted by pressing Command+Enter"""
+    text_area_field = app.get_by_test_id("stTextInput").nth(12).locator("input").first
+    text_area_field.fill("hello world")
+    text_area_field.press("Enter")
+    expect(app.get_by_test_id("stMarkdown").nth(13)).to_have_text(
+        "text input 13 (value from form) - value: hello world",
+        use_inner_text=True,
+    )
+
+
 def test_help_tooltip_works(app: Page):
     """Test that the help tooltip is displayed on hover."""
     element_with_help = app.get_by_test_id("stTextInput").nth(8)
