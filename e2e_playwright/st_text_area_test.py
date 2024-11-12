@@ -70,7 +70,7 @@ def test_text_area_has_correct_initial_values(app: Page):
         "value 11: default text",
         "value 12: default text",
         "text area 13 (value from state) - value: xyz",
-        "text area 13 (value from state) - value: None",
+        "text area 14 (value from form) - value: ",
     ]
 
     for markdown_element, expected_text in zip(markdown_elements.all(), expected):
@@ -78,7 +78,9 @@ def test_text_area_has_correct_initial_values(app: Page):
 
 
 def test_text_area_shows_state_value(app: Page):
-    expect(app.get_by_test_id("stTextAreaRootElement").nth(13)).to_have_text("xyz")
+    expect(
+        app.get_by_test_id("stTextArea").nth(12).locator("textarea").first
+    ).to_have_text("xyz")
 
 
 def test_text_area_shows_instructions_when_dirty(
