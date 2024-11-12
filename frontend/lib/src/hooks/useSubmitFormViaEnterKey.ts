@@ -77,10 +77,7 @@ export default function useSubmitFormViaEnterKey(
       const isCommandKeyPressed = requireCommandKey
         ? e.metaKey || e.ctrlKey
         : true
-      console.log(
-        "useSubmitFormViaEnterKey. isCommandKeyPressed",
-        isCommandKeyPressed
-      )
+
       if (!isEnterKeyPressed(e) || !isCommandKeyPressed) {
         return
       }
