@@ -28,6 +28,8 @@ import {
   mockSessionInfo,
 } from "@streamlit/lib"
 import { MetricsManager } from "@streamlit/app/src/MetricsManager"
+import * as Utils from "@streamlit/lib/src/theme/utils"
+import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
 
 import { Props, SettingsDialog } from "./SettingsDialog"
 
@@ -61,6 +63,14 @@ const getProps = (extend?: Partial<Props>): Props => ({
 })
 
 describe("SettingsDialog", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  beforeEach(() => {
+    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
+  })
+
   it("renders without crashing", () => {
     const availableThemes = [lightTheme, darkTheme]
     const props = getProps()
