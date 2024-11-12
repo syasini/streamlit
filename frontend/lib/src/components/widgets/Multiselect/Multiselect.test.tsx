@@ -44,7 +44,7 @@ const getProps = (
   width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager({
-    sendRereunBackMsg: vi.fn(),
+    sendRerunBackMsg: vi.fn(),
     formsDataChanged: vi.fn(),
   }),
   ...widgetProps,
