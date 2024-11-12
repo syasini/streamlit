@@ -35,7 +35,7 @@ function createMockForwardMsg(hash: string, cacheable = true): ForwardMsg {
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe("DefaultStreamlitEndpoints", () => {
@@ -321,7 +321,7 @@ describe("DefaultStreamlitEndpoints", () => {
 
   describe("deleteFileAtURL()", () => {
     let axiosMock: MockAdapter
-    const spyRequest = jest.spyOn(axios, "request")
+    const spyRequest = vi.spyOn(axios, "request")
     let endpoints: DefaultStreamlitEndpoints
 
     beforeEach(() => {
