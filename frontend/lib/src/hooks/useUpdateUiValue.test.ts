@@ -17,25 +17,24 @@
 import { waitFor } from "@testing-library/react"
 import { renderHook } from "@testing-library/react-hooks"
 
-import useTimeout from "./useTimeout"
+import useUpdateUiValue from "./useUpdateUiValue"
 
-describe("timeout function", () => {
-  it("should call the callback function after timeout", async () => {
+describe("useUpdateUiValue", () => {
+  it("should update ui value if values are different and ui value is not dirty", async () => {
     const callback = vi.fn()
-    const timeoutDelayMs = 50
-    renderHook(() => useTimeout(callback, timeoutDelayMs))
-    await waitFor(() => expect(callback).toHaveBeenCalledTimes(1), {
-      timeout: 2 * timeoutDelayMs,
-    })
+    renderHook(() => useUpdateUiValue(4, 2, callback, false))
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(4))
   })
 
-  it("should not call the callback function when cancel timeout", async () => {
+  it("shoud not update ui value if values are different and ui value is dirty", async () => {
     const callback = vi.fn()
-    const timeoutDelayMs = 100
-    const { result } = renderHook(() => useTimeout(callback, timeoutDelayMs))
-    const clear = result.current
-    clear()
-    await new Promise(r => setTimeout(r, 2 * timeoutDelayMs))
-    expect(callback).toHaveBeenCalledTimes(0)
+    renderHook(() => useUpdateUiValue(4, 2, callback, true))
+    await waitFor(() => expect(callback).not.toHaveBeenCalled())
+  })
+
+  it("shoud not update ui value if values are same", async () => {
+    const callback = vi.fn()
+    renderHook(() => useUpdateUiValue(4, 4, callback, false))
+    await waitFor(() => expect(callback).not.toHaveBeenCalled())
   })
 })
