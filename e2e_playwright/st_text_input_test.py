@@ -46,7 +46,7 @@ def test_text_input_widget_rendering(
 def test_text_input_has_correct_initial_values(app: Page):
     """Test that st.text_input has the correct initial values."""
     markdown_elements = app.get_by_test_id("stMarkdown")
-    expect(markdown_elements).to_have_count(14)
+    expect(markdown_elements).to_have_count(15)
 
     expected = [
         "value 1: ",
