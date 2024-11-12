@@ -17,26 +17,12 @@
 import { useCallback } from "react"
 
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { isEnterKeyPressed } from "@streamlit/lib/src/util/inputUtils"
 
-const isEnterKeyPressed = (
-  event: Partial<React.KeyboardEvent<HTMLElement>> & {
-    metaKey: boolean
-    ctrlKey: boolean
-    /** @deprecated */
-    keyCode: number
-    key: string
-  }
-): boolean => {
-  const { keyCode, key } = event
-
-  // Using keyCode as well due to some different behaviors on Windows
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=79407
-  return (
-    (key === "Enter" || keyCode === 13 || keyCode === 10) &&
-    // Do not send the sentence being composed when Enter is typed into the IME.
-    !(event.nativeEvent?.isComposing === true)
-  )
-}
+export type SubmitFormKeyboardEvent = Pick<
+  React.KeyboardEvent<HTMLElement>,
+  "metaKey" | "ctrlKey" | "keyCode" | "key" | "nativeEvent" | "preventDefault"
+>
 
 /**
  * Will return a memoized function that will call commitWidgetValue and submit the form
@@ -57,23 +43,9 @@ export default function useSubmitFormViaEnterKey(
   widgetMgr: WidgetStateManager,
   fragmentId?: string,
   requireCommandKey = false
-): (
-  e: Partial<React.KeyboardEvent<HTMLElement>> & {
-    metaKey: boolean
-    ctrlKey: boolean
-    keyCode: number
-    key: string
-  }
-) => void {
+): (e: SubmitFormKeyboardEvent) => void {
   return useCallback(
-    (
-      e: Partial<React.KeyboardEvent<HTMLElement>> & {
-        metaKey: boolean
-        ctrlKey: boolean
-        keyCode: number
-        key: string
-      }
-    ): void => {
+    (e: SubmitFormKeyboardEvent): void => {
       const isCommandKeyPressed = requireCommandKey
         ? e.metaKey || e.ctrlKey
         : true
@@ -82,7 +54,7 @@ export default function useSubmitFormViaEnterKey(
         return
       }
 
-      e.preventDefault?.()
+      e.preventDefault()
       if (callCommitWidgetValue) {
         commitWidgetValue()
       }

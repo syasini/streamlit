@@ -49,6 +49,8 @@ describe("useSubmitFormViaEnterKey", () => {
       metaKey: false,
       ctrlKey: false,
       keyCode: 0,
+      nativeEvent: undefined as never,
+      preventDefault: vi.fn(),
     })
     await waitFor(() => {
       expect(commitWidgetValue).toHaveBeenCalledTimes(1)
@@ -84,6 +86,8 @@ describe("useSubmitFormViaEnterKey", () => {
       metaKey: false,
       ctrlKey: false,
       keyCode: 0,
+      nativeEvent: undefined as never,
+      preventDefault: vi.fn(),
     })
     await waitFor(() => {
       expect(commitWidgetValue).not.toHaveBeenCalled()
@@ -119,6 +123,8 @@ describe("useSubmitFormViaEnterKey", () => {
       metaKey: false,
       ctrlKey: false,
       keyCode: 0,
+      nativeEvent: undefined as never,
+      preventDefault: vi.fn(),
     })
     await waitFor(() => {
       expect(commitWidgetValue).not.toHaveBeenCalled()
@@ -160,6 +166,8 @@ describe("useSubmitFormViaEnterKey", () => {
         metaKey: metaKey,
         ctrlKey: ctrlKey,
         keyCode: 0,
+        nativeEvent: undefined as never,
+        preventDefault: vi.fn(),
       })
       await waitFor(() => {
         expect(commitWidgetValue).toHaveBeenCalledTimes(1)
@@ -196,6 +204,8 @@ describe("useSubmitFormViaEnterKey", () => {
       metaKey: false,
       ctrlKey: false,
       keyCode: 0,
+      nativeEvent: undefined as never,
+      preventDefault: vi.fn(),
     })
     await waitFor(() => {
       expect(commitWidgetValue).toHaveBeenCalledTimes(1)
@@ -231,6 +241,8 @@ describe("useSubmitFormViaEnterKey", () => {
       metaKey: false,
       ctrlKey: false,
       keyCode: 0,
+      nativeEvent: undefined as never,
+      preventDefault: vi.fn(),
     })
     await waitFor(() => {
       expect(commitWidgetValue).not.toHaveBeenCalled()

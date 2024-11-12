@@ -20,8 +20,10 @@ import { isInForm } from "@streamlit/lib/src/util/utils"
 import { ValueWithSource } from "@streamlit/lib/src/hooks/useBasicWidgetState"
 
 type OnInputChangeEventType = {
-  target: { value: string }
-} & Partial<HTMLInputElement>
+  target: {
+    value: HTMLInputElement["value"]
+  }
+}
 
 interface OnInputChangeProps {
   formId: string | undefined
