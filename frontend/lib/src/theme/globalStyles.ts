@@ -139,13 +139,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     }
   }
 
-  // Images and content
-
-  img,
-  svg {
-    vertical-align: middle;
-  }
-
   // Forms
   //
   // 1. Allow labels to use margin for spacing.
