@@ -158,7 +158,8 @@ const TextArea: FC<Props> = ({
     element.formId,
     commitWidgetValue,
     dirty,
-    widgetMgr,
+    widgetMgr.allowFormEnterToSubmit,
+    widgetMgr.submitForm,
     fragmentId,
     true
   )

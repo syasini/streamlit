@@ -16,10 +16,14 @@
 
 import { useCallback } from "react"
 
-import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
-
 const isEnterKeyPressed = (
-  event: React.KeyboardEvent<HTMLElement>
+  event: Partial<React.KeyboardEvent<HTMLElement>> & {
+    metaKey: boolean
+    ctrlKey: boolean
+    /** @deprecated */
+    keyCode: number
+    key: string
+  }
 ): boolean => {
   const { keyCode, key } = event
 
@@ -39,7 +43,8 @@ const isEnterKeyPressed = (
  * @param formId of the form to submit
  * @param commitWidgetValue callback to call
  * @param callCommitWidgetValue whether to call commitWidgetValue
- * @param widgetMgr
+ * @param allowFormEnterToSubmit callback to check if the form should be submitted via Enter key
+ * @param submitForm callback to submit the form
  * @param fragmentId
  * @param requireCommandKey if true, the metaKey or ctrlKey must be pressed to trigger the callback
  * @returns memoized callback
@@ -48,12 +53,27 @@ export default function useSubmitFormViaEnterKey(
   formId: string,
   commitWidgetValue: () => void,
   callCommitWidgetValue: boolean,
-  widgetMgr: WidgetStateManager,
+  allowFormEnterToSubmit: (formId: string) => boolean,
+  submitForm: (formId: string, fragmentId?: string) => void,
   fragmentId?: string,
   requireCommandKey = false
-): (e: React.KeyboardEvent<HTMLElement>) => void {
+): (
+  e: Partial<React.KeyboardEvent<HTMLElement>> & {
+    metaKey: boolean
+    ctrlKey: boolean
+    keyCode: number
+    key: string
+  }
+) => void {
   return useCallback(
-    (e: React.KeyboardEvent<HTMLElement>): void => {
+    (
+      e: Partial<React.KeyboardEvent<HTMLElement>> & {
+        metaKey: boolean
+        ctrlKey: boolean
+        keyCode: number
+        key: string
+      }
+    ): void => {
       const isCommandKeyPressed = requireCommandKey
         ? e.metaKey || e.ctrlKey
         : true
@@ -61,13 +81,13 @@ export default function useSubmitFormViaEnterKey(
         return
       }
 
-      e.preventDefault()
+      e.preventDefault?.()
       if (callCommitWidgetValue) {
         commitWidgetValue()
       }
 
-      if (widgetMgr.allowFormEnterToSubmit(formId)) {
-        widgetMgr.submitForm(formId, fragmentId)
+      if (allowFormEnterToSubmit(formId)) {
+        submitForm(formId, fragmentId)
       }
     },
     [
@@ -75,7 +95,8 @@ export default function useSubmitFormViaEnterKey(
       fragmentId,
       callCommitWidgetValue,
       commitWidgetValue,
-      widgetMgr,
+      allowFormEnterToSubmit,
+      submitForm,
       requireCommandKey,
     ]
   )

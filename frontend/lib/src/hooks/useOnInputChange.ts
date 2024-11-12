@@ -19,17 +19,33 @@ import { Dispatch, SetStateAction, useCallback } from "react"
 import { isInForm } from "@streamlit/lib/src/util/utils"
 import { ValueWithSource } from "@streamlit/lib/src/hooks/useBasicWidgetState"
 
+type OnInputChangeEventType = {
+  target: { value: string }
+} & Partial<HTMLInputElement>
+
+/**
+ * Will return a memoized function that accepts an HTMLInputElement and will call
+ * commitWidgetValue and setDirty with its value, unless the value is longer than
+ * maxChars. Will also call the setValueWithSource callback if the input is in a form.
+ *
+ * @param formId if is in a form
+ * @param maxChars if the input element's value length is greater than this, nothing will be called. Set to 0 to disable.
+ * @param setDirty calls setDirty with true
+ * @param setUiValue calls setUiValue with the input element's value
+ * @param setValueWithSource calls setValueWithSource with the input element's value
+ * @return memoized callback
+ */
 export default function useOnInputChange(
-  formId: string,
+  formId: string | undefined,
   maxChars: number,
   setDirty: (dirty: boolean) => void,
   setUiValue: (value: string) => void,
   setValueWithSource: Dispatch<
     SetStateAction<ValueWithSource<string | null> | null>
   >
-): (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void {
+): (e: OnInputChangeEventType) => void {
   return useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+    (e: OnInputChangeEventType): void => {
       const { value: newValue } = e.target
 
       if (maxChars !== 0 && newValue.length > maxChars) {
