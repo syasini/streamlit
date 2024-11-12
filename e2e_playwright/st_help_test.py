@@ -30,7 +30,7 @@ def _get_keyed_help_element(app: Page, key: str) -> Locator:
 def test_help_display(app: Page, assert_snapshot: ImageCompareFunction):
     """Test that st.header renders correctly with dividers."""
     help_elements = app.get_by_test_id("stHelp")
-    expect(help_elements).to_have_count(3)
+    expect(help_elements).to_have_count(4)
     assert_snapshot(
         _get_keyed_help_element(app, "help_no_docs"),
         name="st_help-class_no_docs",
