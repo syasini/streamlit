@@ -24,8 +24,13 @@ import {
   LabelVisibilityMessage as LabelVisibilityMessageProto,
   MultiSelect as MultiSelectProto,
 } from "@streamlit/lib/src/proto"
+import * as Utils from "@streamlit/lib/src/theme/utils"
 
 import Multiselect, { Props } from "./Multiselect"
+
+const mockConvertRemToPx = (scssVar: string): number => {
+  return Number(scssVar.replace("rem", "")) * 16
+}
 
 const getProps = (
   elementProps: Partial<MultiSelectProto> = {},
@@ -49,6 +54,14 @@ const getProps = (
 })
 
 describe("Multiselect widget", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  beforeEach(() => {
+    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
+  })
+
   it("renders without crashing", () => {
     const props = getProps()
     render(<Multiselect {...props} />)

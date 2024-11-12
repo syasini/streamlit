@@ -21,8 +21,13 @@ import { act, fireEvent, screen } from "@testing-library/react"
 import { render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import { Selectbox as SelectboxProto } from "@streamlit/lib/src/proto"
+import * as Utils from "@streamlit/lib/src/theme/utils"
 
 import Selectbox, { Props } from "./Selectbox"
+
+const mockConvertRemToPx = (scssVar: string): number => {
+  return Number(scssVar.replace("rem", "")) * 16
+}
 
 const getProps = (
   elementProps: Partial<SelectboxProto> = {},
@@ -51,6 +56,10 @@ const pickOption = (selectbox: HTMLElement, value: string): void => {
 }
 
 describe("Selectbox widget", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it("renders without crashing", () => {
     const props = getProps()
     render(<Selectbox {...props} />)
@@ -88,10 +97,12 @@ describe("Selectbox widget", () => {
   it("handles the onChange event", () => {
     const props = getProps()
     vi.spyOn(props.widgetMgr, "setIntValue")
+    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
 
     render(<Selectbox {...props} />)
 
     const selectbox = screen.getByRole("combobox")
+
     pickOption(selectbox, "b")
 
     expect(props.widgetMgr.setIntValue).toHaveBeenLastCalledWith(
@@ -110,6 +121,7 @@ describe("Selectbox widget", () => {
     props.widgetMgr.setFormSubmitBehaviors("form", true)
 
     vi.spyOn(props.widgetMgr, "setIntValue")
+    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
 
     render(<Selectbox {...props} />)
 
