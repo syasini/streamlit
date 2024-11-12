@@ -22,10 +22,9 @@ import React, {
   useState,
 } from "react"
 
-import { useTheme } from "@emotion/react"
 import { EmotionIcon } from "@emotion-icons/emotion-icon"
 import { Ellipses, Info, Warning } from "@emotion-icons/open-iconic"
-import { withTheme } from "@emotion/react"
+import { useTheme, withTheme } from "@emotion/react"
 import Hotkeys from "react-hot-keys"
 import { CSSTransition } from "react-transition-group"
 import { SignalConnection } from "typed-signals"
@@ -33,7 +32,6 @@ import { SignalConnection } from "typed-signals"
 import {
   BaseButton,
   BaseButtonKind,
-  EmotionTheme,
   Icon,
   isNullOrUndefined,
   notNullOrUndefined,
