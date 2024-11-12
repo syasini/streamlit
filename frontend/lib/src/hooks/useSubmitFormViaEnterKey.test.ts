@@ -18,6 +18,7 @@ import { waitFor } from "@testing-library/react"
 import { renderHook } from "@testing-library/react-hooks"
 
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+
 import useSubmitFormViaEnterKey from "./useSubmitFormViaEnterKey"
 
 const widgetMgr = new WidgetStateManager({
