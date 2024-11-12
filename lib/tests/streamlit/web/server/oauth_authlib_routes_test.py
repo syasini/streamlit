@@ -60,11 +60,34 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
             get=MagicMock(return_value=SECRETS_MOCK),
         ),
     )
+    @patch(
+        "streamlit.web.server.oidc_mixin.TornadoOAuth2App.client_cls.request",
+        MagicMock(
+            return_value=MagicMock(
+                json=MagicMock(
+                    return_value={
+                        "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+                    }
+                )
+            )
+        ),
+    )
     def test_login_handler_success(self):
-        # TODO[kajarenc] Mock external network calls
         token = encode_provider_token("google")
         response = self.fetch(f"/auth/login?provider={token}", follow_redirects=False)
+
+        authorization_url = response.headers["Location"]
+
         assert response.code == 302
-        assert response.headers["Location"].startswith(
+        assert authorization_url.startswith(
             "https://accounts.google.com/o/oauth2/v2/auth"
+        )
+        assert "&client_id=CLIENT_ID" in authorization_url
+        assert "CLIENT_SECRET" not in authorization_url
+        assert "&prompt=select_account" in authorization_url
+        assert "&scope=openid+email+profile" in authorization_url
+        assert "&state=" in authorization_url
+        assert (
+            "&redirect_uri=http%3A%2F%2Flocalhost%3A8501%2Foauth2callback"
+            in authorization_url
         )

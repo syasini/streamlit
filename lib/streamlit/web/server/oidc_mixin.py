@@ -33,6 +33,8 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
     def load_server_metadata(self):
         result = super().load_server_metadata()
         if "S256" in result.get("code_challenge_methods_supported", []):
+            # Todo[kajarenc]: maybe not set code_challenge_method to S256 if
+            #  it is explicitly stated in the auth section.
             self.client_kwargs["code_challenge_method"] = "S256"
         return result
 
