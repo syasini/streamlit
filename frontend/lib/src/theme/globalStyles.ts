@@ -139,26 +139,6 @@ export const globalStyles = (theme: EmotionTheme): SerializedStyles => css`
     }
   }
 
-  // Images and content
-
-  img,
-  svg {
-    vertical-align: middle;
-  }
-
-  // 1. Remove the margin in Firefox and Safari
-
-  input,
-  button,
-  select,
-  optgroup,
-  textarea {
-    margin: 0; // 1
-    font-family: inherit;
-    line-height: inherit;
-    font-size: inherit;
-  }
-
   // Set the cursor for all buttons or button-like elements
   button,
   [role="button"] {
