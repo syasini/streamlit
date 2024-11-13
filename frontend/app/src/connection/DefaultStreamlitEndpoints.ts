@@ -88,11 +88,13 @@ export class DefaultStreamlitEndpoints implements StreamlitEndpoints {
   }
 
   /**
-   * Construct a URL for uploading a file. If the URL is relative and starts
-   * with "/_stcore/upload_file", assume we're uploading the file to the
-   * Streamlit Tornado server and construct the URL appropriately. Otherwise,
-   * we're probably uploading the file to some external service, so we leave
-   * the URL alone.
+   * Construct a URL for uploading a file. If the `fileUploadClientConfig`
+   * exists, we build URL by prefixing URL with prefix from the config,
+   * otherwise if the `fileUploadClientConfig` is not present, if URL is
+   * relative and starts with "/_stcore/upload_file", assume we're uploading
+   * the file to the Streamlit Tornado server and construct the URL
+   * appropriately. Otherwise, we're probably uploading the file to some
+   * external service, so we leave the URL alone.
    */
   public buildFileUploadURL(url: string): string {
     if (this.fileUploadClientConfig) {

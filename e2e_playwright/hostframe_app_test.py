@@ -105,6 +105,7 @@ def test_handles_set_file_upload_client_config_message(iframed_app: IframedPage)
     url = r.value.url
     headers = r.value.all_headers()
 
+    assert r.value.response().status == 204  # Upload successful
     assert url.startswith("http://localhost") and "_stcore/upload_file" in url
     assert "header1" not in headers
 
