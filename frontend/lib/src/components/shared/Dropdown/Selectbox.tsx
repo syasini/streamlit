@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { memo, useEffect, useState } from "react"
+import React, { memo, useCallback, useEffect, useState } from "react"
 
 import { isMobile } from "react-device-detect"
 import { ChevronDown } from "baseui/icon"
@@ -57,7 +57,7 @@ interface SelectOption {
 }
 
 // Add a custom filterOptions method to filter options only based on labels.
-// The baseweb default method filters based on labels or indices
+// The baseweb default method filters based on labels or indices.
 // More details: https://github.com/streamlit/streamlit/issues/1010
 // Also filters using fuzzy search powered by fzy.js. Automatically handles
 // upper/lowercase.
@@ -99,35 +99,39 @@ const Selectbox: React.FC<Props> = ({
     }
   }, [propValue, value])
 
-  const handleChange = (params: OnChangeParams): void => {
-    if (params.value.length === 0) {
-      setValue(null)
-      onChange(null)
-      return
-    }
+  const handleChange = useCallback(
+    (params: OnChangeParams): void => {
+      if (params.value.length === 0) {
+        setValue(null)
+        onChange(null)
+        return
+      }
 
-    const [selected] = params.value
-    const newValue = parseInt(selected.value, 10)
-    setValue(newValue)
-    onChange(newValue)
-  }
+      const [selected] = params.value
+      const newValue = parseInt(selected.value, 10)
+      setValue(newValue)
+      onChange(newValue)
+    },
+    [onChange]
+  )
 
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    const currentInput = event.target.value
-    setIsEmpty(!currentInput)
-  }
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      const currentInput = event.target.value
+      setIsEmpty(!currentInput)
+    },
+    []
+  )
 
-  const handleClose = (): void => {
+  const handleClose = useCallback((): void => {
     setIsEmpty(false)
-  }
+  }, [])
 
-  const filterOptions = (
-    options: readonly Option[],
-    filterValue: string
-  ): readonly Option[] =>
-    fuzzyFilterSelectOptions(options as SelectOption[], filterValue)
+  const filterOptions = useCallback(
+    (options: readonly Option[], filterValue: string): readonly Option[] =>
+      fuzzyFilterSelectOptions(options as SelectOption[], filterValue),
+    []
+  )
 
   let selectDisabled = disabled
   let options = propOptions
@@ -199,7 +203,7 @@ const Selectbox: React.FC<Props> = ({
                 Svg: {
                   style: {
                     color: theme.colors.darkGray,
-                    // setting this width and height makes the clear-icon align with dropdown arrows
+                    // Setting this width and height makes the clear-icon align with dropdown arrows
                     padding: theme.spacing.threeXS,
                     height: theme.sizes.clearIconSize,
                     width: theme.sizes.clearIconSize,
