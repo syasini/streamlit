@@ -314,6 +314,8 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
         f"default-src 'none'; worker-src blob:; form-action 'none'; "
         f"connect-src ws://localhost:{app_port}/_stcore/stream "
         f"http://localhost:{app_port}/_stcore/allowed-message-origins "
+        f"http://localhost:{app_port}/_stcore/upload_file/ "
+        f"https://some-prefix.com/somethingelse/_stcore/upload_file/ "
         f"http://localhost:{app_port}/_stcore/host-config "
         f"http://localhost:{app_port}/_stcore/health; script-src 'unsafe-inline' "
         f"'unsafe-eval' {app_url}/static/js/; style-src 'unsafe-inline' "
@@ -640,6 +642,7 @@ def assert_snapshot(
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
             snapshot_updates_file_path.write_bytes(img_bytes)
+
             test_failure_messages.append(
                 f"Snapshot matching for {snapshot_file_name} failed. "
                 f"Expected size: {img_b.size}, actual size: {img_a.size}. "

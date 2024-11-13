@@ -16,10 +16,10 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
-import { act, fireEvent, screen } from "@testing-library/react"
+import { act, fireEvent, screen, within } from "@testing-library/react"
+import { userEvent } from "@testing-library/user-event"
 
-import { render } from "@streamlit/lib/src/test_util"
+import { customRenderLibContext, render } from "@streamlit/lib/src/test_util"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
   DateInput as DateInputProto,
@@ -47,8 +47,8 @@ const getProps = (
   width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager({
-    sendRerunBackMsg: jest.fn(),
-    formsDataChanged: jest.fn(),
+    sendRerunBackMsg: vi.fn(),
+    formsDataChanged: vi.fn(),
   }),
   ...widgetProps,
 })
@@ -57,13 +57,13 @@ describe("DateInput widget", () => {
   it("renders without crashing", () => {
     const props = getProps()
     render(<DateInput {...props} />)
-    expect(screen.getByTestId("stDateInput")).toBeInTheDocument()
+    expect(screen.getByTestId("stDateInput")).toBeVisible()
   })
 
   it("renders a label", () => {
     const props = getProps()
     render(<DateInput {...props} />)
-    expect(screen.getByText("Label")).toBeInTheDocument()
+    expect(screen.getByText("Label")).toBeVisible()
   })
 
   it("displays the correct placeholder and value for the provided format", () => {
@@ -71,8 +71,8 @@ describe("DateInput widget", () => {
       format: "DD.MM.YYYY",
     })
     render(<DateInput {...props} />)
-    expect(screen.getByPlaceholderText("DD.MM.YYYY")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("20.01.1970")).toBeInTheDocument()
+    expect(screen.getByPlaceholderText("DD.MM.YYYY")).toBeVisible()
+    expect(screen.getByDisplayValue("20.01.1970")).toBeVisible()
   })
 
   it("pass labelVisibility prop to StyledWidgetLabel correctly when hidden", () => {
@@ -99,7 +99,7 @@ describe("DateInput widget", () => {
 
   it("sets widget value on render", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringArrayValue")
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
     expect(props.widgetMgr.setStringArrayValue).toHaveBeenCalledWith(
@@ -114,7 +114,7 @@ describe("DateInput widget", () => {
 
   it("can pass a fragmentId to setStringArrayValue", () => {
     const props = getProps(undefined, { fragmentId: "myFragmentId" })
-    jest.spyOn(props.widgetMgr, "setStringArrayValue")
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
     expect(props.widgetMgr.setStringArrayValue).toHaveBeenCalledWith(
@@ -153,7 +153,7 @@ describe("DateInput widget", () => {
 
   it("updates the widget value when it's changed", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringArrayValue")
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
     const datePicker = screen.getByTestId("stDateInputField")
@@ -172,7 +172,7 @@ describe("DateInput widget", () => {
 
   it("resets its value to default when it's closed with empty input", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringArrayValue")
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
     const dateInput = screen.getByTestId("stDateInputField")
@@ -263,7 +263,7 @@ describe("DateInput widget", () => {
     const props = getProps({ formId: "form" })
     props.widgetMgr.setFormSubmitBehaviors("form", true)
 
-    jest.spyOn(props.widgetMgr, "setStringArrayValue")
+    vi.spyOn(props.widgetMgr, "setStringArrayValue")
 
     render(<DateInput {...props} />)
 
@@ -297,5 +297,71 @@ describe("DateInput widget", () => {
       },
       undefined
     )
+  })
+
+  describe("localization", () => {
+    const getCalendarHeader = async (): Promise<HTMLElement> => {
+      const calendar = await screen.findByLabelText("Calendar.")
+      const presentations = await within(calendar).findAllByRole(
+        "presentation"
+      )
+      return presentations[presentations.length - 1]
+    }
+
+    describe("with a locale whose week starts on Monday", () => {
+      const locale = "de"
+
+      it("renders expected week day ordering", async () => {
+        const user = userEvent.setup()
+        const props = getProps()
+        customRenderLibContext(<DateInput {...props} />, { locale })
+
+        await user.click(await screen.findByLabelText("Select a date."))
+
+        expect(await getCalendarHeader()).toHaveTextContent("MoTuWeThFrSaSu")
+      })
+    })
+
+    describe("with a locale whose week starts on Saturday", () => {
+      const locale = "ar"
+
+      it("renders expected week day ordering", async () => {
+        const user = userEvent.setup()
+        const props = getProps()
+        customRenderLibContext(<DateInput {...props} />, { locale })
+
+        await user.click(await screen.findByLabelText("Select a date."))
+
+        expect(await getCalendarHeader()).toHaveTextContent("SaSuMoTuWeThFr")
+      })
+    })
+
+    describe("with a locale whose week starts on Sunday", () => {
+      const locale = "en-US"
+
+      it("renders expected week day ordering", async () => {
+        const user = userEvent.setup()
+        const props = getProps()
+        customRenderLibContext(<DateInput {...props} />, { locale })
+
+        await user.click(await screen.findByLabelText("Select a date."))
+
+        expect(await getCalendarHeader()).toHaveTextContent("SuMoTuWeThFrSa")
+      })
+    })
+
+    describe("with an invalid locale", () => {
+      const locale = "does-not-exist"
+
+      it("falls back to en-US locale", async () => {
+        const user = userEvent.setup()
+        const props = getProps()
+        customRenderLibContext(<DateInput {...props} />, { locale })
+
+        await user.click(await screen.findByLabelText("Select a date."))
+
+        expect(await getCalendarHeader()).toHaveTextContent("SuMoTuWeThFrSa")
+      })
+    })
   })
 })

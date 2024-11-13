@@ -50,7 +50,7 @@ export const StyledDocContainer = styled.span<StyledDocContainerProps>(
 export const StyledDocHeader = styled.div(({ theme }) => ({
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
   backgroundColor: theme.colors.docStringContainerBackground,
-  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
   // Add rounded corners to the top of the container to prevent the background
   // color from bleeding into the surrounding area.
   borderTopLeftRadius: theme.radii.default,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, memo, useCallback, useMemo } from "react"
 
 import { ChevronDown } from "baseui/icon"
 import {
@@ -43,7 +43,7 @@ import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
   useBasicWidgetState,
   ValueWithSource,
-} from "@streamlit/lib/src/useBasicWidgetState"
+} from "@streamlit/lib/src/hooks/useBasicWidgetState"
 
 export interface Props {
   disabled: boolean
@@ -378,4 +378,4 @@ const Multiselect: FC<Props> = props => {
   )
 }
 
-export default Multiselect
+export default memo(Multiselect)

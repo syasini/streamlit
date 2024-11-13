@@ -77,7 +77,8 @@ export const StyledUploadedFiles = styled.div(({ theme }) => ({
 
 export const StyledUploadedFilesList = styled.ul(({ theme }) => ({
   listStyleType: "none",
-  marginBottom: theme.spacing.none,
+  margin: theme.spacing.none,
+  padding: theme.spacing.none,
 }))
 
 export const StyledUploadedFilesListItem = styled.li(({ theme }) => ({
