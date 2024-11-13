@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import React, {
-  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
