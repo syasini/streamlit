@@ -22,7 +22,10 @@ import tornado.web
 import tornado.websocket
 
 from streamlit.user_info import encode_provider_token
+from streamlit.web.server import oauth_authlib_routes
 from streamlit.web.server.oauth_authlib_routes import (
+    AuthCache,
+    AuthCallbackHandler,
     AuthLoginHandler,
     AuthLogoutHandler,
 )
@@ -156,3 +159,101 @@ class LogoutHandlerTest(tornado.testing.AsyncHTTPTestCase):
         assert response.code == 302
         assert response.headers["Location"] == "/"
         assert '_streamlit_user="";' in response.headers["Set-Cookie"]
+
+
+@patch(
+    "streamlit.web.server.oauth_authlib_routes.secrets_singleton",
+    MagicMock(
+        load_if_toml_exists=MagicMock(return_value=True),
+        get=MagicMock(return_value=SECRETS_MOCK),
+    ),
+)
+class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
+    def get_app(self):
+        return tornado.web.Application(
+            [
+                (
+                    r"/oauth2callback",
+                    AuthCallbackHandler,
+                )
+            ],
+            cookie_secret="AAAA",
+        )
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.old_value = oauth_authlib_routes.auth_cache
+        oauth_authlib_routes.auth_cache = AuthCache()
+        oauth_authlib_routes.auth_cache.set("a_b_google_123", "AAA", None)
+
+    def tearDown(self) -> None:
+        oauth_authlib_routes.auth_cache = self.old_value
+
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
+    @patch(
+        "streamlit.web.server.oauth_authlib_routes.create_oauth_client",
+        return_value=(
+            MagicMock(
+                authorize_access_token=MagicMock(
+                    return_value={"userinfo": {"email": "test@example.com"}}
+                )
+            ),
+            MagicMock(),
+        ),
+    )
+    def test_auth_callback_success(
+        self, mock_create_oauth_client, mock_set_auth_cookie
+    ):
+        """Test auth callback success."""
+        response = self.fetch("/oauth2callback?state=123", follow_redirects=False)
+        mock_create_oauth_client.assert_called_with("google")
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "email": "test@example.com",
+                "origin": "http://localhost:8501",
+            }
+        )
+
+        assert response.code == 302
+        assert response.headers["Location"] == "/"
+
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
+    def test_auth_callback_failure_missing_provider_in_cache(
+        self, mock_set_auth_cookie
+    ):
+        """Test auth callback success."""
+        response = self.fetch("/oauth2callback?state=456", follow_redirects=False)
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "provider": None,
+                "error": "Missing provider",
+                "email": None,
+                "origin": "http://localhost:8501",
+            }
+        )
+
+        assert response.code == 302
+        assert response.headers["Location"] == "/"
+
+    def test_auth_callback_failure_missing_state(self):
+        """Test auth callback failure missing state."""
+        response = self.fetch("/oauth2callback", follow_redirects=False)
+        assert response.code == 400
+
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
+    def test_auth_callback_with_error_query_param(self, mock_set_auth_cookie):
+        response = self.fetch(
+            "/oauth2callback?state=123&error=foo", follow_redirects=False
+        )
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "provider": "google",
+                "error": "foo",
+                "email": None,
+                "origin": "http://localhost:8501",
+            }
+        )
+
+        assert response.code == 302
+        assert response.headers["Location"] == "/"
