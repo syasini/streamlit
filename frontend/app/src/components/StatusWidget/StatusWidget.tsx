@@ -111,7 +111,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
   rerunScript,
   stopScript,
   allowRunOnSave,
-}): ReactElement => {
+}) => {
   const [statusMinimized, setStatusMinimized] = useState(shouldMinimize())
   const [scriptChangedOnDisk, setScriptChangedOnDisk] = useState(false)
   const [promptMinimized, setPromptMinimized] = useState(false)
