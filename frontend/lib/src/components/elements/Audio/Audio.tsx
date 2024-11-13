@@ -16,9 +16,12 @@
 
 import React, { ReactElement, useEffect, useMemo, useRef } from "react"
 
+import { useTheme } from "@emotion/react"
+
 import { Audio as AudioProto } from "@streamlit/lib/src/proto"
 import { StreamlitEndpoints } from "@streamlit/lib/src/StreamlitEndpoints"
 import { WidgetStateManager as ElementStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { EmotionTheme } from "@streamlit/lib/src/theme/types"
 
 export interface AudioProps {
   endpoints: StreamlitEndpoints
@@ -33,6 +36,8 @@ export default function Audio({
   endpoints,
   elementMgr,
 }: Readonly<AudioProps>): ReactElement {
+  const theme: EmotionTheme = useTheme()
+
   const audioRef = useRef<HTMLAudioElement>(null)
 
   const { startTime, endTime, loop, autoplay } = element
@@ -147,14 +152,21 @@ export default function Audio({
   const uri = endpoints.buildMediaURL(element.url)
 
   return (
-    <audio
-      className="stAudio"
-      data-testid="stAudio"
-      ref={audioRef}
-      controls
-      autoPlay={autoplay && !preventAutoplay}
-      src={uri}
-      style={{ width }}
-    />
+    <div style={{ lineHeight: 0 }}>
+      <audio
+        className="stAudio"
+        data-testid="stAudio"
+        ref={audioRef}
+        controls
+        autoPlay={autoplay && !preventAutoplay}
+        src={uri}
+        style={{
+          width,
+          height: theme.sizes.minElementHeight,
+          margin: 0,
+          padding: 0,
+        }}
+      />
+    </div>
   )
 }
