@@ -25,6 +25,7 @@ export { default as IsDialogContext } from "./components/core/IsDialogContext"
 export { default as IsSidebarContext } from "./components/core/IsSidebarContext"
 export { LibContext } from "./components/core/LibContext"
 export type { LibConfig, LibContextProps } from "./components/core/LibContext"
+export { PortalProvider } from "./components/core/Portal/PortalProvider"
 export { default as ThemeProvider } from "./components/core/ThemeProvider"
 export { default as AlertElement } from "./components/elements/AlertElement"
 export { default as StreamlitSyntaxHighlighter } from "./components/elements/CodeBlock/StreamlitSyntaxHighlighter"
@@ -50,6 +51,7 @@ export {
 } from "./components/shared/Modal"
 export { default as StreamlitMarkdown } from "./components/shared/StreamlitMarkdown"
 export { Placement, default as Tooltip } from "./components/shared/Tooltip"
+export { WindowDimensionsProvider } from "./components/shared/WindowDimensions/Provider"
 export { ComponentRegistry } from "./components/widgets/CustomComponent"
 export { Quiver } from "./dataframes/Quiver"
 export { FileUploadClient } from "./FileUploadClient"
@@ -81,7 +83,11 @@ export type {
   JWTHeader,
   StreamlitEndpoints,
 } from "./StreamlitEndpoints"
-export { mockWindowLocation, render } from "./test_util"
+export {
+  customRenderLibContext,
+  mockWindowLocation,
+  render,
+} from "./test_util"
 export {
   AUTO_THEME_NAME,
   CUSTOM_THEME_NAME,

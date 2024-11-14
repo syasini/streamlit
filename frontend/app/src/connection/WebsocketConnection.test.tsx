@@ -26,15 +26,14 @@ import {
   mockSessionInfoProps,
   SessionInfo,
 } from "@streamlit/lib"
+
 import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
 import {
   Args,
   CORS_ERROR_MESSAGE_DOCUMENTATION_LINK,
   doInitPings,
-  StyledBashCode,
   WebsocketConnection,
 } from "@streamlit/app/src/connection/WebsocketConnection"
-import { StyledPre } from "@streamlit/lib/src/components/elements/CodeBlock/styled-components"
 
 const MOCK_ALLOWED_ORIGINS_CONFIG = {
   allowedOrigins: ["list", "of", "allowed", "origins"],
