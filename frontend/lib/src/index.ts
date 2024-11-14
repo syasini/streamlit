@@ -27,6 +27,7 @@ export { LibContext } from "./components/core/LibContext"
 export type { LibConfig, LibContextProps } from "./components/core/LibContext"
 export { default as ThemeProvider } from "./components/core/ThemeProvider"
 export { default as AlertElement } from "./components/elements/AlertElement"
+export { default as StreamlitSyntaxHighlighter } from "./components/elements/CodeBlock/StreamlitSyntaxHighlighter"
 export { handleFavicon } from "./components/elements/Favicon"
 export { default as TextElement } from "./components/elements/TextElement"
 export {
@@ -35,7 +36,11 @@ export {
 } from "./components/shared/BaseButton"
 export { default as BaseColorPicker } from "./components/shared/BaseColorPicker"
 export { default as UISelectbox } from "./components/shared/Dropdown/Selectbox"
-export { EmojiIcon, default as Icon } from "./components/shared/Icon"
+export {
+  DynamicIcon,
+  EmojiIcon,
+  default as Icon,
+} from "./components/shared/Icon"
 export {
   default as Modal,
   ModalBody,
@@ -44,7 +49,6 @@ export {
   ModalHeader,
 } from "./components/shared/Modal"
 export { default as StreamlitMarkdown } from "./components/shared/StreamlitMarkdown"
-export { Small } from "./components/shared/TextElements"
 export { Placement, default as Tooltip } from "./components/shared/Tooltip"
 export { ComponentRegistry } from "./components/widgets/CustomComponent"
 export { Quiver } from "./dataframes/Quiver"
@@ -73,9 +77,9 @@ export { RootStyleProvider } from "./RootStyleProvider"
 export { ScriptRunState } from "./ScriptRunState"
 export { SessionInfo } from "./SessionInfo"
 export type {
+  FileUploadClientConfig,
   JWTHeader,
   StreamlitEndpoints,
-  FileUploadClientConfig,
 } from "./StreamlitEndpoints"
 export { mockWindowLocation, render } from "./test_util"
 export {
@@ -127,11 +131,14 @@ export {
   isEmbed,
   isInChildFrame,
   isLightThemeInQueryParams,
+  isNullOrUndefined,
   isPaddingDisplayed,
   isScrollingHidden,
   isToolbarDisplayed,
   makeElementWithInfoText,
+  notNullOrUndefined,
   notUndefined,
+  preserveEmbedQueryParams,
   setCookie,
 } from "./util/utils"
 export { WidgetStateManager, createFormsData } from "./WidgetStateManager"
