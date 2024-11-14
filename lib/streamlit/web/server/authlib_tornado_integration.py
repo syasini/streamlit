@@ -38,6 +38,10 @@ class TornadoIntegration(FrameworkIntegration):  # type: ignore[misc]
         """Configure Authlib integration with provider parameters
         specified in secrets.toml
         """
+
+        # oauth.config here is an auth section from secrets.toml
+        # We parse it here to transform nested AttrDict (for client_kwargs value)
+        # to dict so Authlib can work with it under the hood.
         if not oauth.config:
             return {}
 
