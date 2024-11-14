@@ -44,4 +44,5 @@ def test_static_served_image_embedded_in_markdown(app: Page):
 
     expect(image_element).to_be_visible()
     # Check that the image gets loaded correctly
-    app.expect_response("**/streamlit-logo.png")
+    with app.expect_response("**/streamlit-logo.png") as response:
+        assert response.value.status == 200
