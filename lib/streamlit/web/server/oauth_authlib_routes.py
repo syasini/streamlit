@@ -90,7 +90,14 @@ class AuthLoginHandler(tornado.web.RequestHandler):
 
 class AuthHandlerMixin(tornado.web.RequestHandler):
     def set_auth_cookie(self, user_info: dict[str, Any]) -> None:
-        self.set_signed_cookie(AUTH_COOKIE_NAME, json.dumps(user_info), httpOnly=True)
+        try:
+            self.set_signed_cookie(
+                AUTH_COOKIE_NAME, json.dumps(user_info), httpOnly=True
+            )
+        except AttributeError:
+            self.set_secure_cookie(
+                AUTH_COOKIE_NAME, json.dumps(user_info), httponly=True
+            )
 
     def clear_auth_cookie(self) -> None:
         self.clear_cookie(AUTH_COOKIE_NAME)

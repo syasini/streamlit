@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock, patch
 
 import tornado.httpserver
@@ -191,7 +190,7 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
     def tearDown(self) -> None:
         oauth_authlib_routes.auth_cache = self.old_value
 
-    @patch.object(tornado.web.RequestHandler, "set_signed_cookie")
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
     @patch(
         "streamlit.web.server.oauth_authlib_routes.create_oauth_client",
         return_value=(
@@ -204,42 +203,34 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
         ),
     )
     def test_auth_callback_success(
-        self, mock_create_oauth_client, mock_set_signed_cookie
+        self, mock_create_oauth_client, mock_set_auth_cookie
     ):
         """Test auth callback success."""
         response = self.fetch("/oauth2callback?state=123", follow_redirects=False)
         mock_create_oauth_client.assert_called_with("google")
-        mock_set_signed_cookie.assert_called_with(
-            "_streamlit_user",
-            json.dumps(
-                {
-                    "email": "test@example.com",
-                    "origin": "http://localhost:8501",
-                }
-            ),
-            httpOnly=True,
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "email": "test@example.com",
+                "origin": "http://localhost:8501",
+            }
         )
 
         assert response.code == 302
         assert response.headers["Location"] == "/"
 
-    @patch.object(tornado.web.RequestHandler, "set_signed_cookie")
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
     def test_auth_callback_failure_missing_provider_in_cache(
-        self, mock_set_signed_cookie
+        self, mock_set_auth_cookie
     ):
         """Test auth callback success."""
         response = self.fetch("/oauth2callback?state=456", follow_redirects=False)
-        mock_set_signed_cookie.assert_called_with(
-            "_streamlit_user",
-            json.dumps(
-                {
-                    "provider": None,
-                    "error": "Missing provider",
-                    "email": None,
-                    "origin": "http://localhost:8501",
-                }
-            ),
-            httpOnly=True,
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "provider": None,
+                "error": "Missing provider",
+                "email": None,
+                "origin": "http://localhost:8501",
+            }
         )
 
         assert response.code == 302
@@ -250,22 +241,18 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
         response = self.fetch("/oauth2callback", follow_redirects=False)
         assert response.code == 400
 
-    @patch.object(tornado.web.RequestHandler, "set_signed_cookie")
-    def test_auth_callback_with_error_query_param(self, mock_set_signed_cookie):
+    @patch.object(AuthCallbackHandler, "set_auth_cookie")
+    def test_auth_callback_with_error_query_param(self, mock_set_auth_cookie):
         response = self.fetch(
             "/oauth2callback?state=123&error=foo", follow_redirects=False
         )
-        mock_set_signed_cookie.assert_called_with(
-            "_streamlit_user",
-            json.dumps(
-                {
-                    "provider": "google",
-                    "error": "foo",
-                    "email": None,
-                    "origin": "http://localhost:8501",
-                }
-            ),
-            httpOnly=True,
+        mock_set_auth_cookie.assert_called_with(
+            {
+                "provider": "google",
+                "error": "foo",
+                "email": None,
+                "origin": "http://localhost:8501",
+            }
         )
 
         assert response.code == 302
