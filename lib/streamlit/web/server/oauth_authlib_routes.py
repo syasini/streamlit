@@ -51,7 +51,7 @@ def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
         auth_section = secrets_singleton.get("auth")
         if auth_section:
             redirect_uri = auth_section.get("redirect_uri", None)
-            config = dict(auth_section.to_dict())
+            config = auth_section.to_dict()
         else:
             config = {}
             redirect_uri = "/"

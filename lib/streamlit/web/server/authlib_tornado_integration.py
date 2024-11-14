@@ -12,11 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Sequence
+
 from authlib.integrations.base_client import (  # type: ignore[import-untyped]
     FrameworkIntegration,
 )
 
 from streamlit.runtime.secrets import AttrDict
+
+if TYPE_CHECKING:
+    from streamlit.web.server.oidc_mixin import TornadoOAuth
 
 
 class TornadoIntegration(FrameworkIntegration):  # type: ignore[misc]
@@ -25,7 +32,9 @@ class TornadoIntegration(FrameworkIntegration):  # type: ignore[misc]
         identity tokens"""
 
     @staticmethod
-    def load_config(oauth, name, params):
+    def load_config(
+        oauth: TornadoOAuth, name: str, params: Sequence[str]
+    ) -> dict[str, Any]:
         """Configure Authlib integration with provider parameters
         specified in secrets.toml
         """
