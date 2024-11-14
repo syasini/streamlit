@@ -19,9 +19,7 @@ This file is automatically run by pytest before tests are executed.
 
 from __future__ import annotations
 
-import gc
 import hashlib
-import io
 import os
 import re
 import shlex
@@ -213,15 +211,6 @@ def app_port(worker_id: str) -> int:
     return find_available_port()
 
 
-def flush_all_files():
-    for obj in gc.get_objects():
-        if isinstance(obj, io.IOBase):
-            try:
-                obj.flush()
-            except Exception:
-                pass
-
-
 @pytest.fixture(scope="module", autouse=True)
 def app_server(
     app_port: int, request: FixtureRequest
@@ -257,7 +246,6 @@ def app_server(
     yield streamlit_proc
     streamlit_stdout = streamlit_proc.terminate()
     print(streamlit_stdout, flush=True)
-    flush_all_files()
 
 
 @pytest.fixture(scope="function")
@@ -531,6 +519,15 @@ def output_folder(pytestconfig: Any) -> Path:
     return Path(pytestconfig.getoption("--output")).resolve()
 
 
+def _write_bytes_to_file(file_path: Path, data: bytes) -> None:
+    """Write bytes to a file and ensure that the file is flushed to disk."""
+    view = memoryview(data)
+    with open(file_path, mode="wb") as f:
+        f.write(view)
+        # Ensure that the file is flushed to disk
+        f.flush()
+
+
 @pytest.fixture(scope="function")
 def assert_snapshot(
     request: FixtureRequest, output_folder: Path
@@ -624,10 +621,10 @@ def assert_snapshot(
         #     shutil.rmtree(test_failures_dir)
 
         if not snapshot_file_path.exists():
-            snapshot_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_file_path, img_bytes)
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-            snapshot_updates_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
             # For missing snapshots, we don't want to directly fail in order to generate
             # all missing snapshots in one run.
             test_failure_messages.append(f"Missing snapshot for {snapshot_file_name}")
@@ -652,7 +649,7 @@ def assert_snapshot(
             # ValueError is thrown when the images have different sizes
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-            snapshot_updates_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
 
             test_failure_messages.append(
                 f"Snapshot matching for {snapshot_file_name} failed. "
@@ -677,7 +674,7 @@ def assert_snapshot(
 
         # Update this in updates folder:
         snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-        snapshot_updates_file_path.write_bytes(img_bytes)
+        _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
         print(
             "Writing snapshot 2",
             snapshot_updates_file_path,
