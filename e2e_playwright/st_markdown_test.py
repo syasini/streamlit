@@ -21,6 +21,7 @@ from e2e_playwright.shared.app_utils import (
     expect_help_tooltip,
     get_element_by_key,
     get_markdown,
+    wait_for_all_images_to_be_loaded,
 )
 
 
@@ -241,13 +242,8 @@ def test_large_image_in_markdown(app: Page, assert_snapshot: ImageCompareFunctio
     image_element.scroll_into_view_if_needed()
     expect(image_element).to_be_visible()
     expect(image_element).to_have_css("max-width", "100%")
-    # Wait for the image to load:
-    with app.expect_response("**/streamlit-logo.png") as response:
-        assert response.value.status == 200
 
-    # Add additional timeout to avoid flakiness
-    #  since sometimes the image is not rendered yet
-    app.wait_for_timeout(2000)
+    wait_for_all_images_to_be_loaded(app)
     assert_snapshot(markdown_element, name="st_markdown-with_large_image")
 
 
