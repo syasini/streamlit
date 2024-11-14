@@ -23,7 +23,6 @@ import hashlib
 import os
 import re
 import shlex
-import shutil
 import socket
 import subprocess
 import sys
@@ -314,8 +313,6 @@ def iframed_app(page: Page, app_port: int) -> IframedPage:
         f"default-src 'none'; worker-src blob:; form-action 'none'; "
         f"connect-src ws://localhost:{app_port}/_stcore/stream "
         f"http://localhost:{app_port}/_stcore/allowed-message-origins "
-        f"http://localhost:{app_port}/_stcore/upload_file/ "
-        f"https://some-prefix.com/somethingelse/_stcore/upload_file/ "
         f"http://localhost:{app_port}/_stcore/host-config "
         f"http://localhost:{app_port}/_stcore/health; script-src 'unsafe-inline' "
         f"'unsafe-eval' {app_url}/static/js/; style-src 'unsafe-inline' "
@@ -608,9 +605,9 @@ def assert_snapshot(
         snapshot_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         test_failures_dir = module_snapshot_failures_dir / snapshot_file_name
-        if test_failures_dir.exists():
-            # Remove the past runs failure dir for this specific screenshot
-            shutil.rmtree(test_failures_dir)
+        # if test_failures_dir.exists():
+        #     # Remove the past runs failure dir for this specific screenshot
+        #     shutil.rmtree(test_failures_dir)
 
         if not snapshot_file_path.exists():
             snapshot_file_path.write_bytes(img_bytes)
@@ -648,6 +645,15 @@ def assert_snapshot(
                 f"Expected size: {img_b.size}, actual size: {img_a.size}. "
                 f"Error: {ex}"
             )
+            print(
+                "Writing snapshot 1",
+                snapshot_updates_file_path,
+                snapshot_updates_file_path.exists(),
+                sum(
+                    len(files)
+                    for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
+                ),
+            )
             return
         total_pixels = img_a.size[0] * img_a.size[1]
         max_diff_pixels = int(image_threshold * total_pixels)
@@ -658,6 +664,15 @@ def assert_snapshot(
         # Update this in updates folder:
         snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
         snapshot_updates_file_path.write_bytes(img_bytes)
+        print(
+            "Writing snapshot 2",
+            snapshot_updates_file_path,
+            snapshot_updates_file_path.exists(),
+            sum(
+                len(files)
+                for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
+            ),
+        )
 
         # Create new failures folder for this test:
         test_failures_dir.mkdir(parents=True, exist_ok=True)
@@ -669,6 +684,7 @@ def assert_snapshot(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
             f" {mismatch/total_pixels * 100:.2f}%)"
         )
+        return
 
     yield compare
 
