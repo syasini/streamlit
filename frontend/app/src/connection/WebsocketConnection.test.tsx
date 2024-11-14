@@ -26,7 +26,6 @@ import {
   mockSessionInfoProps,
   SessionInfo,
 } from "@streamlit/lib"
-
 import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
 import {
   Args,
