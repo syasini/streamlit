@@ -104,7 +104,7 @@ export interface StyledSidebarNavIconProps {
   isActive: boolean
 }
 
-export const StyledSidebarNavIcon = styled.div<StyledSidebarNavIconProps>(
+export const StyledSidebarNavIcon = styled.span<StyledSidebarNavIconProps>(
   ({ theme, isActive }) => {
     const svgColor = conditionalCustomColor(
       theme,
@@ -118,6 +118,7 @@ export const StyledSidebarNavIcon = styled.div<StyledSidebarNavIconProps>(
     )
 
     return {
+      display: "inline-flex",
       span: {
         color: isActive ? activeSvgColor : svgColor,
         fontWeight: isActive
