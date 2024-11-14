@@ -108,10 +108,11 @@ def test_st_map_clicking_on_fullscreen_toolbar_button(
     # to prevent flakiness.
     app.wait_for_timeout(10000)
 
+    map_element = app.get_by_test_id("stDeckGlJsonChart").nth(0)
+
     assert_fullscreen_toolbar_button_interactions(
-        app,
+        map_element,
         assert_snapshot=assert_snapshot,
-        widget_test_id="stDeckGlJsonChart",
         filename_prefix="st_map",
         # The pydeck tests are a lot flakier than need be so increase the pixel threshold
         pixel_threshold=1.0,

@@ -16,18 +16,46 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, expect
 
 if TYPE_CHECKING:
     from e2e_playwright.conftest import ImageCompareFunction
 
 
+def expand_element(element: Locator):
+    # Hover over element to show the toolbar
+    element.hover()
+
+    # Check if the toolbar is visible
+    element_toolbar = element.get_by_test_id("stElementToolbar")
+    expect(element_toolbar).to_be_visible()
+    expect(element_toolbar).to_have_css("opacity", "1")
+
+    # Get the fullscreen button
+    expand_button = element_toolbar.get_by_role("button", name="Fullscreen")
+    expect(expand_button).to_be_visible()
+    expand_button.click()
+
+    # Make sure that the button shows the close fullscreen button
+    expect(
+        element_toolbar.get_by_role("button", name="Close fullscreen")
+    ).to_be_visible()
+
+
+def collapse_element(element: Locator):
+    element_toolbar = element.get_by_test_id("stElementToolbar")
+    expect(element_toolbar).to_be_visible()
+    expect(element_toolbar).to_have_css("opacity", "1")
+
+    close_button = element_toolbar.get_by_role("button", name="Close fullscreen")
+    expect(close_button).to_be_visible()
+    close_button.click()
+
+
 def assert_fullscreen_toolbar_button_interactions(
-    app: Page,
+    widget_element: Locator,
     assert_snapshot: ImageCompareFunction,
-    widget_test_id: str,
     filename_prefix: str = "",
-    nth: int = 0,
     pixel_threshold: float = 0.05,
 ):
     """
@@ -35,33 +63,22 @@ def assert_fullscreen_toolbar_button_interactions(
     expands the map into fullscreen.
     """
 
-    widget_element = app.get_by_test_id(widget_test_id).nth(nth)
-    widget_toolbar = widget_element.get_by_test_id("stElementToolbar")
-    fullscreen_wrapper = app.get_by_test_id("stFullScreenFrame").nth(nth)
+    fullscreen_wrapper = widget_element.page.locator(
+        "[data-testid='stFullScreenFrame']", has=widget_element
+    )
 
-    fullscreen_toolbar_button = widget_toolbar.get_by_test_id(
-        "stElementToolbarButton"
-    ).last
-
-    # Activate toolbar:
-    widget_element.hover()
-    # Check that it is visible
-    expect(widget_toolbar).to_have_css("opacity", "1")
-
-    # Click on expand to fullscreen button:
-    fullscreen_toolbar_button.click()
-
-    # Check that it is visible
+    expand_element(widget_element)
     assert_snapshot(
-        app,
-        name=f"{filename_prefix if filename_prefix != '' else widget_test_id}-fullscreen_expanded",
+        fullscreen_wrapper,
+        name=f"{filename_prefix}-fullscreen_expanded",
         pixel_threshold=pixel_threshold,
     )
 
     # Click again on fullscreen button to close fullscreen mode:
-    fullscreen_toolbar_button.click()
+    collapse_element(widget_element)
+
     assert_snapshot(
         fullscreen_wrapper,
-        name=f"{filename_prefix if filename_prefix != '' else widget_test_id}-fullscreen_collapsed",
+        name=f"{filename_prefix}-fullscreen_collapsed",
         pixel_threshold=pixel_threshold,
     )

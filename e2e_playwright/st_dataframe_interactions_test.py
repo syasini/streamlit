@@ -205,12 +205,12 @@ def test_clicking_on_fullscreen_toolbar_button(
 ):
     """Test that clicking on fullscreen toolbar button expands the dataframe into fullscreen."""
 
+    df_element = app.get_by_test_id("stDataFrame").nth(4)
+    expect(df_element).to_be_visible()
     assert_fullscreen_toolbar_button_interactions(
-        app,
+        df_element,
         assert_snapshot=assert_snapshot,
-        widget_test_id="stDataFrame",
         filename_prefix="st_dataframe",
-        nth=4,
     )
 
 

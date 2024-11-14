@@ -26,6 +26,28 @@ from e2e_playwright.conftest import wait_for_app_run
 COMMAND_KEY = "Meta" if platform.system() == "Darwin" else "Control"
 
 
+def get_radio(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
+    """Get a radio widget with the given label.
+
+    Parameters
+    ----------
+
+    locator : Locator
+        The locator to search for the element.
+
+    label : str or Pattern[str]
+        The label of the element to get.
+
+    Returns
+    -------
+    Locator
+        The element.
+    """
+    element = locator.get_by_test_id("stRadio").filter(has_text=label)
+    expect(element).to_be_visible()
+    return element
+
+
 def get_checkbox(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
     """Get a checkbox widget with the given label.
 
@@ -297,6 +319,29 @@ def expect_warning(
     """
     warning_el = locator.get_by_test_id("stAlert").filter(has_text=expected_message)
     expect(warning_el).to_be_visible()
+
+
+def select_radio_option(
+    locator: Locator | Page,
+    label: str | Pattern[str],
+    option: str | Pattern[str],
+) -> None:
+    """Select a radio option with the given label and option.
+
+    Parameters
+    ----------
+    locator : Locator | Page
+        The locator to search for the radio element.
+
+    label : str or Pattern[str]
+        The label of the radio element to select.
+
+    option : str or Pattern[str]
+        The option to select.
+    """
+    radio_element = get_radio(locator, label)
+    radio_element.locator("label").filter(has_text=option).click()
+    wait_for_app_run(locator)
 
 
 def click_checkbox(

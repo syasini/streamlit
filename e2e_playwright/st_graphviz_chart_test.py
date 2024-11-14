@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run, wait_until
-from e2e_playwright.shared.app_utils import check_top_level_class
+from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
+from e2e_playwright.shared.app_utils import check_top_level_class, select_radio_option
+from e2e_playwright.shared.toolbar_utils import (
+    assert_fullscreen_toolbar_button_interactions,
+)
 
 
 def get_first_graph_svg(app: Page):
     return app.get_by_test_id("stGraphVizChart").nth(0).locator("svg")
-
-
-def click_fullscreen(app: Page):
-    app.get_by_role("button", name="Fullscreen").nth(0).click()
-    # Wait for the animation to finish
-    app.wait_for_timeout(1000)
 
 
 def test_initial_setup(app: Page):
@@ -54,45 +53,20 @@ def test_first_graph_dimensions(app: Page):
     expect(first_graph_svg).to_have_attribute("height", "116pt")
 
 
-def test_first_graph_fullscreen(app: Page, assert_snapshot: ImageCompareFunction):
-    """Test if the first graph shows in fullscreen."""
-
-    # Hover over the parent div
-    app.get_by_test_id("stGraphVizChart").nth(0).hover()
-
-    # Enter fullscreen
-    click_fullscreen(app)
-
-    first_graph_svg = get_first_graph_svg(app)
-    # The width and height unset on the element on fullscreen
-    expect(first_graph_svg).not_to_have_attribute("width", "79pt")
-    expect(first_graph_svg).not_to_have_attribute("height", "116pt")
-
-    def check_dimensions():
-        svg_dimensions = first_graph_svg.bounding_box()
-        return svg_dimensions["width"] == 1256 and svg_dimensions["height"] == 662
-
-    wait_until(app, check_dimensions)
-
-    assert_snapshot(first_graph_svg, name="st_graphviz-fullscreen")
-
-
-def test_first_graph_after_exit_fullscreen(
+def test_clicking_on_fullscreen_toolbar_button(
     app: Page, assert_snapshot: ImageCompareFunction
 ):
-    """Test if the first graph has correct size after exiting fullscreen."""
+    """Test that clicking on fullscreen toolbar button expands the
+    graphviz chart into fullscreen."""
 
-    # Hover over the parent div
-    app.get_by_test_id("stGraphVizChart").nth(0).hover()
+    df_element = app.get_by_test_id("stGraphVizChart").nth(0)
+    expect(df_element).to_be_visible()
 
-    # Enter and exit fullscreen
-    click_fullscreen(app)
-    click_fullscreen(app)
-
-    first_graph_svg = get_first_graph_svg(app)
-    expect(first_graph_svg).to_have_attribute("width", "79pt")
-    expect(first_graph_svg).to_have_attribute("height", "116pt")
-    assert_snapshot(first_graph_svg, name="st_graphviz-after_exit_fullscreen")
+    assert_fullscreen_toolbar_button_interactions(
+        df_element,
+        assert_snapshot=assert_snapshot,
+        filename_prefix="st_dataframe",
+    )
 
 
 def test_renders_with_specified_engines(
@@ -102,10 +76,8 @@ def test_renders_with_specified_engines(
 
     engines = ["dot", "neato", "twopi", "circo", "fdp", "osage", "patchwork"]
 
-    radios = app.query_selector_all('label[data-baseweb="radio"]')
-
-    for idx, engine in enumerate(engines):
-        radios[idx].click(force=True)
+    for engine in engines:
+        select_radio_option(app, "Select engine", engine)
         wait_for_app_run(app)
         expect(app.get_by_test_id("stMarkdown").nth(0)).to_have_text(engine)
 

@@ -73,7 +73,7 @@ st.graphviz_chart(hello)
 
 st.graphviz_chart(styled)
 
-st.graphviz_chart(finite)
+st.graphviz_chart(finite, use_container_width=True)
 
 # draw graphs in columns
 

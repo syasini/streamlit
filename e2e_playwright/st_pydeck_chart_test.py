@@ -99,10 +99,11 @@ def test_st_pydeck_clicking_on_fullscreen_toolbar_button(
     # wait for mapbox to load
     wait_for_app_run(app, 15000)
 
+    pydeck_element = app.get_by_test_id("stDeckGlJsonChart").nth(0)
+
     assert_fullscreen_toolbar_button_interactions(
-        app,
+        pydeck_element,
         assert_snapshot=assert_snapshot,
-        widget_test_id="stDeckGlJsonChart",
         filename_prefix="st_pydeck_chart",
         # The pydeck tests are a lot flakier than need be so increase the pixel threshold
         pixel_threshold=1.0,
