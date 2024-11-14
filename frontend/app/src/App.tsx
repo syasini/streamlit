@@ -1052,7 +1052,7 @@ export class App extends PureComponent<Props, State> {
       this.maybeSetState(this.appNavigation.handleNewSession(newSessionProto))
 
       // Set the favicon to its default values
-      this.onPageIconChanged(`${process.env.PUBLIC_URL}/favicon.png`)
+      this.onPageIconChanged(`${import.meta.env.BASE_URL}favicon.png`)
     } else {
       this.setState({
         fragmentIdsThisRun,
@@ -1486,6 +1486,7 @@ export class App extends PureComponent<Props, State> {
 
   onPageChange = (pageScriptHash: string): void => {
     const { elements, mainScriptHash } = this.state
+
     // We are about to change the page, so clear all auto reruns
     // This also happens in handleNewSession, but it might be too late compared
     // to small interval values, which might trigger a rerun before the new
