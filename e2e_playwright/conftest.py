@@ -19,7 +19,9 @@ This file is automatically run by pytest before tests are executed.
 
 from __future__ import annotations
 
+import gc
 import hashlib
+import io
 import os
 import re
 import shlex
@@ -211,6 +213,15 @@ def app_port(worker_id: str) -> int:
     return find_available_port()
 
 
+def flush_all_files():
+    for obj in gc.get_objects():
+        if isinstance(obj, io.IOBase):
+            try:
+                obj.flush()
+            except Exception:
+                pass
+
+
 @pytest.fixture(scope="module", autouse=True)
 def app_server(
     app_port: int, request: FixtureRequest
@@ -245,7 +256,8 @@ def app_server(
         raise RuntimeError("Unable to start Streamlit app")
     yield streamlit_proc
     streamlit_stdout = streamlit_proc.terminate()
-    print(streamlit_stdout)
+    print(streamlit_stdout, flush=True)
+    flush_all_files()
 
 
 @pytest.fixture(scope="function")
