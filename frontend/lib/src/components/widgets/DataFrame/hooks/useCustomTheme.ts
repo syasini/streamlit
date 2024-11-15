@@ -19,7 +19,7 @@ import { useTheme } from "@emotion/react"
 import { Theme as GlideTheme, SpriteMap } from "@glideapps/glide-data-grid"
 import { transparentize } from "color2k"
 
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { convertRemToPx, EmotionTheme } from "@streamlit/lib/src/theme"
 
 type CustomThemeReturn = {
   theme: Partial<GlideTheme>
@@ -76,8 +76,8 @@ function useCustomTheme(): CustomThemeReturn {
       textBubble: theme.colors.fadedText60,
       bgCell: theme.colors.bgColor,
       bgCellMedium: theme.colors.bgColor, // uses same as bgCell to always have the same background color
-      cellHorizontalPadding: 8,
-      cellVerticalPadding: 3,
+      cellHorizontalPadding: convertRemToPx(theme.spacing.sm),
+      cellVerticalPadding: convertRemToPx("0.188rem"),
       // Special cells:
       bgBubble: theme.colors.secondaryBg,
       bgBubbleSelected: theme.colors.secondaryBg,
