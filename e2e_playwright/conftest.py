@@ -23,6 +23,7 @@ import hashlib
 import os
 import re
 import shlex
+import shutil
 import socket
 import subprocess
 import sys
@@ -54,9 +55,37 @@ if TYPE_CHECKING:
 
 @pytest.fixture(scope="session", autouse=True)
 def delete_output_dir(pytestconfig: Any) -> None:
-    # Prevent deletion of output dir
-    print("Deleting output dir was called..")
-    pass
+    # There seems to be a bug with the combination of pytest-playwright, xdist,
+    # and pytest-rerunfailures where the output dir is deleted when it shouldn't be.
+    # To prevent this issue, we are not deleting the output dir when running with
+    # reruns and xdist.
+
+    print(
+        "Deleting output dir was called..",
+        pytestconfig.getoption("n", None),
+        pytestconfig.getoption("reruns", None),
+    )
+
+    if not (
+        pytestconfig.getoption("n", None) and pytestconfig.getoption("reruns", None)
+    ):
+        output_dir = pytestconfig.getoption("--output")
+        if os.path.exists(output_dir):
+            try:
+                shutil.rmtree(output_dir)
+            except FileNotFoundError:
+                # When running in parallel, another thread may have already deleted the files
+                pass
+            except OSError as error:
+                if error.errno != 16:
+                    raise
+                # We failed to remove folder, might be due to the whole folder being mounted inside a container:
+                #   https://github.com/microsoft/playwright/issues/12106
+                #   https://github.com/microsoft/playwright-python/issues/1781
+                # Do a best-effort to remove all files inside of it instead.
+                entries = os.listdir(output_dir)
+                for entry in entries:
+                    shutil.rmtree(entry)
 
 
 def reorder_early_fixtures(metafunc: pytest.Metafunc):
