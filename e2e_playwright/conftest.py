@@ -61,23 +61,9 @@ def delete_output_dir(pytestconfig: Any) -> None:
     # reruns and xdist.
 
     uses_xdist = (
-        pytestconfig.getoption("workerinput", None)
-        or pytestconfig.getoption("n", None)
-        or os.getenv("PYTEST_XDIST_WORKER"),
+        pytestconfig.getoption("workerinput", None) or os.getenv("PYTEST_XDIST_WORKER"),
     )
-
     uses_reruns = pytestconfig.getoption("reruns", None)
-
-    print(
-        "Deleting output dir was called..",
-        pytestconfig.option,
-        pytestconfig.getoption("n", None),
-        pytestconfig.getoption("reruns", None),
-        pytestconfig.getoption("workerinput", None),
-        os.getenv("PYTEST_XDIST_WORKER"),
-        uses_xdist,
-        uses_reruns,
-    )
 
     if not (uses_xdist and uses_reruns):
         output_dir = pytestconfig.getoption("--output")
