@@ -723,6 +723,8 @@ export class App extends PureComponent<Props, State> {
         navigation: (navigation: Navigation) =>
           this.handleNavigation(navigation),
       })
+      console.log(msgProto.type)
+      console.log(msgProto)
     } catch (e) {
       const err = ensureError(e)
       logError(err)
@@ -840,10 +842,9 @@ export class App extends PureComponent<Props, State> {
     // we fallback to the entrypoint files layout when available.
     const { currentPageScriptHash, mainScriptHash, preferredLayouts } =
       this.state
-    const keys = Object.keys(preferredLayouts)
     if (
-      !keys.includes(currentPageScriptHash) &&
-      keys.includes(mainScriptHash)
+      !(currentPageScriptHash in preferredLayouts) &&
+      mainScriptHash in preferredLayouts
     ) {
       preferredLayouts[currentPageScriptHash] =
         preferredLayouts[mainScriptHash]
@@ -1087,17 +1088,18 @@ export class App extends PureComponent<Props, State> {
 
     // Use previously saved layout if exists, otherwise default to CENTERED.
     // If page uses set_page_config, layout will be overridden in handlePageConfigChanged.
-    this.setState((prevState: State) => {
-      const newLayout =
-        preferredLayouts[newPageScriptHash] ?? PageConfig.Layout.CENTERED
-      return {
-        layout: newLayout,
-        userSettings: {
-          ...prevState.userSettings,
-          wideMode: newLayout === PageConfig.Layout.WIDE,
-        },
-      }
-    })
+    if (newPageScriptHash in preferredLayouts) {
+      this.setState((prevState: State) => {
+        const newLayout = preferredLayouts[newPageScriptHash]
+        return {
+          layout: newLayout,
+          userSettings: {
+            ...prevState.userSettings,
+            wideMode: newLayout === PageConfig.Layout.WIDE,
+          },
+        }
+      })
+    }
   }
 
   /**
