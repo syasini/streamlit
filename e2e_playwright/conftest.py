@@ -694,7 +694,7 @@ def assert_snapshot(
                 for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
             ),
         )
-        Path(output_folder / "snapshot-updates" / snapshot_file_name).write_text(
+        Path(output_folder / snapshot_file_name).write_text(
             str(snapshot_updates_file_path), encoding="utf-8"
         )
 
