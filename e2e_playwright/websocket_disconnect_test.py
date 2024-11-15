@@ -18,8 +18,6 @@ from e2e_playwright.conftest import ImageCompareFunction
 
 
 def test_disconnected_states(app: Page, assert_snapshot: ImageCompareFunction):
-    app.route("**", lambda route, _: route.abort())
-
     expect(app.get_by_test_id("stButton").locator("button")).not_to_have_attribute(
         "disabled", ""
     )
@@ -27,8 +25,8 @@ def test_disconnected_states(app: Page, assert_snapshot: ImageCompareFunction):
 
     expect(app.get_by_test_id("stConnectionStatus")).not_to_be_visible()
 
-    app.evaluate("window.streamlitDebug.disconnectWebsocket()")
-
+    # activating this will disable all elements and simulate runtime shutdown
+    app.evaluate("window.streamlitDebug.shutdownRuntime()")
     expect(app.get_by_test_id("stConnectionStatus")).to_contain_text("Connecting")
 
     expect(app.get_by_test_id("stButton").locator("button")).to_have_attribute(
@@ -72,4 +70,3 @@ def test_disconnected_states(app: Page, assert_snapshot: ImageCompareFunction):
     # make sure that the close-x button is not focused
     dialog.blur(timeout=0)
     assert_snapshot(dialog, name="websocket_connection-disconnected_dialog")
-    app.wait_for_timeout(3000)
