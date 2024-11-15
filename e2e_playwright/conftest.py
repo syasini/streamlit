@@ -522,6 +522,7 @@ def delete_output_dir(pytestconfig: Any) -> None:
     if not (uses_xdist and uses_reruns):
         # Delete the output folder. Uses the same logic as the default
         # delete_output_dir fixture from pytest-playwright:
+        # https://github.com/microsoft/playwright-pytest/blob/fb51327390ccbd3561c1777499934eb88296f1bf/pytest-playwright/pytest_playwright/pytest_playwright.py#L68
         output_dir = pytestconfig.getoption("--output")
         if os.path.exists(output_dir):
             try:
