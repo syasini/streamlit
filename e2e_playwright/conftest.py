@@ -242,11 +242,11 @@ def app_server(
     streamlit_proc.start()
     if not wait_for_app_server_to_start(app_port):
         streamlit_stdout = streamlit_proc.terminate()
-        print(streamlit_stdout)
+        print(streamlit_stdout, flush=True)
         raise RuntimeError("Unable to start Streamlit app")
     yield streamlit_proc
     streamlit_stdout = streamlit_proc.terminate()
-    print(streamlit_stdout)
+    print(streamlit_stdout, flush=True)
 
 
 @pytest.fixture(scope="function")
@@ -520,6 +520,15 @@ def output_folder(pytestconfig: Any) -> Path:
     return Path(pytestconfig.getoption("--output")).resolve()
 
 
+def _write_bytes_to_file(file_path: Path | str, data: bytes) -> None:
+    """Write bytes to a file and ensure that the file is flushed to disk."""
+    view = memoryview(data)
+    with open(file_path, mode="wb") as f:
+        f.write(view)
+        # Ensure that the file is flushed to disk
+        f.flush()
+
+
 @pytest.fixture(scope="function")
 def assert_snapshot(
     request: FixtureRequest, output_folder: Path
@@ -613,10 +622,10 @@ def assert_snapshot(
             shutil.rmtree(test_failures_dir)
 
         if not snapshot_file_path.exists():
-            snapshot_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_file_path, img_bytes)
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-            snapshot_updates_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
             # For missing snapshots, we don't want to directly fail in order to generate
             # all missing snapshots in one run.
             test_failure_messages.append(f"Missing snapshot for {snapshot_file_name}")
@@ -641,7 +650,7 @@ def assert_snapshot(
             # ValueError is thrown when the images have different sizes
             # Update this in updates folder:
             snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-            snapshot_updates_file_path.write_bytes(img_bytes)
+            _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
 
             test_failure_messages.append(
                 f"Snapshot matching for {snapshot_file_name} failed. "
@@ -657,7 +666,7 @@ def assert_snapshot(
 
         # Update this in updates folder:
         snapshot_updates_file_path.parent.mkdir(parents=True, exist_ok=True)
-        snapshot_updates_file_path.write_bytes(img_bytes)
+        _write_bytes_to_file(snapshot_updates_file_path, img_bytes)
 
         # Create new failures folder for this test:
         test_failures_dir.mkdir(parents=True, exist_ok=True)
