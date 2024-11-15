@@ -508,16 +508,17 @@ class ImageCompareFunction(Protocol):
 
 @pytest.fixture(scope="session", autouse=True)
 def delete_output_dir(pytestconfig: Any) -> None:
-    # Overwriting the default delete_output_dir fixture from pytest-playwright:
     # There seems to be a bug with the combination of pytest-playwright, xdist,
     # and pytest-rerunfailures where the output dir is deleted when it shouldn't be.
     # To prevent this issue, we are not deleting the output dir when running with
     # reruns and xdist.
 
-    if not (
-        pytestconfig.getoption("n", None) and pytestconfig.getoption("reruns", None)
-    ):
-        # Delete the output dir if it exists:
+    uses_xdist = (
+        pytestconfig.getoption("workerinput", None) or os.getenv("PYTEST_XDIST_WORKER"),
+    )
+    uses_reruns = pytestconfig.getoption("reruns", None)
+
+    if not (uses_xdist and uses_reruns):
         output_dir = pytestconfig.getoption("--output")
         if os.path.exists(output_dir):
             try:
