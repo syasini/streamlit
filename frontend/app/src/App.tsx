@@ -723,8 +723,6 @@ export class App extends PureComponent<Props, State> {
         navigation: (navigation: Navigation) =>
           this.handleNavigation(navigation),
       })
-      console.log(msgProto.type)
-      console.log(msgProto)
     } catch (e) {
       const err = ensureError(e)
       logError(err)
