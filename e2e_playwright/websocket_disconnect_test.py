@@ -72,3 +72,4 @@ def test_disconnected_states(app: Page, assert_snapshot: ImageCompareFunction):
     # make sure that the close-x button is not focused
     dialog.blur(timeout=0)
     assert_snapshot(dialog, name="websocket_connection-disconnected_dialog")
+    app.wait_for_timeout(3000)
