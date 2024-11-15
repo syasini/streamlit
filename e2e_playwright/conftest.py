@@ -65,6 +65,8 @@ def delete_output_dir(pytestconfig: Any) -> None:
         pytestconfig.option,
         pytestconfig.getoption("n", None),
         pytestconfig.getoption("reruns", None),
+        pytestconfig.getoption("workerinput", None),
+        "pytest-xdist" in pytestconfig.pluginmanager.plugins,
         os.getenv("PYTEST_XDIST_WORKER"),
     )
 
