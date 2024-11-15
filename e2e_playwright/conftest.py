@@ -506,6 +506,37 @@ class ImageCompareFunction(Protocol):
         """
 
 
+@pytest.fixture(scope="session", autouse=True)
+def delete_output_dir(pytestconfig: Any) -> None:
+    # Overwriting the default delete_output_dir fixture from pytest-playwright:
+    # There seems to be a bug with the combination of pytest-playwright, xdist,
+    # and pytest-rerunfailures where the output dir is deleted when it shouldn't be.
+    # To prevent this issue, we are not deleting the output dir when running with
+    # reruns and xdist.
+
+    if not (
+        pytestconfig.getoption("n", None) and pytestconfig.getoption("reruns", None)
+    ):
+        # Delete the output dir if it exists:
+        output_dir = pytestconfig.getoption("--output")
+        if os.path.exists(output_dir):
+            try:
+                shutil.rmtree(output_dir)
+            except FileNotFoundError:
+                # When running in parallel, another thread may have already deleted the files
+                pass
+            except OSError as error:
+                if error.errno != 16:
+                    raise
+                # We failed to remove folder, might be due to the whole folder being mounted inside a container:
+                #   https://github.com/microsoft/playwright/issues/12106
+                #   https://github.com/microsoft/playwright-python/issues/1781
+                # Do a best-effort to remove all files inside of it instead.
+                entries = os.listdir(output_dir)
+                for entry in entries:
+                    shutil.rmtree(entry)
+
+
 @pytest.fixture(scope="session")
 def output_folder(pytestconfig: Any) -> Path:
     """Fixture returning the directory that is used for all test failures information.
