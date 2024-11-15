@@ -67,7 +67,7 @@ export type UseDeckGlProps = Omit<DeckGLProps, "mapboxToken"> & {
   theme: EmotionTheme
 }
 
-const DEFAULT_DECK_GL_HEIGHT = 500
+const DEFAULT_DECK_GL_HEIGHT = "31.25rem"
 
 export const EMPTY_STATE: DeckGlElementState = {
   selection: {
