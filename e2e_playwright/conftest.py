@@ -528,6 +528,15 @@ def _write_bytes_to_file(file_path: Path, data: bytes) -> None:
         f.flush()
 
 
+def _print_disk_usage(path: Path | str):
+    import shutil
+
+    total, used, free = shutil.disk_usage(path)
+    print("Total: %d GiB" % (total // (2**30)))
+    print("Used: %d GiB" % (used // (2**30)))
+    print("Free: %d GiB" % (free // (2**30)))
+
+
 @pytest.fixture(scope="function")
 def assert_snapshot(
     request: FixtureRequest, output_folder: Path
@@ -665,6 +674,7 @@ def assert_snapshot(
                     for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
                 ),
             )
+            _print_disk_usage(output_folder)
             return
         total_pixels = img_a.size[0] * img_a.size[1]
         max_diff_pixels = int(image_threshold * total_pixels)
@@ -700,6 +710,7 @@ def assert_snapshot(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
             f" {mismatch/total_pixels * 100:.2f}%)"
         )
+        _print_disk_usage(output_folder)
         return
 
     yield compare
