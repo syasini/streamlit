@@ -395,4 +395,7 @@ function SidebarWithProvider(props: SidebarProps): ReactElement {
   )
 }
 
+// Since it is still a class-based component, we need to disable the
+// no-restricted-syntax rule to allow withTheme.
+// eslint-disable-next-line no-restricted-syntax
 export default withTheme(SidebarWithProvider)

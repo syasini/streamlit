@@ -84,7 +84,6 @@ describe("ComponentInstance", () => {
         registry={componentRegistry}
         width={100}
         disabled={false}
-        theme={mockTheme.emotion}
         widgetMgr={
           new WidgetStateManager({
             sendRerunBackMsg: vi.fn(),
@@ -108,7 +107,6 @@ describe("ComponentInstance", () => {
         registry={componentRegistry}
         width={100}
         disabled={false}
-        theme={mockTheme.emotion}
         widgetMgr={
           new WidgetStateManager({
             sendRerunBackMsg: vi.fn(),
@@ -129,7 +127,6 @@ describe("ComponentInstance", () => {
         registry={componentRegistry}
         width={100}
         disabled={false}
-        theme={mockTheme.emotion}
         widgetMgr={
           new WidgetStateManager({
             sendRerunBackMsg: vi.fn(),
@@ -156,7 +153,6 @@ describe("ComponentInstance", () => {
         registry={componentRegistry}
         width={100}
         disabled={false}
-        theme={mockTheme.emotion}
         widgetMgr={
           new WidgetStateManager({
             sendRerunBackMsg: vi.fn(),
@@ -181,7 +177,6 @@ describe("ComponentInstance", () => {
         registry={componentRegistry}
         width={100}
         disabled={false}
-        theme={mockTheme.emotion}
         widgetMgr={
           new WidgetStateManager({
             sendRerunBackMsg: vi.fn(),
@@ -206,7 +201,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -242,7 +236,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -280,7 +273,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -307,7 +299,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -357,7 +348,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -389,7 +379,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -412,7 +401,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={width}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -444,7 +432,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={width}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -467,7 +454,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -505,7 +491,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -527,7 +512,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -561,7 +545,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -622,7 +605,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -691,7 +673,6 @@ describe("ComponentInstance", () => {
           registry={componentRegistry}
           width={100}
           disabled={false}
-          theme={mockTheme.emotion}
           widgetMgr={
             new WidgetStateManager({
               sendRerunBackMsg: vi.fn(),
@@ -735,7 +716,6 @@ describe("ComponentInstance", () => {
             registry={componentRegistry}
             width={100}
             disabled={false}
-            theme={mockTheme.emotion}
             widgetMgr={
               new WidgetStateManager({
                 sendRerunBackMsg: vi.fn(),
@@ -794,7 +774,6 @@ describe("ComponentInstance", () => {
             registry={componentRegistry}
             width={100}
             disabled={false}
-            theme={mockTheme.emotion}
             widgetMgr={
               new WidgetStateManager({
                 sendRerunBackMsg: vi.fn(),
