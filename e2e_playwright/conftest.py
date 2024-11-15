@@ -241,7 +241,7 @@ def app_server(
     streamlit_proc.start()
     if not wait_for_app_server_to_start(app_port):
         streamlit_stdout = streamlit_proc.terminate()
-        print(streamlit_stdout)
+        print(streamlit_stdout, flush=True)
         raise RuntimeError("Unable to start Streamlit app")
     yield streamlit_proc
     streamlit_stdout = streamlit_proc.terminate()
@@ -684,12 +684,17 @@ def assert_snapshot(
                 for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
             ),
         )
+        Path(output_folder / "snapshot-updates" / snapshot_file_name).write_text(
+            str(snapshot_updates_file_path), encoding="utf-8"
+        )
 
         # Create new failures folder for this test:
         test_failures_dir.mkdir(parents=True, exist_ok=True)
         img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
         img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
         img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
+
+        print("Wrote failures", test_failures_dir)
 
         test_failure_messages.append(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
