@@ -673,6 +673,7 @@ def assert_snapshot(
                     len(files)
                     for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
                 ),
+                len(img_bytes),
             )
             _print_disk_usage(output_folder)
             return
@@ -693,6 +694,7 @@ def assert_snapshot(
                 len(files)
                 for _, _, files in os.walk(Path(output_folder / "snapshot-updates"))
             ),
+            len(img_bytes),
         )
         Path(output_folder / snapshot_file_name).write_text(
             str(snapshot_updates_file_path), encoding="utf-8"
