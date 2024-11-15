@@ -52,6 +52,13 @@ if TYPE_CHECKING:
     from types import ModuleType
 
 
+@pytest.fixture(scope="session", autouse=True)
+def delete_output_dir(pytestconfig: Any) -> None:
+    # Prevent deletion of output dir
+    print("Deleting output dir was called..")
+    pass
+
+
 def reorder_early_fixtures(metafunc: pytest.Metafunc):
     """Put fixtures with `pytest.mark.early` first during execution
 
