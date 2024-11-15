@@ -37,6 +37,7 @@ from typing import TYPE_CHECKING, Any, Callable, Generator, Literal, Protocol
 from urllib import parse
 
 import pytest
+import pytest_playwright.pytest_playwright as pytest_playwright
 import requests
 from PIL import Image
 from playwright.sync_api import (
@@ -53,6 +54,9 @@ if TYPE_CHECKING:
     from types import ModuleType
 
 
+pytest_playwright.delete_output_dir = lambda *args, **kwargs: None
+
+
 @pytest.fixture(scope="session", autouse=True)
 def delete_output_dir(pytestconfig: Any) -> None:
     # There seems to be a bug with the combination of pytest-playwright, xdist,
@@ -62,8 +66,10 @@ def delete_output_dir(pytestconfig: Any) -> None:
 
     print(
         "Deleting output dir was called..",
+        pytestconfig.option,
         pytestconfig.getoption("n", None),
         pytestconfig.getoption("reruns", None),
+        os.getenv("PYTEST_XDIST_WORKER"),
     )
 
     if not (
