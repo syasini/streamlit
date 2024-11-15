@@ -67,7 +67,7 @@ export const StyledDocString = styled.div(({ theme }) => ({
   fontSize: theme.fontSizes.sm,
 
   "&:not(:last-child)": {
-    borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
+    borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
   },
 }))
 
@@ -81,7 +81,7 @@ export const StyledMembersTable = styled.table(({ theme }) => ({
 
 export const StyledMembersRow = styled.tr(({ theme }) => ({
   "&:not(:last-child)": {
-    borderBottom: `${theme.sizes.borderWidth} dotted ${theme.colors.borderColor}`,
+    borderBottom: `${theme.sizes.borderWidth} dotted ${theme.colors.borderColorLight}`,
   },
 }))
 
