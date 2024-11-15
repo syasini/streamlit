@@ -47,7 +47,6 @@ def test_renders_screencast_dialog_properly(
     themed_app.get_by_text("Record a screencast").click()
     dialog = themed_app.get_by_test_id("stDialog")
     expect(dialog).to_be_visible()
-
     assert_snapshot(dialog.get_by_role("dialog"), name="record_screencast_dialog")
 
 
@@ -93,7 +92,6 @@ def test_renders_clear_cache_dialog_properly(
     expect(dialog).to_contain_text(
         "Are you sure you want to clear the app's function caches?"
     )
-
     assert_snapshot(dialog.get_by_role("dialog"), name="clear_cache_dialog")
 
 
@@ -106,5 +104,4 @@ def test_renders_active_theme_dialog_properly(
 
     dialog = themed_app.get_by_test_id("stDialog")
     expect(dialog).to_be_visible()
-
     assert_snapshot(dialog.get_by_role("dialog"), name="edit_active_theme_dialog")
