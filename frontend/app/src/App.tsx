@@ -1084,8 +1084,8 @@ export class App extends PureComponent<Props, State> {
       )
     }
 
-    // Use previously saved layout if exists, otherwise default to CENTERED.
-    // If page uses set_page_config, layout will be overridden in handlePageConfigChanged.
+    // Use previously saved layout if exists. If page uses set_page_config,
+    // layout will be overridden later in handlePageConfigChanged.
     if (newPageScriptHash in preferredLayouts) {
       this.setState((prevState: State) => {
         const newLayout = preferredLayouts[newPageScriptHash]
@@ -1487,6 +1487,11 @@ export class App extends PureComponent<Props, State> {
   onPageChange = (pageScriptHash: string): void => {
     const { elements, mainScriptHash } = this.state
 
+    this.setState((prevState: State) => {
+      const preferredLayouts = prevState.preferredLayouts
+      preferredLayouts[prevState.currentPageScriptHash] = prevState.layout
+      return { preferredLayouts: preferredLayouts }
+    })
     // We are about to change the page, so clear all auto reruns
     // This also happens in handleNewSession, but it might be too late compared
     // to small interval values, which might trigger a rerun before the new
