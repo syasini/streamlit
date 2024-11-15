@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-const vitest = require("eslint-plugin-vitest")
-
 module.exports = {
   extends: ["../.eslintrc.js"], // Extend from the root configuration
   rules: {
