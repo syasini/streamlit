@@ -689,10 +689,10 @@ def assert_snapshot(
         )
 
         # Create new failures folder for this test:
-        test_failures_dir.mkdir(parents=True, exist_ok=True)
-        img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
-        img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
-        img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
+        # test_failures_dir.mkdir(parents=True, exist_ok=True)
+        # img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
+        # img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
+        # img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
 
         print("Wrote failures", test_failures_dir)
 
