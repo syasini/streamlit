@@ -564,15 +564,6 @@ def _write_bytes_to_file(file_path: Path, data: bytes) -> None:
         f.flush()
 
 
-def _print_disk_usage(path: Path | str):
-    import shutil
-
-    total, used, free = shutil.disk_usage(path)
-    print("Total: %d GiB" % (total // (2**30)))
-    print("Used: %d GiB" % (used // (2**30)))
-    print("Free: %d GiB" % (free // (2**30)))
-
-
 @pytest.fixture(scope="function")
 def assert_snapshot(
     request: FixtureRequest, output_folder: Path
@@ -711,7 +702,6 @@ def assert_snapshot(
                 ),
                 len(img_bytes),
             )
-            _print_disk_usage(output_folder)
             return
         total_pixels = img_a.size[0] * img_a.size[1]
         max_diff_pixels = int(image_threshold * total_pixels)
@@ -732,23 +722,17 @@ def assert_snapshot(
             ),
             len(img_bytes),
         )
-        Path(output_folder / snapshot_file_name).write_text(
-            str(snapshot_updates_file_path), encoding="utf-8"
-        )
 
         # Create new failures folder for this test:
-        # test_failures_dir.mkdir(parents=True, exist_ok=True)
-        # img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
-        # img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
-        # img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
-
-        print("Wrote failures", test_failures_dir)
+        test_failures_dir.mkdir(parents=True, exist_ok=True)
+        img_diff.save(f"{test_failures_dir}/diff_{snapshot_file_name}{file_extension}")
+        img_a.save(f"{test_failures_dir}/actual_{snapshot_file_name}{file_extension}")
+        img_b.save(f"{test_failures_dir}/expected_{snapshot_file_name}{file_extension}")
 
         test_failure_messages.append(
             f"Snapshot mismatch for {snapshot_file_name} ({mismatch} pixels difference;"
             f" {mismatch/total_pixels * 100:.2f}%)"
         )
-        _print_disk_usage(output_folder)
         return
 
     yield compare
