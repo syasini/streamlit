@@ -844,11 +844,16 @@ export class App extends PureComponent<Props, State> {
       !(currentPageScriptHash in preferredLayouts) &&
       mainScriptHash in preferredLayouts
     ) {
-      preferredLayouts[currentPageScriptHash] =
-        preferredLayouts[mainScriptHash]
-      this.setState({
+      const newLayout = preferredLayouts[mainScriptHash]
+      preferredLayouts[currentPageScriptHash] = newLayout
+      this.setState(prevState => ({
         preferredLayouts: preferredLayouts,
-      })
+        layout: newLayout,
+        userSettings: {
+          ...prevState.userSettings,
+          wideMode: newLayout === PageConfig.Layout.WIDE,
+        },
+      }))
     }
   }
 
@@ -1490,6 +1495,9 @@ export class App extends PureComponent<Props, State> {
     this.setState((prevState: State) => {
       const preferredLayouts = prevState.preferredLayouts
       preferredLayouts[prevState.currentPageScriptHash] = prevState.layout
+      if (!(prevState.mainScriptHash in preferredLayouts)) {
+        preferredLayouts[prevState.mainScriptHash] = prevState.layout
+      }
       return { preferredLayouts: preferredLayouts }
     })
     // We are about to change the page, so clear all auto reruns
