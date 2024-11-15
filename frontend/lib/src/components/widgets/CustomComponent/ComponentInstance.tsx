@@ -16,7 +16,7 @@
 
 import React, { ReactElement, useEffect, useRef, useState } from "react"
 
-import { useTheme, withTheme } from "@emotion/react"
+import { useTheme } from "@emotion/react"
 import queryString from "query-string"
 
 import AlertElement from "@streamlit/lib/src/components/elements/AlertElement"
