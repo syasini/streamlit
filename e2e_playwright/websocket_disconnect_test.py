@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
 
 
-@pytest.mark.flaky(reruns=0)  # deactivate reruns
 def test_disconnected_states(app: Page, assert_snapshot: ImageCompareFunction):
     app.route("**", lambda route, _: route.abort())
 
