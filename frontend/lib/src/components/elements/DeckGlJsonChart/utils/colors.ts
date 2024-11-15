@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as layers from "@deck.gl/layers/typed"
-import * as geoLayers from "@deck.gl/geo-layers/typed"
-import * as meshLayers from "@deck.gl/mesh-layers/typed"
+import * as layers from "@deck.gl/layers"
+import * as geoLayers from "@deck.gl/geo-layers"
+import * as meshLayers from "@deck.gl/mesh-layers"
 
 import { jsonConverter } from "./jsonConverter"
 
@@ -47,7 +47,11 @@ export const LAYER_TYPE_TO_FILL_FUNCTION = {
   [layers.PathLayer.layerName]: ["getColor"],
   [layers.PointCloudLayer.layerName]: ["getColor"],
   [layers.PolygonLayer.layerName]: ["getFillColor"],
-  [layers.ScatterplotLayer.layerName]: ["getFillColor"],
+  [layers.ScatterplotLayer.layerName]: [
+    "getFillColor",
+    "getColor",
+    "getLineColor",
+  ],
   [layers.SolidPolygonLayer.layerName]: ["getFillColor"],
   [layers.TextLayer.layerName]: ["getColor"],
   [meshLayers.ScenegraphLayer.layerName]: ["getColor"],

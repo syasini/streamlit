@@ -41,15 +41,24 @@ H3_HEX_DATA = [
 ]
 df = pd.DataFrame(H3_HEX_DATA)
 
-
 WIDGET_ELEMENTS: list[tuple[str, ELEMENT_PRODUCER]] = [
     # buttons
     ("button", lambda: st.button("Click me")),
     ("download_button", lambda: st.download_button("Download me", b"")),
-    ("chat_input", lambda: st.chat_input("Chat with me")),
+    (
+        "form_submit_button",
+        # Form submit button doesn't work in the context of the test
+        # since it requires to be wrapped in a form. Therefore,
+        # we are just using a text input as a proxy for the form submit button.
+        lambda: st.text_input("Write me"),
+    ),
     # checkboxes
     ("checkbox", lambda: st.checkbox("Check me")),
-    # ("pills", lambda: st.pills("Some pills", ["a", "b", "c"])),
+    ("pills", lambda: st.pills("Some pills", ["a", "b", "c"])),
+    (
+        "segmented_control",
+        lambda: st.segmented_control("Some segments", ["a", "b", "c"]),
+    ),
     ("toggle", lambda: st.toggle("Toggle me")),
     # arrows
     ("data_editor", lambda: st.data_editor(pd.DataFrame())),
@@ -57,20 +66,22 @@ WIDGET_ELEMENTS: list[tuple[str, ELEMENT_PRODUCER]] = [
     # other widgets
     ("color_picker", lambda: st.color_picker("Pick a color")),
     # media manager
+    ("audio_input", lambda: st.audio_input("Record me")),
     ("experimental_audio_input", lambda: st.experimental_audio_input("Record me")),
     ("camera_input", lambda: st.camera_input("Take a picture")),
     ("file_uploader", lambda: st.file_uploader("Upload me")),
     # selectors
+    ("feedback", lambda: st.feedback()),
     ("multiselect", lambda: st.multiselect("Show me", ["a", "b", "c"])),
     ("number_input", lambda: st.number_input("Enter a number")),
     ("radio", lambda: st.radio("Choose me", ["a", "b", "c"])),
     ("slider", lambda: st.slider("Slide me")),
     ("selectbox", lambda: st.selectbox("Select me", ["a", "b", "c"])),
     ("select_slider", lambda: st.select_slider("Select me", ["a", "b", "c"])),
-    ("feedback", lambda: st.feedback()),
     # text_widgets
     ("text_area", lambda: st.text_area("Write me")),
     ("text_input", lambda: st.text_input("Write me")),
+    ("chat_input", lambda: st.chat_input("Chat with me")),
     # time_widgets
     ("date_input", lambda: st.date_input("Pick a date")),
     ("time_input", lambda: st.time_input("Pick a time")),
