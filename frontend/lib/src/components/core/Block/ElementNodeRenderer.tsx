@@ -276,7 +276,7 @@ const RawElementNodeRenderer = (
     }
 
     case "arrowTable":
-      const tableBorder = node.element.arrowTable?.border || true
+      const tableBorder = node.element.arrowTable?.border ?? true
       return (
         <ArrowTable
           element={node.quiverElement as Quiver}
