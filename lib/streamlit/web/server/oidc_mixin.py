@@ -37,32 +37,27 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
             self.client_kwargs["code_challenge_method"] = "S256"
         return result
 
-    def save_authorize_data(self, **kwargs):
-        state = kwargs.pop("state", None)
-        if state:
-            assert self.framework.cache is not None
-            session = None
-            self.framework.set_state_data(session, state, kwargs)
-        else:
-            raise RuntimeError("Missing state value")
-
     def authorize_redirect(
         self, request_handler: tornado.web.RequestHandler, redirect_uri=None, **kwargs
     ):
         """Create a HTTP Redirect for Authorization Endpoint.
 
-        :param request: HTTP request instance from Starlette view.
+        :param request_handler: HTTP request instance from Tornado.
         :param redirect_uri: Callback or redirect URI for authorization.
         :param kwargs: Extra parameters to include.
         :return: A HTTP redirect response.
         """
-        rv = self.create_authorization_url(redirect_uri, **kwargs)
-        self.save_authorize_data(redirect_uri=redirect_uri, **rv)
-        request_handler.redirect(rv["url"], status=302)
+        auth_context = self.create_authorization_url(redirect_uri, **kwargs)
+        self._save_authorize_data(redirect_uri=redirect_uri, **auth_context)
+        request_handler.redirect(auth_context["url"], status=302)
 
     def authorize_access_token(
         self, request_handler: tornado.web.RequestHandler, **kwargs
     ):
+        """
+        :param request_handler: HTTP request instance from Tornado.
+        :return: A token dict.
+        """
         error = request_handler.get_argument("error", None)
         if error:
             description = request_handler.get_argument("error_description", None)
@@ -86,8 +81,17 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
             userinfo = self.parse_id_token(
                 token, nonce=state_data["nonce"], claims_options=claims_options
             )
-            token["userinfo"] = userinfo
+            token = {**token, "userinfo": userinfo}
         return token
+
+    def _save_authorize_data(self, **kwargs):
+        state = kwargs.pop("state", None)
+        if state:
+            assert self.framework.cache is not None
+            session = None
+            self.framework.set_state_data(session, state, kwargs)
+        else:
+            raise RuntimeError("Missing state value")
 
 
 class TornadoOAuth(BaseOAuth):  # type: ignore[misc]
