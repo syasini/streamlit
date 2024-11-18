@@ -64,6 +64,7 @@ import {
   isColoredLineDisplayed,
   isEmbed,
   isInChildFrame,
+  isNullOrUndefined,
   isPaddingDisplayed,
   isPresetTheme,
   isScrollingHidden,
@@ -76,6 +77,7 @@ import {
   Logo,
   Navigation,
   NewSession,
+  notNullOrUndefined,
   notUndefined,
   PageConfig,
   PageInfo,
@@ -84,6 +86,7 @@ import {
   PagesChanged,
   ParentMessage,
   PerformanceEvents,
+  preserveEmbedQueryParams,
   PresetThemeName,
   ScriptRunState,
   SessionEvent,
@@ -96,12 +99,7 @@ import {
   WidgetStateManager,
   WidgetStates,
 } from "@streamlit/lib"
-import {
-  isNullOrUndefined,
-  notNullOrUndefined,
-  preserveEmbedQueryParams,
-} from "@streamlit/lib/src/util/utils"
-import getBrowserInfo from "@streamlit/lib/src/util/getBrowserInfo"
+import getBrowserInfo from "@streamlit/app/src/util/getBrowserInfo"
 import { AppContext } from "@streamlit/app/src/components/AppContext"
 import AppView from "@streamlit/app/src/components/AppView"
 import StatusWidget from "@streamlit/app/src/components/StatusWidget"
@@ -342,6 +340,11 @@ export class App extends PureComponent<Props, State> {
           this.state.appConfig.useExternalAuthToken
         ) {
           this.endpoints.setJWTHeader({ jwtHeaderName, jwtHeaderValue })
+        }
+      },
+      fileUploadClientConfigChanged: config => {
+        if (this.endpoints.setFileUploadClientConfig !== undefined) {
+          this.endpoints.setFileUploadClientConfig(config)
         }
       },
       hostMenuItemsChanged: hostMenuItems => {
