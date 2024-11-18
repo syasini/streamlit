@@ -28,7 +28,7 @@ htmlcov
 # Test fixtures
 cffi_bin
 
-# Pyenv / UV Stuff
+# Pyenv / uv Stuff
 .python-version
 venv
 .venv
