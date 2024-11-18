@@ -16,41 +16,40 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { fireEvent, screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
 
-import AudioInputActionButtons from "./AudioInputActionButtons"
+import AudioInputActionButtons, {
+  AudioInputActionButtonProps,
+} from "./AudioInputActionButtons"
+
+const getProps = (): AudioInputActionButtonProps => ({
+  disabled: false,
+  isRecording: false,
+  isPlaying: false,
+  isUploading: false,
+  recordingUrlExists: false,
+  isError: false,
+  startRecording: vi.fn(),
+  stopRecording: vi.fn(),
+  onClickPlayPause: vi.fn(),
+  onClear: vi.fn(),
+})
 
 describe("AudioInputActionButton", () => {
   it("should render without crashing", () => {
-    render(
-      <AudioInputActionButtons
-        disabled={false}
-        isRecording={false}
-        isPlaying={false}
-        recordingUrlExists={false}
-        startRecording={jest.fn()}
-        stopRecording={jest.fn()}
-        onClickPlayPause={jest.fn()}
-      />
-    )
+    render(<AudioInputActionButtons {...getProps()} />)
 
     expect(screen.getByTestId("stAudioInputActionButton")).toBeInTheDocument()
   })
 
   it("should start recording when recording button is pressed", () => {
-    const startRecording = jest.fn()
+    const startRecording = vi.fn()
     render(
       <AudioInputActionButtons
-        disabled={false}
-        isRecording={false}
-        isPlaying={false}
-        recordingUrlExists={false}
+        {...getProps()}
         startRecording={startRecording}
-        stopRecording={jest.fn()}
-        onClickPlayPause={jest.fn()}
       />
     )
 
@@ -60,16 +59,12 @@ describe("AudioInputActionButton", () => {
   })
 
   it("should stop recording when recording button is pressed", () => {
-    const stopRecording = jest.fn()
+    const stopRecording = vi.fn()
     render(
       <AudioInputActionButtons
-        disabled={false}
+        {...getProps()}
         isRecording={true}
-        isPlaying={false}
-        recordingUrlExists={false}
-        startRecording={jest.fn()}
         stopRecording={stopRecording}
-        onClickPlayPause={jest.fn()}
       />
     )
 
@@ -79,15 +74,11 @@ describe("AudioInputActionButton", () => {
   })
 
   it("should play when play button is pressed", () => {
-    const onClickPlayPause = jest.fn()
+    const onClickPlayPause = vi.fn()
     render(
       <AudioInputActionButtons
-        disabled={false}
-        isRecording={false}
-        isPlaying={false}
+        {...getProps()}
         recordingUrlExists={true}
-        startRecording={jest.fn()}
-        stopRecording={jest.fn()}
         onClickPlayPause={onClickPlayPause}
       />
     )
@@ -99,15 +90,12 @@ describe("AudioInputActionButton", () => {
   })
 
   it("should pause when pause button is pressed", () => {
-    const onClickPlayPause = jest.fn()
+    const onClickPlayPause = vi.fn()
     render(
       <AudioInputActionButtons
-        disabled={false}
-        isRecording={false}
+        {...getProps()}
         isPlaying={true}
         recordingUrlExists={true}
-        startRecording={jest.fn()}
-        stopRecording={jest.fn()}
         onClickPlayPause={onClickPlayPause}
       />
     )
@@ -120,22 +108,34 @@ describe("AudioInputActionButton", () => {
 
   describe("when disabled", () => {
     it("should not start recording when recording button is pressed", () => {
-      const startRecording = jest.fn()
+      const startRecording = vi.fn()
       render(
         <AudioInputActionButtons
+          {...getProps()}
           disabled={true}
-          isRecording={false}
-          isPlaying={false}
-          recordingUrlExists={false}
           startRecording={startRecording}
-          stopRecording={jest.fn()}
-          onClickPlayPause={jest.fn()}
         />
       )
 
       expect(screen.getByLabelText("Record")).toBeInTheDocument()
       fireEvent.click(screen.getByLabelText("Record"))
       expect(startRecording).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("when uploading", () => {
+    it("should render the uploading spinner", () => {
+      render(<AudioInputActionButtons {...getProps()} isUploading={true} />)
+
+      expect(screen.getByLabelText("Uploading")).toBeInTheDocument()
+    })
+  })
+
+  describe("when error", () => {
+    it("should render the error message", () => {
+      render(<AudioInputActionButtons {...getProps()} isError={true} />)
+
+      expect(screen.getByLabelText("Reset")).toBeInTheDocument()
     })
   })
 })

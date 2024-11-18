@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-from playwright.sync_api import Locator, Page, expect
+from __future__ import annotations
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
+import pytest
+from playwright.sync_api import FrameLocator, Locator, Page, Route, expect
+
+from e2e_playwright.conftest import IframedPage, ImageCompareFunction, wait_for_app_run
 from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     click_button,
@@ -25,15 +27,35 @@ from e2e_playwright.shared.app_utils import (
 )
 
 
+def stop_recording(audio_input: Locator, app: Page):
+    """Stop recording audio and wait for the recording to complete."""
+    audio_input.get_by_role("button", name="Stop recording").click()
+    app.wait_for_timeout(5000)  # ci seems to be very slow so adding wait here
+
+
+def ensure_waveform_is_not_rendered(audio_input: Locator):
+    expect(audio_input.get_by_test_id("stAudioInputWaveSurfer")).not_to_be_visible()
+
+    time_code = audio_input.get_by_test_id("stAudioInputWaveformTimeCode")
+    expect(time_code).to_have_text("00:00")
+
+    audio_input.hover()
+    expect(
+        audio_input.get_by_role("button", name="Clear recording")
+    ).not_to_be_visible()
+
+
 def ensure_waveform_rendered(audio_input: Locator):
     # Check for the waveform and time code
     expect(audio_input.get_by_test_id("stAudioInputWaveSurfer")).to_be_visible()
+
     time_code = audio_input.get_by_test_id("stAudioInputWaveformTimeCode")
     expect(time_code).to_be_visible()
     expect(time_code).not_to_have_text("00:00")
 
     audio_input.hover()
     expect(audio_input.get_by_role("button", name="Clear recording")).to_be_visible()
+    expect(audio_input.get_by_role("button", name="Download as WAV")).to_be_visible()
 
 
 def test_audio_input_renders(app: Page):
@@ -88,16 +110,15 @@ def test_no_permission_audio_input_snapshot(
     ).not_to_be_visible()
 
     expect(record_button).to_be_visible()
-    expect(record_button).to_be_disabled()
+    expect(record_button).not_to_be_disabled()
 
-    # TODO(nico): uncomment once safari blockade is lifted
-    # expect(record_button).not_to_be_disabled()
-    # record_button.click()
+    expect(record_button).not_to_be_disabled()
+    record_button.click()
 
     # Verify the permission message is visible
-    # expect(
-    #     themed_app.get_by_text("This app would like to use your microphone.")
-    # ).to_be_visible()
+    expect(
+        themed_app.get_by_text("This app would like to use your microphone.")
+    ).to_be_visible()
 
     # Capture the snapshot
     assert_snapshot(no_permission_audio_input, name="st_audio_input-no_permission")
@@ -118,6 +139,41 @@ def test_audio_input_label_visibility_snapshot(
     )
 
 
+def _test_download_audio_file(app: Page, locator: FrameLocator | Locator):
+    audio_input = locator.get_by_test_id("stAudioInput").nth(1)
+    audio_input.get_by_role("button", name="Record").click()
+    app.wait_for_timeout(1500)
+
+    stop_recording(audio_input, app)
+
+    with app.expect_download() as download_info:
+        download_button = audio_input.get_by_role("button", name="Download as WAV")
+        download_button.click()
+
+    download = download_info.value
+    file_name = download.suggested_filename
+
+    assert file_name == "recording.wav"
+
+
+@pytest.mark.only_browser("chromium")
+def test_audio_input_file_download(app: Page):
+    """Test that the audio input file can be downloaded."""
+    app.context.grant_permissions(["microphone"])
+
+    _test_download_audio_file(app, app.locator("body"))
+
+
+@pytest.mark.only_browser("chromium")
+def test_audio_input_file_download_in_iframe(iframed_app: IframedPage):
+    """Test that the audio input file can be downloaded within an iframe."""
+
+    page: Page = iframed_app.page
+    frame_locator: FrameLocator = iframed_app.open_app(None)
+
+    _test_download_audio_file(page, frame_locator)
+
+
 @pytest.mark.only_browser("chromium")
 def test_audio_input_callback(app: Page):
     """Test that the callback is triggered when audio input changes."""
@@ -128,7 +184,8 @@ def test_audio_input_callback(app: Page):
     audio_input = app.get_by_test_id("stAudioInput").nth(5)
     audio_input.get_by_role("button", name="Record").click()
     app.wait_for_timeout(1500)
-    audio_input.get_by_role("button", name="Stop recording").click()
+
+    stop_recording(audio_input, app)
 
     ensure_waveform_rendered(audio_input)
 
@@ -143,9 +200,11 @@ def test_audio_input_remount_keep_value(app: Page):
 
     # Simulate recording interaction
     audio_input = app.get_by_test_id("stAudioInput").nth(6)
+    audio_input.scroll_into_view_if_needed()
     audio_input.get_by_role("button", name="Record").click()
     app.wait_for_timeout(1500)
-    audio_input.get_by_role("button", name="Stop recording").click()
+
+    stop_recording(audio_input, app)
 
     wait_for_app_run(app)
 
@@ -171,14 +230,25 @@ def test_audio_input_works_in_forms(app: Page):
     form_audio_input = app.get_by_test_id("stAudioInput").nth(1)
     form_audio_input.get_by_role("button", name="Record").click()
     app.wait_for_timeout(1500)
-    form_audio_input.get_by_role("button", name="Stop recording").click()
+
+    stop_recording(form_audio_input, app)
+
+    submit_button = app.get_by_role("button", name="Submit")
+    submit_button.scroll_into_view_if_needed()
+    expect(submit_button).to_be_enabled()
 
     # Verify the form state has not changed yet
     expect(app.get_by_text("Audio Input in Form: None")).to_be_visible()
 
+    app.wait_for_timeout(1500)
+
     # Submit the form and verify the state update
     click_form_button(app, "Submit")
     wait_for_app_run(app)
+
+    ensure_waveform_is_not_rendered(form_audio_input)
+
+    app.get_by_text("Audio Input in Form:").scroll_into_view_if_needed()
     expect(app.get_by_text("Audio Input in Form: None")).not_to_be_visible()
 
 
@@ -193,13 +263,16 @@ def test_audio_input_works_with_fragments(app: Page):
 
     # Simulate recording interaction in a fragment
     fragment_audio_input = app.get_by_test_id("stAudioInput").nth(2)
+    fragment_audio_input.scroll_into_view_if_needed()
     fragment_audio_input.get_by_role("button", name="Record").click()
     app.wait_for_timeout(1500)
-    fragment_audio_input.get_by_role("button", name="Stop recording").click()
+
+    stop_recording(fragment_audio_input, app)
 
     wait_for_app_run(app)
 
     # Verify the state is updated without additional reruns
+    app.get_by_text("Audio Input in Fragment:").scroll_into_view_if_needed()
     expect(app.get_by_text("Audio Input in Fragment: None")).not_to_be_visible()
     expect(app.get_by_text("Runs: 1")).to_be_visible()
 
@@ -230,16 +303,22 @@ def test_audio_input_basic_flow(app: Page):
     expect(clock).to_have_text("00:00")
     record_button.click()
 
-    # Stop recording after a second and verify state change
-    stop_button = audio_input.get_by_role("button", name="Stop recording").first
-    expect(stop_button).to_be_visible()
     app.wait_for_timeout(1500)
-    stop_button.click()
+
+    stop_recording(audio_input, app)
 
     wait_for_app_run(app)
     expect(app.get_by_text("Audio Input 1: True")).to_be_visible()
 
     ensure_waveform_rendered(audio_input)
+
+    expect(app.get_by_text("Channels:")).to_be_visible()
+    expect(app.get_by_text("Sample Width:")).to_be_visible()
+    expect(app.get_by_text("Frame Rate (Sample Rate):")).to_be_visible()
+    expect(app.get_by_text("Duration:")).to_be_visible()
+
+    # Ensure no error is displayed
+    expect(app.get_by_text("Error loading WAV file")).not_to_be_visible()
 
     # Play and pause the recording, then verify the controls
     play_button = audio_input.get_by_role("button", name="Play").first
@@ -261,3 +340,33 @@ def test_audio_input_basic_flow(app: Page):
     expect(app.get_by_text("Audio Input 1: False")).to_be_visible()
     expect(audio_input.get_by_role("button", name="Record").first).to_be_visible()
     expect(clock).to_have_text("00:00")
+
+
+@pytest.mark.only_browser("chromium")
+def test_audio_input_error_state(
+    themed_app: Page, assert_snapshot: ImageCompareFunction
+):
+    """Test the error state of audio input."""
+    themed_app.context.grant_permissions(["microphone"])
+
+    def handle(route: Route):
+        route.abort("failed")
+
+    themed_app.route("**/_stcore/upload_file/**", handle)
+
+    audio_input = themed_app.get_by_test_id("stAudioInput").first
+
+    audio_input.get_by_role("button", name="Record").click()
+    themed_app.wait_for_timeout(1500)
+    stop_recording(audio_input, themed_app)
+
+    expect(
+        audio_input.get_by_text("An error has occurred, please try again.")
+    ).to_be_visible()
+
+    assert_snapshot(audio_input, name="st_audio_input-error_state")
+
+    audio_input.get_by_role("button", name="Reset").click()
+    expect(
+        audio_input.get_by_text("An error has occurred, please try again.")
+    ).not_to_be_visible()

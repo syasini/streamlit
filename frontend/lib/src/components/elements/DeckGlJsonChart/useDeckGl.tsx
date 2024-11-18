@@ -17,10 +17,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import JSON5 from "json5"
-import { PickingInfo } from "@deck.gl/core/typed"
+import { PickingInfo, ViewStateChangeParameters } from "@deck.gl/core"
 import isEqual from "lodash/isEqual"
-import { ViewStateChangeParameters } from "@deck.gl/core/typed/controllers/controller"
-import { TooltipContent } from "@deck.gl/core/typed/lib/tooltip"
+import { TooltipContent } from "@deck.gl/core/dist/lib/tooltip"
 import { parseToRgba } from "color2k"
 
 import { useStWidthHeight } from "@streamlit/lib/src/hooks/useStWidthHeight"
@@ -28,9 +27,11 @@ import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { DeckGlJsonChart as DeckGlJsonChartProto } from "@streamlit/lib/src/proto"
 import {
   useBasicWidgetClientState,
-  ValueWSource,
-} from "@streamlit/lib/src/useBasicWidgetState"
+  ValueWithSource,
+} from "@streamlit/lib/src/hooks/useBasicWidgetState"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
+import { useRequiredContext } from "@streamlit/lib/src/hooks/useRequiredContext"
+import { ElementFullscreenContext } from "@streamlit/lib/src/components/shared/ElementFullscreen/ElementFullscreenContext"
 
 import type {
   DeckGlElementState,
@@ -55,7 +56,7 @@ type UseDeckGlShape = {
   onViewStateChange: (params: ViewStateChangeParameters) => void
   selectionMode: DeckGlJsonChartProto.SelectionMode | undefined
   setSelection: React.Dispatch<
-    React.SetStateAction<ValueWSource<DeckGlElementState> | null>
+    React.SetStateAction<ValueWithSource<DeckGlElementState> | null>
   >
   viewState: Record<string, unknown>
   width: number | string
@@ -138,7 +139,7 @@ function getStateFromWidgetMgr(
 function updateWidgetMgrState(
   element: DeckGlJsonChartProto,
   widgetMgr: WidgetStateManager,
-  vws: ValueWSource<DeckGlElementState>,
+  vws: ValueWithSource<DeckGlElementState>,
   fragmentId?: string
 ): void {
   if (!element.id) {
@@ -155,15 +156,12 @@ function updateWidgetMgrState(
 
 export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
   const {
-    element,
-    fragmentId,
     height: propsHeight,
-    isFullScreen: propsIsFullScreen,
-    isLightTheme,
-    theme,
-    widgetMgr,
     width: propsWidth,
-  } = props
+    expanded: propsIsFullScreen,
+  } = useRequiredContext(ElementFullscreenContext)
+
+  const { element, fragmentId, isLightTheme, theme, widgetMgr } = props
   const {
     selectionMode: allSelectionModes,
     tooltip,
@@ -234,18 +232,6 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
       }-v9`
     }
 
-    // Set width and height based on the fullscreen state
-    if (isFullScreen) {
-      Object.assign(copy.initialViewState, { width, height })
-    } else {
-      if (!copy.initialViewState.height) {
-        copy.initialViewState.height = DEFAULT_DECK_GL_HEIGHT
-      }
-      if (shouldUseContainerWidth) {
-        copy.initialViewState.width = width
-      }
-    }
-
     if (copy.layers) {
       const anyLayersHaveSelection = Object.values(
         data.selection.indices
@@ -296,18 +282,33 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
 
           const shouldUseOriginalFillFunction = !anyLayersHaveSelection
 
-          if (shouldUseOriginalFillFunction) {
-            // If we aren't changing the fill color, we don't need to change the fillFunction
-            return clonedLayer
-          }
-
           const originalFillFunction = layer[fillFunction] as
             | FillFunction
             | undefined
 
+          if (shouldUseOriginalFillFunction || !originalFillFunction) {
+            // If we aren't changing the fill color, we don't need to change the fillFunction
+            return clonedLayer
+          }
+
+          const selectedOpacity = 255
+          const unselectedOpacity = Math.floor(255 * 0.4)
+
           // Fallback colors in case there are issues while parsing the colors for a given object
-          const selectedColor = parseToRgba(theme.colors.primary)
-          const unselectedColor = parseToRgba(theme.colors.gray20)
+          const selectedColorParsed = parseToRgba(theme.colors.primary)
+          const selectedColor: [number, number, number, number] = [
+            selectedColorParsed[0],
+            selectedColorParsed[1],
+            selectedColorParsed[2],
+            selectedOpacity,
+          ]
+          const unselectedColorParsed = parseToRgba(theme.colors.gray20)
+          const unselectedColor: [number, number, number, number] = [
+            unselectedColorParsed[0],
+            unselectedColorParsed[1],
+            unselectedColorParsed[2],
+            unselectedOpacity,
+          ]
 
           const newFillFunction: FillFunction = (object, objectInfo) => {
             return getContextualFillColor({
@@ -317,6 +318,8 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
               originalFillFunction,
               selectedColor,
               unselectedColor,
+              selectedOpacity,
+              unselectedOpacity,
             })
           }
 
@@ -332,15 +335,11 @@ export const useDeckGl = (props: UseDeckGlProps): UseDeckGlShape => {
     return jsonConverter.convert(copy)
   }, [
     data.selection.indices,
-    height,
-    isFullScreen,
     isLightTheme,
     isSelectionModeActivated,
     parsedPydeckJson,
-    shouldUseContainerWidth,
     theme.colors.gray20,
     theme.colors.primary,
-    width,
   ])
 
   useEffect(() => {

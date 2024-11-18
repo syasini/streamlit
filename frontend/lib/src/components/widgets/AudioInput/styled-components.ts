@@ -15,13 +15,14 @@
  */
 
 import styled from "@emotion/styled"
+import { Spinner } from "baseui/spinner"
 
 export const StyledAudioInputContainerDiv = styled.div()
 
 export const StyledWaveformContainerDiv = styled.div(({ theme }) => ({
   height: theme.sizes.largestElementHeight,
   width: "100%",
-  background: theme.genericColors.secondaryBg,
+  background: theme.colors.secondaryBg,
   borderRadius: theme.radii.default,
   marginBottom: theme.spacing.twoXS,
   display: "flex",
@@ -47,22 +48,26 @@ export const StyledWaveformTimeCode = styled.span<{
   margin: theme.spacing.sm,
   fontFamily: theme.fonts.monospace,
   color: isPlayingOrRecording
-    ? theme.genericColors.bodyText
+    ? theme.colors.bodyText
     : theme.colors.fadedText60,
-  backgroundColor: theme.genericColors.secondaryBg,
+  backgroundColor: theme.colors.secondaryBg,
   fontSize: theme.fontSizes.sm,
 }))
 
-// NoMicPermissions
-export const StyledNoMicInputContainerDiv = styled.div(() => ({
+export const StyledErrorContainerDiv = styled.div({
   width: "100%",
   textAlign: "center",
   overflow: "hidden",
+})
+
+export const StyledErrorTextSpan = styled.span(({ theme }) => ({
+  color: theme.colors.bodyText,
 }))
 
-export const StyledNoMicPermissionsErrorTextSpan = styled.span()
-
-export const StyledNoMicInputLearnMoreLink = styled.a()
+export const StyledNoMicInputLearnMoreLink = styled.a(({ theme }) => ({
+  color: theme.colors.linkText,
+  textDecoration: "underline",
+}))
 
 // Placeholder
 export const StyledPlaceholderContainerDiv = styled.div(({ theme }) => ({
@@ -72,14 +77,17 @@ export const StyledPlaceholderContainerDiv = styled.div(({ theme }) => ({
   alignItems: "center",
 }))
 
-export const StyledPlaceholderDotsDiv = styled.div(({ theme }) => ({
-  height: 10,
-  opacity: 0.2,
-  width: "100%",
-  backgroundImage: `radial-gradient(${theme.colors.fadedText10} 40%, transparent 40%)`,
-  backgroundSize: "10px 10px",
-  backgroundRepeat: "repeat",
-}))
+export const StyledPlaceholderDotsDiv = styled.div(({ theme }) => {
+  const dotSize = "0.625em"
+  return {
+    opacity: 0.2,
+    width: "100%",
+    height: dotSize,
+    backgroundSize: dotSize,
+    backgroundImage: `radial-gradient(${theme.colors.fadedText10} 40%, transparent 40%)`,
+    backgroundRepeat: "repeat",
+  }
+})
 
 export const StyledActionButtonStopRecordingDiv = styled.span(({ theme }) => ({
   "& > button": {
@@ -128,6 +136,19 @@ export const StyledWidgetLabelHelp = styled.div(({ theme }) => ({
   marginLeft: theme.spacing.sm,
 }))
 
-export const StyledAlertWrapperDiv = styled.div(({ theme }) => ({
-  marginTop: theme.spacing.lg,
-}))
+export const StyledSpinner = styled(Spinner)(({ theme }) => {
+  return {
+    fontSize: theme.fontSizes.sm,
+    width: theme.sizes.spinnerSize,
+    height: theme.sizes.spinnerSize,
+    borderWidth: theme.sizes.spinnerThickness,
+    radius: theme.radii.md,
+    justifyContents: "center",
+    padding: theme.spacing.none,
+    margin: theme.spacing.none,
+    borderColor: theme.colors.borderColor,
+    borderTopColor: theme.colors.primary,
+    flexGrow: 0,
+    flexShrink: 0,
+  }
+})
