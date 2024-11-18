@@ -16,7 +16,7 @@
 
 import styled, { CSSObject } from "@emotion/styled"
 
-import { EmotionTheme } from "@streamlit/lib/src/theme"
+import { EmotionTheme } from "@streamlit/lib"
 
 export const StyledAppViewContainer = styled.div({
   display: "flex",
