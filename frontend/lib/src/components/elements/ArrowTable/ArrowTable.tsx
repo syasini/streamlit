@@ -50,11 +50,7 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
         tableBorder={border}
         data-testid="stTableStyledTable"
       >
-        {caption && (
-          <caption>
-            <small>{caption}</small>
-          </caption>
-        )}
+        {caption && <caption>{caption}</caption>}
         {columnHeaders.length > 0 && (
           <thead>
             {columnHeaders.map(rowIndex =>

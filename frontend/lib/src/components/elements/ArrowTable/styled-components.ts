@@ -41,10 +41,13 @@ export const StyledTable = styled.table<StyledTableProps>(
       ? `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`
       : `${theme.sizes.borderWidth} solid transparent`,
     "& caption": {
+      fontFamily: theme.genericFonts.bodyFont,
+      fontSize: theme.fontSizes.sm,
       paddingTop: theme.spacing.sm,
       paddingBottom: 0,
       color: theme.colors.fadedText60,
       textAlign: "left",
+      wordWrap: "break-word",
     },
   })
 )
