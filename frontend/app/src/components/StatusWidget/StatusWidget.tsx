@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import React, {
+  ReactElement,
   ReactNode,
   useCallback,
   useEffect,
@@ -98,6 +99,28 @@ const PROMPT_DISPLAY_HOVER_TIMEOUT_MS = 1.0 * 1000
 
 // Delay time for displaying running man animation.
 const RUNNING_MAN_DISPLAY_DELAY_TIME_MS = 500
+
+interface PromptButtonProps {
+  title: ReactNode
+  disabled: boolean
+  onClick: () => void
+  isMinimized: boolean
+}
+
+const PromptButton = (props: PromptButtonProps): ReactElement => {
+  return (
+    <StyledAppButtonContainer isMinimized={props.isMinimized}>
+      <BaseButton
+        kind={BaseButtonKind.HEADER_BUTTON}
+        disabled={props.disabled}
+        fluidWidth
+        onClick={props.onClick}
+      >
+        {props.title}
+      </BaseButton>
+    </StyledAppButtonContainer>
+  )
+}
 
 /**
  * Displays various script- and connection-related info: our WebSocket
@@ -211,26 +234,6 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     return window.scrollY > 32
   }
 
-  function promptButton(
-    title: ReactNode,
-    disabled: boolean,
-    onClick: () => void,
-    isMinimized: boolean
-  ): ReactNode {
-    return (
-      <StyledAppButtonContainer isMinimized={isMinimized}>
-        <BaseButton
-          kind={BaseButtonKind.HEADER_BUTTON}
-          disabled={disabled}
-          fluidWidth
-          onClick={onClick}
-        >
-          {title}
-        </BaseButton>
-      </StyledAppButtonContainer>
-    )
-  }
-
   function getConnectionStateUI(
     state: ConnectionState
   ): ConnectionStateUI | undefined {
@@ -314,12 +317,6 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
   const renderScriptIsRunning = (): ReactNode => {
     const minimized = statusMinimized
     const stopRequested = scriptRunState === ScriptRunState.STOP_REQUESTED
-    const stopButton = promptButton(
-      stopRequested ? "Stopping..." : "Stop",
-      stopRequested,
-      handleStopScriptClick,
-      minimized
-    )
     const isNewYear = isNewYears()
     const runningSrc = isNewYear ? newYearsRunning : iconRunning
     const runningIcon = (
@@ -344,7 +341,12 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
         <StyledAppStatusLabel isMinimized={statusMinimized} isPrompt={false}>
           Running...
         </StyledAppStatusLabel>
-        {stopButton}
+        <PromptButton
+          isMinimized={statusMinimized}
+          title={stopRequested ? "Stopping..." : "Stop"}
+          disabled={stopRequested}
+          onClick={handleStopScriptClick}
+        />
       </StyledAppStatus>
     ) : (
       <></>
@@ -363,19 +365,18 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
             <StyledAppStatusLabel isMinimized={minimized} isPrompt>
               Source file changed.
             </StyledAppStatusLabel>
-            {promptButton(
-              <StyledShortcutLabel>Rerun</StyledShortcutLabel>,
-              rerunRequested,
-              handleRerunClick,
-              minimized
-            )}
-            {allowRunOnSave &&
-              promptButton(
-                <StyledShortcutLabel>Always rerun</StyledShortcutLabel>,
-                rerunRequested,
-                handleAlwaysRerunClick,
-                minimized
-              )}
+            <PromptButton
+              isMinimized={minimized}
+              title={<StyledShortcutLabel>Rerun</StyledShortcutLabel>}
+              disabled={rerunRequested}
+              onClick={handleRerunClick}
+            />
+            <PromptButton
+              isMinimized={minimized}
+              title={<StyledShortcutLabel>Always rerun</StyledShortcutLabel>}
+              disabled={rerunRequested}
+              onClick={handleAlwaysRerunClick}
+            />
           </StyledAppStatus>
         </div>
       </Hotkeys>
