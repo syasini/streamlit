@@ -189,7 +189,9 @@ export const StyledBottomBlockContainer =
       return {
         width: theme.sizes.full,
         paddingTop: theme.spacing.lg,
-        paddingBottom: showPadding ? "55px" : theme.spacing.threeXL,
+        paddingBottom: showPadding
+          ? theme.sizes.appDefaultBottomPadding
+          : theme.spacing.threeXL,
         paddingLeft: theme.spacing.lg,
         paddingRight: theme.spacing.lg,
         minWidth: undefined,
