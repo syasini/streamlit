@@ -26,6 +26,7 @@ import {
   buildWsUri,
   ForwardMsg,
   ForwardMsgCache,
+  getCookie,
   IBackMsg,
   IHostConfigResponse,
   isNullOrUndefined,
@@ -38,7 +39,6 @@ import {
   SessionInfo,
   StreamlitEndpoints,
   StreamlitMarkdown,
-  getCookie,
 } from "@streamlit/lib"
 import { ConnectionState } from "@streamlit/app/src/connection/ConnectionState"
 
