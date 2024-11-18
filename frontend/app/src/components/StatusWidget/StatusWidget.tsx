@@ -371,12 +371,14 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
               disabled={rerunRequested}
               onClick={handleRerunClick}
             />
-            <PromptButton
-              isMinimized={minimized}
-              title={<StyledShortcutLabel>Always rerun</StyledShortcutLabel>}
-              disabled={rerunRequested}
-              onClick={handleAlwaysRerunClick}
-            />
+            {allowRunOnSave && (
+              <PromptButton
+                isMinimized={minimized}
+                title={<StyledShortcutLabel>Always rerun</StyledShortcutLabel>}
+                disabled={rerunRequested}
+                onClick={handleAlwaysRerunClick}
+              />
+            )}
           </StyledAppStatus>
         </div>
       </Hotkeys>
