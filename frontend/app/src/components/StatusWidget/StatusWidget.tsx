@@ -123,25 +123,20 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
   const sessionEventConn = useRef<SignalConnection>()
   const theme = useTheme()
 
-  const handleAlwaysRerunClick = useCallback((): void => {
+  const handleAlwaysRerunClick = (): void => {
     if (allowRunOnSave) {
       rerunScript(true)
     }
-  }, [allowRunOnSave, rerunScript])
+  }
 
-  const handleKeyDown = useCallback(
-    (keyName: string): void => {
-      // NOTE: 'r' is handled at the App Level
-      if (keyName === "a") {
-        handleAlwaysRerunClick()
-      }
-    },
-    [handleAlwaysRerunClick]
-  )
+  const handleKeyDown = (keyName: string): void => {
+    // NOTE: 'r' is handled at the App Level
+    if (keyName === "a") {
+      handleAlwaysRerunClick()
+    }
+  }
 
-  const isConnected = useCallback((): boolean => {
-    return connectionState === ConnectionState.CONNECTED
-  }, [connectionState])
+  const isConnected = connectionState === ConnectionState.CONNECTED
 
   const minimizePromptAfterTimeout = useCallback((timeout: number): void => {
     // Don't cut an existing timer short. If our timer is already
@@ -182,25 +177,25 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     setStatusMinimized(shouldMinimize())
   }, [])
 
-  const onAppPromptHover = useCallback((): void => {
+  const onAppPromptHover = (): void => {
     setPromptHovered(true)
-  }, [])
+  }
 
-  const onAppPromptUnhover = useCallback((): void => {
+  const onAppPromptUnhover = (): void => {
     setPromptHovered(false)
     setPromptMinimized(false)
     minimizePromptAfterTimeout(PROMPT_DISPLAY_HOVER_TIMEOUT_MS)
-  }, [minimizePromptAfterTimeout])
+  }
 
-  const handleStopScriptClick = useCallback((): void => {
+  const handleStopScriptClick = (): void => {
     stopScript()
-  }, [stopScript])
+  }
 
-  const handleRerunClick = useCallback((): void => {
+  const handleRerunClick = (): void => {
     rerunScript(false)
-  }, [rerunScript])
+  }
 
-  const isNewYears = useCallback((): boolean => {
+  const isNewYears = (): boolean => {
     // Test if current date between 12/31 & 1/06
     const currentDate = new Date()
     const month = currentDate.getMonth()
@@ -210,7 +205,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     // Check if Jan 1st through 6th
     if (month === 0 && date <= 6) return true
     return false
-  }, [])
+  }
 
   function shouldMinimize(): boolean {
     return window.scrollY > 32
@@ -303,7 +298,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
   }, [scriptRunState])
 
   useEffect(() => {
-    if (isConnected()) {
+    if (isConnected) {
       if (
         scriptRunState === ScriptRunState.RUNNING ||
         scriptRunState === ScriptRunState.RERUN_REQUESTED
@@ -314,14 +309,9 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     if (scriptRunState === ScriptRunState.NOT_RUNNING) {
       setShowRunningMan(false)
     }
-  }, [
-    scriptRunState,
-    connectionState,
-    showRunningManAfterInitialDelay,
-    isConnected,
-  ])
+  }, [scriptRunState, showRunningManAfterInitialDelay, isConnected])
 
-  const renderScriptIsRunning = useCallback((): ReactNode => {
+  const renderScriptIsRunning = (): ReactNode => {
     const minimized = statusMinimized
     const stopRequested = scriptRunState === ScriptRunState.STOP_REQUESTED
     const stopButton = promptButton(
@@ -359,15 +349,9 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     ) : (
       <></>
     )
-  }, [
-    handleStopScriptClick,
-    isNewYears,
-    showRunningMan,
-    statusMinimized,
-    scriptRunState,
-  ])
+  }
 
-  const renderRerunScriptPrompt = useCallback((): ReactNode => {
+  const renderRerunScriptPrompt = (): ReactNode => {
     const rerunRequested = scriptRunState === ScriptRunState.RERUN_REQUESTED
     const minimized = promptMinimized && !promptHovered
     const { colors } = theme
@@ -396,20 +380,9 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
         </div>
       </Hotkeys>
     )
-  }, [
-    allowRunOnSave,
-    handleAlwaysRerunClick,
-    handleKeyDown,
-    handleRerunClick,
-    onAppPromptHover,
-    onAppPromptUnhover,
-    promptHovered,
-    promptMinimized,
-    scriptRunState,
-    theme,
-  ])
+  }
 
-  const renderConnectionStatus = useCallback((): ReactNode => {
+  const renderConnectionStatus = (): ReactNode => {
     const ui = getConnectionStateUI(connectionState)
     if (ui === undefined) {
       return null
@@ -427,10 +400,10 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
         </StyledConnectionStatus>
       </Tooltip>
     )
-  }, [connectionState, statusMinimized])
+  }
 
-  const renderWidget = useCallback((): ReactNode => {
-    if (isConnected()) {
+  const renderWidget = (): ReactNode => {
+    if (isConnected) {
       if (
         scriptRunState === ScriptRunState.RUNNING ||
         scriptRunState === ScriptRunState.RERUN_REQUESTED
@@ -448,14 +421,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     }
 
     return renderConnectionStatus()
-  }, [
-    isConnected,
-    renderConnectionStatus,
-    renderRerunScriptPrompt,
-    renderScriptIsRunning,
-    scriptChangedOnDisk,
-    scriptRunState,
-  ])
+  }
 
   // The StatusWidget fades in on appear and fades out on disappear.
   // We keep track of our most recent result from `renderWidget`,
