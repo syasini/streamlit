@@ -17,11 +17,22 @@
 import styled from "@emotion/styled"
 
 import { StyledWidgetLabel } from "@streamlit/lib/src/components/widgets/BaseWidget/styled-components"
+import { Metric as MetricProto } from "@streamlit/lib/src/proto"
 import { LabelVisibilityOptions } from "@streamlit/lib/src/util/utils"
 
-export interface StyledMetricLabelTextProps {
-  visibility?: LabelVisibilityOptions
+export interface StyledMetricContainerProps {
+  border: boolean
 }
+
+export const StyledMetricContainer = styled.div<StyledMetricContainerProps>(
+  ({ theme, border }) => ({
+    ...(border && {
+      border: `1px solid ${theme.colors.fadedText10}`,
+      borderRadius: theme.radii.default,
+      padding: "calc(1em - 1px)", // 1px to account for border
+    }),
+  })
+)
 
 export const StyledTruncateText = styled.div(({ theme }) => ({
   overflowWrap: "normal",
@@ -44,6 +55,10 @@ export const StyledTruncateText = styled.div(({ theme }) => ({
   },
 }))
 
+export interface StyledMetricLabelTextProps {
+  visibility?: LabelVisibilityOptions
+}
+
 export const StyledMetricLabelText = styled(
   StyledWidgetLabel
 )<StyledMetricLabelTextProps>(({ visibility }) => ({
@@ -60,11 +75,32 @@ export const StyledMetricValueText = styled.div(({ theme }) => ({
   color: theme.colors.bodyText,
   paddingBottom: theme.spacing.twoXS,
 }))
+export interface StyledMetricDeltaTextProps {
+  metricColor: MetricProto.MetricColor
+}
 
-export const StyledMetricDeltaText = styled.div(({ theme }) => ({
-  fontSize: theme.fontSizes.md,
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  fontWeight: theme.fontWeights.normal,
-}))
+const getMetricColor = (
+  theme: any,
+  color: MetricProto.MetricColor
+): string => {
+  switch (color) {
+    case MetricProto.MetricColor.RED:
+      return theme.colors.metricNegativeDeltaColor
+    case MetricProto.MetricColor.GREEN:
+      return theme.colors.metricPositiveDeltaColor
+    // this must be grey
+    default:
+      return theme.colors.metricNeutralDeltaColor
+  }
+}
+
+export const StyledMetricDeltaText = styled.div<StyledMetricDeltaTextProps>(
+  ({ theme, metricColor }) => ({
+    color: getMetricColor(theme, metricColor),
+    fontSize: theme.fontSizes.md,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    fontWeight: theme.fontWeights.normal,
+  })
+)

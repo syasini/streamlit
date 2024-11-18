@@ -25,38 +25,55 @@ export const StyledTableContainer = styled.div(({ theme }) => ({
   overflow: ["auto", "overlay"],
 }))
 
-export const StyledTable = styled.table(({ theme }) => ({
-  width: theme.sizes.full,
-  marginBottom: theme.spacing.lg,
-  color: theme.colors.bodyText,
-  // Prevent double borders
-  borderCollapse: "collapse",
-  captionSide: "bottom",
-  border: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
-  "& caption": {
-    paddingTop: theme.spacing.sm,
-    paddingBottom: 0,
-    color: theme.colors.fadedText60,
-    textAlign: "left",
-  },
-}))
+export interface StyledTableProps {
+  tableBorder?: boolean
+}
 
-const styleCellFunction = (theme: EmotionTheme): CSSObject => ({
-  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
-  borderRight: `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`,
+export const StyledTable = styled.table<StyledTableProps>(
+  ({ theme, tableBorder }) => ({
+    width: theme.sizes.full,
+    marginBottom: theme.spacing.lg,
+    color: theme.colors.bodyText,
+    // Prevent double borders
+    borderCollapse: "collapse",
+    captionSide: "bottom",
+    border: tableBorder
+      ? `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`
+      : `${theme.sizes.borderWidth} solid transparent`,
+    "& caption": {
+      paddingTop: theme.spacing.sm,
+      paddingBottom: 0,
+      color: theme.colors.fadedText60,
+      textAlign: "left",
+    },
+  })
+)
+
+const styleCellFunction = (
+  theme: EmotionTheme,
+  border?: boolean
+): CSSObject => ({
+  borderBottom: border
+    ? `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`
+    : `${theme.sizes.borderWidth} solid transparent`,
+  borderRight: border
+    ? `${theme.sizes.borderWidth} solid ${theme.colors.borderColorLight}`
+    : `${theme.sizes.borderWidth} solid transparent`,
   verticalAlign: "middle",
   padding: `${theme.spacing.twoXS} ${theme.spacing.xs}`,
   fontWeight: theme.fontWeights.normal,
 })
 
-export const StyledTableCell = styled.td(({ theme }) =>
-  styleCellFunction(theme)
+export const StyledTableCell = styled.td<StyledTableProps>(
+  ({ theme, tableBorder }) => styleCellFunction(theme, tableBorder)
 )
-export const StyledTableCellHeader = styled.th(({ theme }) => ({
-  ...styleCellFunction(theme),
-  textAlign: "inherit",
-  color: theme.colors.fadedText60,
-}))
+export const StyledTableCellHeader = styled.th<StyledTableProps>(
+  ({ theme, tableBorder }) => ({
+    ...styleCellFunction(theme, tableBorder),
+    textAlign: "inherit",
+    color: theme.colors.fadedText60,
+  })
+)
 
 export const StyledEmptyTableCell = styled(StyledTableCell)(({ theme }) => ({
   color: theme.colors.darkGray,

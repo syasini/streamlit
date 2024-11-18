@@ -173,6 +173,7 @@ const BlockNodeRenderer = (props: BlockPropsWithWidth): ReactElement => {
       <StyledColumn
         weight={node.deltaBlock.column.weight ?? 0}
         gap={node.deltaBlock.column.gap ?? ""}
+        border={node.deltaBlock.column.border ?? false}
         verticalAlignment={
           node.deltaBlock.column.verticalAlignment ?? undefined
         }

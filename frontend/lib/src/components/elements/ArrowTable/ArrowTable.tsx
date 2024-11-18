@@ -30,10 +30,12 @@ import {
 
 export interface TableProps {
   element: Quiver
+  border: boolean
 }
 
 export function ArrowTable(props: Readonly<TableProps>): ReactElement {
   const table = props.element
+  const border = props.border
   const { cssId, cssStyles, caption } = table
   const { headerRows, rows, columns } = table.dimensions
   const allRows = range(rows)
@@ -43,7 +45,11 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
   return (
     <StyledTableContainer className="stTable" data-testid="stTable">
       {cssStyles && <style>{cssStyles}</style>}
-      <StyledTable id={cssId} data-testid="stTableStyledTable">
+      <StyledTable
+        id={cssId}
+        tableBorder={border}
+        data-testid="stTableStyledTable"
+      >
         {caption && (
           <caption>
             <small>{caption}</small>
@@ -52,7 +58,7 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
         {columnHeaders.length > 0 && (
           <thead>
             {columnHeaders.map(rowIndex =>
-              generateTableRow(table, rowIndex, columns)
+              generateTableRow(table, rowIndex, columns, border)
             )}
           </thead>
         )}
@@ -68,7 +74,7 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
             </tr>
           ) : (
             dataRows.map(rowIndex =>
-              generateTableRow(table, rowIndex, columns)
+              generateTableRow(table, rowIndex, columns, border)
             )
           )}
         </tbody>
@@ -80,12 +86,13 @@ export function ArrowTable(props: Readonly<TableProps>): ReactElement {
 function generateTableRow(
   table: Quiver,
   rowIndex: number,
-  columns: number
+  columns: number,
+  border?: boolean
 ): ReactElement {
   return (
     <tr key={rowIndex}>
       {range(columns).map(columnIndex =>
-        generateTableCell(table, rowIndex, columnIndex)
+        generateTableCell(table, rowIndex, columnIndex, border)
       )}
     </tr>
   )
@@ -94,7 +101,8 @@ function generateTableRow(
 function generateTableCell(
   table: Quiver,
   rowIndex: number,
-  columnIndex: number
+  columnIndex: number,
+  border?: boolean
 ): ReactElement {
   const {
     type,
@@ -121,7 +129,11 @@ function generateTableCell(
   switch (type) {
     case "blank": {
       return (
-        <StyledTableCellHeader key={columnIndex} className={cssClass}>
+        <StyledTableCellHeader
+          key={columnIndex}
+          className={cssClass}
+          tableBorder={border}
+        >
           &nbsp;
         </StyledTableCellHeader>
       )
@@ -133,6 +145,7 @@ function generateTableCell(
           scope="row"
           id={cssId}
           className={cssClass}
+          tableBorder={border}
         >
           {formattedContent}
         </StyledTableCellHeader>
@@ -145,6 +158,7 @@ function generateTableCell(
           scope="col"
           className={cssClass}
           style={style}
+          tableBorder={border}
         >
           {formattedContent}
         </StyledTableCellHeader>
@@ -152,7 +166,12 @@ function generateTableCell(
     }
     case "data": {
       return (
-        <StyledTableCell key={columnIndex} id={cssId} style={style}>
+        <StyledTableCell
+          key={columnIndex}
+          id={cssId}
+          style={style}
+          tableBorder={border}
+        >
           {formattedContent}
         </StyledTableCell>
       )

@@ -26,6 +26,7 @@ import { ArrowTable, TableProps } from "./ArrowTable"
 
 const getProps = (data: Uint8Array): TableProps => ({
   element: new Quiver({ data }),
+  border: true,
 })
 
 describe("st._arrow_table", () => {

@@ -134,11 +134,12 @@ export const StyledElementContainer = styled.div<StyledElementContainerProps>(
 interface StyledColumnProps {
   weight: number
   gap: string
+  border: boolean
   verticalAlignment?: BlockProto.Column.VerticalAlignment
 }
 
 export const StyledColumn = styled.div<StyledColumnProps>(
-  ({ weight, gap, theme, verticalAlignment }) => {
+  ({ weight, gap, theme, border, verticalAlignment }) => {
     const { VerticalAlignment } = BlockProto.Column
     const percentage = weight * 100
     const gapWidth = translateGapWidth(gap, theme)
@@ -159,6 +160,11 @@ export const StyledColumn = styled.div<StyledColumnProps>(
       ...(verticalAlignment === VerticalAlignment.CENTER && {
         marginTop: "auto",
         marginBottom: "auto",
+      }),
+      ...(border && {
+        border: `1px solid ${theme.colors.fadedText10}`,
+        borderRadius: theme.radii.default,
+        padding: "calc(1em - 1px)", // 1px to account for border
       }),
     }
   }

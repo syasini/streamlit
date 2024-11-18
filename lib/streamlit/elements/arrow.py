@@ -596,7 +596,7 @@ class ArrowMixin:
             return self.dg._enqueue("arrow_data_frame", proto)
 
     @gather_metrics("table")
-    def table(self, data: Data = None) -> DeltaGenerator:
+    def table(self, data: Data = None, *, border: bool = True) -> DeltaGenerator:
         """Display a static table.
 
         This differs from ``st.dataframe`` in that the table in this case is
@@ -606,6 +606,9 @@ class ArrowMixin:
         ----------
         data : Anything supported by st.dataframe
             The table data.
+        border : bool
+            Whether to show borders. If ``False``, no borders are shown.
+            If ``True`` (default), borders are shown around and within the table.
 
         Example
         -------
@@ -625,6 +628,8 @@ class ArrowMixin:
 
         """
 
+        # TODO: Handle border parameter interaction with index and column headers
+
         # Check if data is uncollected, and collect it but with 100 rows max, instead of
         # 10k rows, which is done in all other cases.
         # We use 100 rows in st.table, because large tables render slowly,
@@ -641,7 +646,7 @@ class ArrowMixin:
         default_uuid = str(hash(delta_path))
 
         proto = ArrowProto()
-        marshall(proto, data, default_uuid)
+        marshall(proto, data, default_uuid, border)
         return self.dg._enqueue("arrow_table", proto)
 
     @gather_metrics("add_rows")
@@ -844,7 +849,12 @@ def _arrow_add_rows(
     return dg
 
 
-def marshall(proto: ArrowProto, data: Data, default_uuid: str | None = None) -> None:
+def marshall(
+    proto: ArrowProto,
+    data: Data,
+    default_uuid: str | None = None,
+    border: bool | None = None,
+) -> None:
     """Marshall pandas.DataFrame into an Arrow proto.
 
     Parameters
@@ -871,3 +881,5 @@ def marshall(proto: ArrowProto, data: Data, default_uuid: str | None = None) -> 
         marshall_styler(proto, data, default_uuid)
 
     proto.data = dataframe_util.convert_anything_to_arrow_bytes(data)
+    if border is not None:
+        proto.border = border
