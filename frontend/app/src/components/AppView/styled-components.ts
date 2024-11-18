@@ -116,7 +116,7 @@ const applyWideModePadding = (theme: EmotionTheme): CSSObject => {
     // Increase side padding, if the current container width is greater than the contentMaxWidth
     // + the wide mode padding - the the centered padding (lg). This allows a smooth transition
     // when switching between centered to wide mode when resizing the window.
-    // And makes sure that wide mode always has the same or larger width than centered mode.
+    // And makes sure that wide mode always has the same or larger content compared to centered mode.
     [`@container (min-width: calc(${theme.sizes.contentMaxWidth} + 2 * (${theme.sizes.wideSidePadding} - ${theme.spacing.lg})))`]:
       {
         paddingLeft: theme.sizes.wideSidePadding,
