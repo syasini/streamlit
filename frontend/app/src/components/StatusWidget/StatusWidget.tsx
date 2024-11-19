@@ -134,6 +134,9 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
   stopScript,
   allowRunOnSave,
 }) => {
+  const shouldMinimize = useCallback((): boolean => {
+    return window.scrollY > 32
+  }, [])
   const [statusMinimized, setStatusMinimized] = useState(shouldMinimize())
   const [scriptChangedOnDisk, setScriptChangedOnDisk] = useState(false)
   const [promptMinimized, setPromptMinimized] = useState(false)
@@ -198,7 +201,7 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
 
   const handleScroll = useCallback((): void => {
     setStatusMinimized(shouldMinimize())
-  }, [])
+  }, [shouldMinimize])
 
   const onAppPromptHover = (): void => {
     setPromptHovered(true)
@@ -228,10 +231,6 @@ const StatusWidget: React.FC<StatusWidgetProps> = ({
     // Check if Jan 1st through 6th
     if (month === 0 && date <= 6) return true
     return false
-  }
-
-  function shouldMinimize(): boolean {
-    return window.scrollY > 32
   }
 
   function getConnectionStateUI(
