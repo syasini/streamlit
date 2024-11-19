@@ -14,9 +14,10 @@
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING, Any
 
-from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
+from streamlit.proto.ForwardMsg_pb2 import ForwardMsg, ForwardMsgList
 
 if TYPE_CHECKING:
     from streamlit.proto.Delta_pb2 import Delta
@@ -139,6 +140,15 @@ class ForwardMsgQueue:
         before being cleared.
         """
         queue = self._queue
+
+        streamlit_proto_path = os.environ.get("STREAMLIT_PROTO_PATH", False)
+        if streamlit_proto_path:
+            forwardMsgList = ForwardMsgList()
+            for msg in queue:
+                forwardMsgList.messages.append(msg)
+            with open(streamlit_proto_path, "wb") as f:
+                f.write(forwardMsgList.SerializeToString())
+
         self.clear()
         return queue
 
