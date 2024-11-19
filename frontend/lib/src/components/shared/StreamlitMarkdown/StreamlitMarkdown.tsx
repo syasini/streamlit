@@ -18,9 +18,10 @@ import React, {
   CSSProperties,
   FunctionComponent,
   HTMLProps,
-  PureComponent,
+  memo,
   ReactElement,
   ReactNode,
+  useContext,
 } from "react"
 
 import { visit } from "unist-util-visit"
@@ -50,6 +51,7 @@ import IsSidebarContext from "@streamlit/lib/src/components/core/IsSidebarContex
 import ErrorBoundary from "@streamlit/lib/src/components/shared/ErrorBoundary"
 import { InlineTooltipIcon } from "@streamlit/lib/src/components/shared/TooltipIcon"
 import {
+  EmotionTheme,
   getMarkdownBgColors,
   getMarkdownTextColors,
 } from "@streamlit/lib/src/theme"
@@ -157,6 +159,7 @@ const HeaderActionElements: FunctionComponent<HeadingActionElements> = ({
   help,
   hideAnchor,
 }) => {
+  const theme: EmotionTheme = useTheme()
   if (!help && hideAnchor) {
     return <></>
   }
@@ -166,7 +169,7 @@ const HeaderActionElements: FunctionComponent<HeadingActionElements> = ({
       {help && <InlineTooltipIcon content={help} />}
       {elementId && !hideAnchor && (
         <StyledLinkIcon href={`#${elementId}`}>
-          <LinkIcon size="18" />
+          <LinkIcon size={theme.iconSizes.base} />
         </StyledLinkIcon>
       )}
     </StyledHeadingActionElements>
@@ -357,8 +360,8 @@ export function RenderedMarkdown({
     h6: CustomHeading,
     ...(overrideComponents || {}),
   }
-  const theme = useTheme()
-  const { red, orange, yellow, green, blue, violet, purple, gray } =
+  const theme: EmotionTheme = useTheme()
+  const { red, orange, yellow, green, blue, violet, purple, gray, primary } =
     getMarkdownTextColors(theme)
   const {
     redbg,
@@ -369,6 +372,7 @@ export function RenderedMarkdown({
     violetbg,
     purplebg,
     graybg,
+    primarybg,
   } = getMarkdownBgColors(theme)
   const colorMapping = new Map(
     Object.entries({
@@ -379,6 +383,7 @@ export function RenderedMarkdown({
       orange: `color: ${orange}`,
       gray: `color: ${gray}`,
       grey: `color: ${gray}`,
+      primary: `color: ${primary}`,
       // Gradient from red, orange, yellow, green, blue, violet, purple
       rainbow: `color: transparent; background-clip: text; -webkit-background-clip: text; background-image: linear-gradient(to right,
         ${red}, ${orange}, ${yellow}, ${green}, ${blue}, ${violet}, ${purple});`,
@@ -389,6 +394,7 @@ export function RenderedMarkdown({
       "orange-background": `background-color: ${orangebg}`,
       "gray-background": `background-color: ${graybg}`,
       "grey-background": `background-color: ${graybg}`,
+      "primary-background": `background-color: ${primarybg}`,
       // Gradient from red, orange, yellow, green, blue, violet, purple
       "rainbow-background": `background: linear-gradient(to right,
         ${redbg}, ${orangebg}, ${yellowbg}, ${greenbg}, ${bluebg}, ${violetbg}, ${purplebg});`,
@@ -604,55 +610,39 @@ export function RenderedMarkdown({
  * Wraps the <ReactMarkdown> component to include our standard
  * renderers and AST plugins (for syntax highlighting, HTML support, etc).
  */
-class StreamlitMarkdown extends PureComponent<Props> {
-  static contextType = IsSidebarContext
+const StreamlitMarkdown: React.FC<Props> = ({
+  source,
+  allowHTML,
+  style,
+  isCaption,
+  isLabel,
+  boldLabel,
+  largerLabel,
+  disableLinks,
+  isToast,
+}) => {
+  const isInSidebar = useContext(IsSidebarContext)
+  const isInDialog = useContext(IsDialogContext)
 
-  context!: React.ContextType<typeof IsSidebarContext>
-
-  public componentDidCatch = (): void => {
-    const { source } = this.props
-
-    throw Object.assign(new Error(), {
-      name: "Error parsing Markdown or HTML in this string",
-      message: <p>{source}</p>,
-      stack: null,
-    })
-  }
-
-  public render(): ReactNode {
-    const {
-      source,
-      allowHTML,
-      style,
-      isCaption,
-      isLabel,
-      boldLabel,
-      largerLabel,
-      disableLinks,
-      isToast,
-    } = this.props
-    const isInSidebar = this.context
-
-    return (
-      <StyledStreamlitMarkdown
-        isCaption={Boolean(isCaption)}
-        isInSidebar={isInSidebar}
+  return (
+    <StyledStreamlitMarkdown
+      isCaption={Boolean(isCaption)}
+      isInSidebarOrDialog={isInSidebar || isInDialog}
+      isLabel={isLabel}
+      boldLabel={boldLabel}
+      largerLabel={largerLabel}
+      isToast={isToast}
+      style={style}
+      data-testid={isCaption ? "stCaptionContainer" : "stMarkdownContainer"}
+    >
+      <RenderedMarkdown
+        source={source}
+        allowHTML={allowHTML}
         isLabel={isLabel}
-        boldLabel={boldLabel}
-        largerLabel={largerLabel}
-        isToast={isToast}
-        style={style}
-        data-testid={isCaption ? "stCaptionContainer" : "stMarkdownContainer"}
-      >
-        <RenderedMarkdown
-          source={source}
-          allowHTML={allowHTML}
-          isLabel={isLabel}
-          disableLinks={disableLinks}
-        />
-      </StyledStreamlitMarkdown>
-    )
-  }
+        disableLinks={disableLinks}
+      />
+    </StyledStreamlitMarkdown>
+  )
 }
 
 interface LinkProps {
@@ -688,4 +678,4 @@ export function LinkWithTargetBlank(props: LinkProps): ReactElement {
   )
 }
 
-export default StreamlitMarkdown
+export default memo(StreamlitMarkdown)

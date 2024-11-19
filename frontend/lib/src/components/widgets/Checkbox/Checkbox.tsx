@@ -29,8 +29,8 @@ import { Checkbox as CheckboxProto } from "@streamlit/lib/src/proto"
 import { WidgetStateManager } from "@streamlit/lib/src/WidgetStateManager"
 import {
   useBasicWidgetState,
-  ValueWSource,
-} from "@streamlit/lib/src/useBasicWidgetState"
+  ValueWithSource,
+} from "@streamlit/lib/src/hooks/useBasicWidgetState"
 import { hasLightBackgroundColor } from "@streamlit/lib/src/theme"
 import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
 import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
@@ -54,23 +54,25 @@ function Checkbox({
   widgetMgr,
   fragmentId,
 }: Readonly<Props>): ReactElement {
-  const [value, setValueWSource] = useBasicWidgetState<boolean, CheckboxProto>(
-    {
-      getStateFromWidgetMgr,
-      getDefaultStateFromProto,
-      getCurrStateFromProto,
-      updateWidgetMgrState,
-      element,
-      widgetMgr,
-      fragmentId,
-    }
-  )
+  const [value, setValueWithSource] = useBasicWidgetState<
+    boolean,
+    CheckboxProto
+  >({
+    getStateFromWidgetMgr,
+    getDefaultStateFromProto,
+    getCurrStateFromProto,
+    updateWidgetMgrState,
+    element,
+    widgetMgr,
+    fragmentId,
+  })
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      setValueWSource({ value: e.target.checked, fromUi: true })
+      setValueWithSource({ value: e.target.checked, fromUi: true })
     },
-    [setValueWSource]
+    // ESLint complains if we remove this unnecessary dep.
+    [setValueWithSource]
   )
 
   const theme = useTheme()
@@ -201,6 +203,8 @@ function Checkbox({
           },
           Label: {
             style: {
+              lineHeight: theme.lineHeights.small,
+              paddingLeft: theme.spacing.sm,
               position: "relative",
               color,
             },
@@ -251,7 +255,7 @@ function getCurrStateFromProto(element: CheckboxProto): boolean {
 function updateWidgetMgrState(
   element: CheckboxProto,
   widgetMgr: WidgetStateManager,
-  vws: ValueWSource<boolean>,
+  vws: ValueWithSource<boolean>,
   fragmentId?: string
 ): void {
   widgetMgr.setBoolValue(

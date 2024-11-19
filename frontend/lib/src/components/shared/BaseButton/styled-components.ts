@@ -100,8 +100,12 @@ export const StyledBaseButton = styled.button<RequiredBaseButtonProps>(
       minHeight: theme.sizes.minElementHeight,
       margin: theme.spacing.none,
       lineHeight: theme.lineHeights.base,
+      textTransform: "none",
+      fontSize: "inherit",
+      fontFamily: "inherit",
       color: "inherit",
       width: fluidWidth ? buttonWidth : "auto",
+      cursor: "pointer",
       userSelect: "none",
       "&:focus": {
         outline: "none",
