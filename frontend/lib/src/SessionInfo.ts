@@ -68,6 +68,7 @@ export class SessionInfo {
    * previous props to `SessionInfo.last`.
    */
   public setCurrent(props?: Props): void {
+    // Don't set anything if the current has not changed.
     if (this._current && isEqual(props, this._current)) {
       return
     }
