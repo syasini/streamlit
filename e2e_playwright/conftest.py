@@ -249,6 +249,21 @@ def app_server(
     print(streamlit_stdout, flush=True)
 
 
+@pytest.fixture(scope="module")
+def fake_oidc_server() -> Generator[AsyncSubprocess, None, None]:
+    """Fixture that starts and stops the Streamlit app server."""
+    oidc_server_proc = AsyncSubprocess(
+        ["python", "shared/oidc_mock_server.py"],
+        cwd=".",
+    )
+
+    oidc_server_proc.start()
+    time.sleep(1)
+    yield oidc_server_proc
+    oidc_server_stdout = oidc_server_proc.terminate()
+    print(oidc_server_stdout, flush=True)
+
+
 @pytest.fixture(scope="function")
 def app(page: Page, app_port: int) -> Page:
     """Fixture that opens the app."""
