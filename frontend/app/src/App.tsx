@@ -639,10 +639,6 @@ export class App extends PureComponent<Props, State> {
             newState !== ConnectionState.DISCONNECTED_FOREVER,
         })
       }
-
-      if (this.sessionInfo.isSet) {
-        this.sessionInfo.clearCurrent()
-      }
     }
 
     this.setState({ connectionState: newState })
@@ -825,24 +821,15 @@ export class App extends PureComponent<Props, State> {
 
   handlePageProfileMsg = (pageProfile: PageProfile): void => {
     const pageProfileObj = PageProfile.toObject(pageProfile)
-    let appId: string | null = null,
-      sessionId: string | null = null,
-      pythonVersion: string | null = null
-
-    if (this.sessionInfo.isSet) {
-      appId = this.sessionInfo.current.appId
-      sessionId = this.sessionInfo.current.sessionId
-      pythonVersion = this.sessionInfo.current.pythonVersion
-    }
 
     const browserInfo = getBrowserInfo()
     this.metricsMgr.enqueue("pageProfile", {
       ...pageProfileObj,
       isFragmentRun: Boolean(pageProfileObj.isFragmentRun),
-      appId,
+      appId: this.sessionInfo.current.appId,
       numPages: this.state.appPages?.length,
-      sessionId,
-      pythonVersion,
+      sessionId: this.sessionInfo.current.sessionId,
+      pythonVersion: this.sessionInfo.current.pythonVersion,
       pageScriptHash: this.state.currentPageScriptHash,
       activeTheme: this.props.theme?.activeTheme?.name,
       totalLoadTime: Math.round(
@@ -996,6 +983,10 @@ export class App extends PureComponent<Props, State> {
       this.handleOneTimeInitialization(newSessionProto)
     }
 
+    this.sessionInfo.setCurrent(
+      SessionInfo.propsFromNewSessionMessage(newSessionProto)
+    )
+
     const { appHash, currentPageScriptHash: prevPageScriptHash } = this.state
     const {
       scriptRunId,
@@ -1067,10 +1058,6 @@ export class App extends PureComponent<Props, State> {
   handleOneTimeInitialization = (newSessionProto: NewSession): void => {
     const initialize = newSessionProto.initialize as Initialize
     const config = newSessionProto.config as Config
-
-    this.sessionInfo.setCurrent(
-      SessionInfo.propsFromNewSessionMessage(newSessionProto)
-    )
 
     this.metricsMgr.initialize({
       gatherUsageStats: config.gatherUsageStats,
@@ -1804,7 +1791,7 @@ export class App extends PureComponent<Props, State> {
   }
 
   requestFileURLs = (requestId: string, files: File[]): void => {
-    if (this.isServerConnected() && this.sessionInfo.isSet) {
+    if (this.isServerConnected()) {
       const backMsg = new BackMsg({
         fileUrlsRequest: {
           requestId,

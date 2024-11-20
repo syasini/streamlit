@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import isEqual from "lodash/isEqual"
+
 import {
   Config,
   EnvironmentInfo,
@@ -66,6 +68,10 @@ export class SessionInfo {
    * previous props to `SessionInfo.last`.
    */
   public setCurrent(props?: Props): void {
+    if (this._current && isEqual(props, this._current)) {
+      return
+    }
+
     this._last = notNullOrUndefined(this._current)
       ? { ...this._current }
       : undefined
