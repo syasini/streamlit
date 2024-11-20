@@ -34,11 +34,11 @@ export const StyledDetails = styled.details<StyledDetailsProps>(
     width: "100%",
     borderStyle: "solid",
     borderWidth: theme.sizes.borderWidth,
-    borderColor: theme.colors.fadedText10,
+    borderColor: theme.colors.borderColor,
     borderRadius: theme.radii.default,
     ...(isStale
       ? {
-          borderColor: theme.colors.fadedText05,
+          borderColor: theme.colors.borderColorLight,
           transition: "border 1s ease-in 0.5s",
         }
       : {}),
@@ -71,6 +71,7 @@ export const StyledSummary = styled.summary<StyledSummaryProps>(
     paddingRight: theme.spacing.lg,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.md,
+    cursor: "pointer",
     listStyleType: "none",
     "&::-webkit-details-marker": {
       display: "none",

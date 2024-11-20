@@ -121,7 +121,7 @@ const WebcamComponent = ({
   const theme: EmotionTheme = useTheme()
 
   return (
-    <StyledCameraInput width={debouncedWidth} data-testid="stWebcamComponent">
+    <StyledCameraInput data-testid="stCameraInputWebcamComponent">
       {webcamPermission !== WebcamPermission.SUCCESS &&
       !disabled &&
       !clearPhotoInProgress ? (
@@ -130,7 +130,7 @@ const WebcamComponent = ({
         isMobile && <SwitchFacingModeButton switchFacingMode={setFacingMode} />
       )}
       <StyledBox
-        data-testid="stWebcamStyledBox"
+        data-testid="stCameraInputWebcamStyledBox"
         hidden={
           webcamPermission !== WebcamPermission.SUCCESS &&
           !disabled &&

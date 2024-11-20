@@ -15,15 +15,16 @@
  */
 import React from "react"
 
-import { transparentize } from "color2k"
-import { Theme as GlideTheme, SpriteMap } from "@glideapps/glide-data-grid"
 import { useTheme } from "@emotion/react"
+import { Theme as GlideTheme, SpriteMap } from "@glideapps/glide-data-grid"
+import { transparentize } from "color2k"
 
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 type CustomThemeReturn = {
   theme: Partial<GlideTheme>
   tableBorderRadius: string
+  tableBorderWidth: string
   headerIcons: SpriteMap
 }
 
@@ -51,8 +52,8 @@ function useCustomTheme(): CustomThemeReturn {
       accentColor: theme.colors.primary,
       accentFg: theme.colors.white,
       accentLight: transparentize(theme.colors.primary, 0.9),
-      borderColor: theme.colors.fadedText05,
-      horizontalBorderColor: theme.colors.fadedText05,
+      borderColor: theme.colors.borderColorLight,
+      horizontalBorderColor: theme.colors.borderColorLight,
       fontFamily: theme.genericFonts.bodyFont,
       bgSearchResult: transparentize(theme.colors.primary, 0.9),
       resizeIndicatorColor: theme.colors.primary,
@@ -94,6 +95,7 @@ function useCustomTheme(): CustomThemeReturn {
   return {
     theme: glideTheme,
     tableBorderRadius: theme.radii.default,
+    tableBorderWidth: theme.sizes.borderWidth,
     // Configure custom SVG icons used in the column header:
     headerIcons,
   }

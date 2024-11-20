@@ -19,6 +19,7 @@ import json
 import os
 import threading
 import unittest
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from unittest import mock
 from unittest.mock import MagicMock, patch
@@ -42,9 +43,10 @@ from streamlit.proto.WidgetStates_pb2 import WidgetState, WidgetStates
 from streamlit.runtime import Runtime, RuntimeConfig
 from streamlit.runtime.memory_media_file_storage import MemoryMediaFileStorage
 from streamlit.runtime.memory_uploaded_file_manager import MemoryUploadedFileManager
-from streamlit.runtime.scriptrunner import ScriptRunContext, add_script_run_ctx
+from streamlit.runtime.scriptrunner import add_script_run_ctx
 from streamlit.type_util import to_bytes
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
+from tests.testutil import create_mock_script_run_ctx
 
 if TYPE_CHECKING:
     from streamlit.components.types.base_custom_component import BaseCustomComponent
@@ -81,8 +83,7 @@ class DeclareComponentTest(unittest.TestCase):
         self.runtime = Runtime(config)
 
         # declare_component needs a script_run_ctx to be set
-        self.script_run_ctx = MagicMock(spec=ScriptRunContext)
-        add_script_run_ctx(threading.current_thread(), self.script_run_ctx)
+        add_script_run_ctx(threading.current_thread(), create_mock_script_run_ctx())
 
     def tearDown(self) -> None:
         Runtime._instance = None
@@ -121,8 +122,8 @@ class DeclareComponentTest(unittest.TestCase):
             inner_module_component.name,
         )
 
-    def test_only_path(self):
-        """Succeed when a path is provided."""
+    def test_only_path_str(self):
+        """Succeed when a path is provided via str."""
 
         def isdir(path):
             return path == PATH or path == os.path.abspath(PATH)
@@ -132,6 +133,26 @@ class DeclareComponentTest(unittest.TestCase):
             side_effect=isdir,
         ):
             component = components.declare_component("test", path=PATH)
+
+        self.assertEqual(PATH, component.path)
+        self.assertIsNone(component.url)
+
+        self.assertEqual(
+            ComponentRegistry.instance().get_component_path(component.name),
+            component.abspath,
+        )
+
+    def test_only_path_pathlib(self):
+        """Succeed when a path is provided via Path."""
+
+        def isdir(path):
+            return path == PATH or path == os.path.abspath(PATH)
+
+        with mock.patch(
+            "streamlit.components.v1.component_registry.os.path.isdir",
+            side_effect=isdir,
+        ):
+            component = components.declare_component("test", path=Path(PATH))
 
         self.assertEqual(PATH, component.path)
         self.assertIsNone(component.url)

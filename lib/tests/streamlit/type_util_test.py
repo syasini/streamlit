@@ -26,6 +26,7 @@ import pytest
 from parameterized import parameterized
 
 from streamlit import type_util
+from streamlit.delta_generator import DeltaGenerator
 from streamlit.errors import StreamlitAPIException
 from streamlit.runtime.context import StreamlitCookies, StreamlitHeaders
 from streamlit.runtime.secrets import Secrets
@@ -85,6 +86,22 @@ class TypeUtilTest(unittest.TestCase):
 
         res = type_util.is_namedtuple(John)
         self.assertTrue(res)
+
+    @pytest.mark.require_integration
+    def test_is_pydantic_model(self):
+        from pydantic import BaseModel
+
+        class OtherObject:
+            foo: int
+            bar: str
+
+        class BarModel(BaseModel):
+            foo: int
+            bar: str
+
+        self.assertTrue(type_util.is_pydantic_model(BarModel(foo=1, bar="test")))
+        self.assertFalse(type_util.is_pydantic_model(BarModel))
+        self.assertFalse(type_util.is_pydantic_model(OtherObject))
 
     def test_to_bytes(self):
         bytes_obj = b"some bytes"
@@ -152,6 +169,8 @@ class TypeUtilTest(unittest.TestCase):
         assert type_util.has_callable_attr(TestClass, "also_not_callable") is False
         assert type_util.has_callable_attr(TestClass, "not_a_real_attr") is False
 
+        assert type_util.has_callable_attr(DeltaGenerator(), "foo") is False
+
     @parameterized.expand(
         [
             ({"key": "value"}, False),
@@ -166,3 +185,21 @@ class TypeUtilTest(unittest.TestCase):
     def test_is_custom_dict(self, dict_obj: Any, is_custom_dict: bool):
         """Test that `is_custom_dict` returns True for all Streamlit custom dicts."""
         assert type_util.is_custom_dict(dict_obj) is is_custom_dict
+
+    def test_is_delta_generator(self):
+        """Test that `is_delta_generator` returns True for DeltaGenerator."""
+
+        assert type_util.is_delta_generator(DeltaGenerator()) is True
+        assert type_util.is_delta_generator("not a DeltaGenerator") is False
+
+    def test_async_generator_to_sync(self):
+        """Test that `async_generator_to_sync` converts an async generator to a sync
+        generator."""
+
+        async def async_gen():
+            yield "hello "
+            yield "world "
+            yield "!"
+
+        sync_gen = type_util.async_generator_to_sync(async_gen())
+        assert "".join(sync_gen) == "hello world !"

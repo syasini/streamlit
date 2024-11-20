@@ -17,7 +17,6 @@
 import React from "react"
 
 import { fireEvent, screen } from "@testing-library/react"
-import "@testing-library/jest-dom"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { Block as BlockProto } from "@streamlit/lib/src/proto"
@@ -50,16 +49,21 @@ describe("Popover container", () => {
     )
     const popoverButton = screen.getByTestId("stPopover")
     expect(popoverButton).toBeInTheDocument()
+    expect(popoverButton).toHaveClass("stPopover")
   })
 
-  it("renders label as expected", () => {
+  it("renders label on the popover", () => {
     const props = getProps()
     render(
       <Popover {...props}>
         <div>test</div>
       </Popover>
     )
-    expect(screen.getByText(props.element.label)).toBeInTheDocument()
+
+    const popover = screen.getByRole("button", {
+      name: `${props.element.label}`,
+    })
+    expect(popover).toBeInTheDocument()
   })
 
   it("should render the text when opened", () => {

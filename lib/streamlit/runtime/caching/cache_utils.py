@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import functools
 import hashlib
 import inspect
@@ -125,12 +126,10 @@ class CachedFuncInfo:
         self,
         func: FunctionType,
         show_spinner: bool | str,
-        allow_widgets: bool,
         hash_funcs: HashFuncsDict | None,
     ):
         self.func = func
         self.show_spinner = show_spinner
-        self.allow_widgets = allow_widgets
         self.hash_funcs = hash_funcs
 
     @property
@@ -175,7 +174,14 @@ class BoundCachedFunc:
         return f"<BoundCachedFunc: {self._cached_func._info.func} of {self._instance}>"
 
     def clear(self, *args, **kwargs):
-        self._cached_func.clear(self._instance, *args, **kwargs)
+        if args or kwargs:
+            # The instance is required as first parameter to allow
+            # args to be correctly resolved to the parameter names:
+            self._cached_func.clear(self._instance, *args, **kwargs)
+        else:
+            # if no args/kwargs are specified, we just want to clear the
+            # entire cache of this method:
+            self._cached_func.clear()
 
 
 class CachedFunc:
@@ -230,11 +236,9 @@ class CachedFunc:
             hash_funcs=self._info.hash_funcs,
         )
 
-        try:
+        with contextlib.suppress(CacheKeyNotFoundError):
             cached_result = cache.read_result(value_key)
             return self._handle_cache_hit(cached_result)
-        except CacheKeyNotFoundError:
-            pass
         return self._handle_cache_miss(cache, value_key, func_args, func_kwargs)
 
     def _handle_cache_hit(self, result: CachedResult) -> Any:
@@ -283,13 +287,14 @@ class CachedFunc:
                 cached_result = cache.read_result(value_key)
                 # Another thread computed the value before us. Early exit!
                 return self._handle_cache_hit(cached_result)
-
             except CacheKeyNotFoundError:
+                # No cache hit -> we will call the cached function
+                # below.
                 pass
 
             # We acquired the lock before any other thread. Compute the value!
             with self._info.cached_message_replay_ctx.calling_cached_function(
-                self._info.func, self._info.allow_widgets
+                self._info.func
             ):
                 computed_value = self._info.func(*func_args, **func_kwargs)
 
@@ -329,8 +334,10 @@ class CachedFunc:
 
         Parameters
         ----------
+
         *args: Any
             Arguments of the cached functions.
+
         **kwargs: Any
             Keyword arguments of the cached function.
 
@@ -471,8 +478,7 @@ def _make_function_key(cache_type: CacheType, func: FunctionType) -> str:
         source_code, hasher=func_hasher, cache_type=cache_type, hash_source=func
     )
 
-    cache_key = func_hasher.hexdigest()
-    return cache_key
+    return func_hasher.hexdigest()
 
 
 def _get_positional_arg_name(func: FunctionType, arg_index: int) -> str | None:

@@ -17,9 +17,37 @@
 export const sizes = {
   full: "100%",
   headerHeight: "3.75rem",
+  // Old header height to avoid addtl cascading visual/snapshot changes
+  fullScreenHeaderHeight: "2.875rem",
   sidebarTopSpace: "6rem",
-  sidebar: "21rem",
+  toastWidth: "21rem",
   contentMaxWidth: "46rem",
+  maxChartTooltipWidth: "30rem",
+  // Used for checkboxes, radio, and toggles:
+  checkbox: "1rem",
   borderWidth: "1px",
   minElementHeight: "2.5rem",
+  smallLogoHeight: "1.25rem",
+  defaultLogoHeight: "1.5rem",
+  largeLogoHeight: "2rem",
+  sliderThumb: "0.75rem",
+  wideSidePadding: "5rem",
+  headerDecorationHeight: "0.125rem",
+  appRunningMen: "1.6rem",
+  appStatusMaxWidth: "20rem",
+  largestElementHeight: "4.25rem",
+  spinnerSize: "1.375rem",
+  spinnerThickness: "0.2rem",
+  tabHeight: "2.5rem",
+  // Min width used for popover and dialog:
+  minPopupWidth: "20rem",
+  maxTooltipHeight: "18.75rem",
+  chatAvatarSize: "2rem",
+  // Used for the clear icon used by some Input elements
+  clearIconSize: "1.5em",
+  numberInputControlsWidth: "2rem",
+  emptyDropdownHeight: "5.625rem",
+  dropdownItemHeight: "2.5rem",
+  maxDropdownHeight: "18.75rem",
+  appDefaultBottomPadding: "3.5rem",
 }

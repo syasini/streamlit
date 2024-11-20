@@ -22,17 +22,17 @@ from typing import TYPE_CHECKING, Dict, Final, Union, cast
 
 from typing_extensions import TypeAlias
 
-import streamlit as st
 from streamlit import runtime, type_util, url_util
+from streamlit.elements.lib.form_utils import current_form_id
 from streamlit.elements.lib.subtitle_utils import process_subtitle_data
+from streamlit.elements.lib.utils import compute_and_register_element_id
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.Audio_pb2 import Audio as AudioProto
 from streamlit.proto.Video_pb2 import Video as VideoProto
 from streamlit.runtime import caching
 from streamlit.runtime.metrics_util import gather_metrics
-from streamlit.runtime.scriptrunner import get_script_run_ctx
-from streamlit.runtime.state.common import compute_widget_id
 from streamlit.time_util import time_to_seconds
+from streamlit.type_util import NumpyShape
 
 if TYPE_CHECKING:
     from typing import Any
@@ -41,8 +41,16 @@ if TYPE_CHECKING:
 
     from streamlit.delta_generator import DeltaGenerator
 
+
 MediaData: TypeAlias = Union[
-    str, bytes, io.BytesIO, io.RawIOBase, io.BufferedReader, "npt.NDArray[Any]", None
+    str,
+    Path,
+    bytes,
+    io.BytesIO,
+    io.RawIOBase,
+    io.BufferedReader,
+    "npt.NDArray[Any]",
+    None,
 ]
 
 SubtitleData: TypeAlias = Union[
@@ -77,8 +85,8 @@ class MediaMixin:
 
         Parameters
         ----------
-        data : str, bytes, BytesIO, numpy.ndarray, or file
-            Raw audio data, filename, or a URL pointing to the file to load.
+        data : str, Path, bytes, BytesIO, numpy.ndarray, or file
+            Raw audio data, file path (str or Path object), or a URL pointing to the file to load.
             Raw data formats must include all necessary file headers to match the file
             format specified via ``format``.
             If ``data`` is a numpy array, it must either be a 1D array of the waveform
@@ -167,7 +175,6 @@ class MediaMixin:
         start_time, end_time = _parse_start_time_end_time(start_time, end_time)
 
         audio_proto = AudioProto()
-        coordinates = self.dg._get_delta_path_str()
 
         is_data_numpy_array = type_util.is_type(data, "numpy.ndarray")
 
@@ -176,11 +183,11 @@ class MediaMixin:
                 "`sample_rate` must be specified when `data` is a numpy array."
             )
         if not is_data_numpy_array and sample_rate is not None:
-            st.warning(
+            self.dg.warning(
                 "Warning: `sample_rate` will be ignored since data is not a numpy "
                 "array."
             )
-
+        coordinates = self.dg._get_delta_path_str()
         marshall_audio(
             coordinates,
             audio_proto,
@@ -191,6 +198,7 @@ class MediaMixin:
             end_time,
             loop,
             autoplay,
+            form_id=current_form_id(self.dg),
         )
         return self.dg._enqueue("audio", audio_proto)
 
@@ -211,8 +219,8 @@ class MediaMixin:
 
         Parameters
         ----------
-        data : str, bytes, io.BytesIO, numpy.ndarray, or file
-            Raw video data, filename, or URL pointing to a video to load.
+        data : str, Path, bytes, io.BytesIO, numpy.ndarray, or file
+            Raw video data, file path (str or Path object), or URL pointing to a video to load.
             Includes support for YouTube URLs.
             Numpy arrays and raw data formats must include all necessary file
             headers to match specified file format.
@@ -349,6 +357,7 @@ class MediaMixin:
             loop,
             autoplay,
             muted,
+            form_id=current_form_id(self.dg),
         )
         return self.dg._enqueue("video", video_proto)
 
@@ -419,6 +428,8 @@ def _marshall_av_media(
     if isinstance(data, (str, bytes)):
         # Pass strings and bytes through unchanged
         data_or_filename = data
+    elif isinstance(data, Path):
+        data_or_filename = str(data)
     elif isinstance(data, io.BytesIO):
         data.seek(0)
         data_or_filename = data.getvalue()
@@ -457,6 +468,7 @@ def marshall_video(
     loop: bool = False,
     autoplay: bool = False,
     muted: bool = False,
+    form_id: str | None = None,
 ) -> None:
     """Marshalls a video proto, using url processors as needed.
 
@@ -464,7 +476,7 @@ def marshall_video(
     ----------
     coordinates : str
     proto : the proto to fill. Must have a string field called "data".
-    data : str, bytes, BytesIO, numpy.ndarray, or file opened with
+    data : str, Path, bytes, BytesIO, numpy.ndarray, or file opened with
            io.open().
         Raw video data or a string with a URL pointing to the video
         to load. Includes support for YouTube URLs.
@@ -499,6 +511,9 @@ def marshall_video(
     muted: bool
         Whether the video should play with the audio silenced. This can be used to
         enable autoplay without user interaction. Defaults to False.
+    form_id: str | None
+        The ID of the form that this element is placed in. Provide None if
+        the element is not placed in a form.
     """
 
     if start_time < 0 or (end_time is not None and end_time <= start_time):
@@ -514,6 +529,9 @@ def marshall_video(
     # "type" distinguishes between YouTube and non-YouTube links
     proto.type = VideoProto.Type.NATIVE
 
+    if isinstance(data, Path):
+        data = str(data)  # Convert Path to string
+
     if isinstance(data, str) and url_util.is_url(
         data, allowed_schemas=("http", "https", "data")
     ):
@@ -526,7 +544,6 @@ def marshall_video(
                 )
         else:
             proto.url = data
-
     else:
         _marshall_av_media(coordinates, proto, data, mimetype)
 
@@ -565,10 +582,12 @@ def marshall_video(
                 ) from original_err
 
     if autoplay:
-        ctx = get_script_run_ctx()
         proto.autoplay = autoplay
-        id = compute_widget_id(
+        proto.id = compute_and_register_element_id(
             "video",
+            # video does not yet allow setting a user-defined key
+            user_key=None,
+            form_id=form_id,
             url=proto.url,
             mimetype=mimetype,
             start_time=start_time,
@@ -576,10 +595,7 @@ def marshall_video(
             loop=loop,
             autoplay=autoplay,
             muted=muted,
-            page=ctx.active_script_hash if ctx else None,
         )
-
-        proto.id = id
 
 
 def _parse_start_time_end_time(
@@ -633,29 +649,29 @@ def _validate_and_normalize(data: npt.NDArray[Any]) -> tuple[bytes, int]:
     # to st.audio data)
     import numpy as np
 
-    data: npt.NDArray[Any] = np.array(data, dtype=float)
+    transformed_data: npt.NDArray[Any] = np.array(data, dtype=float)
 
-    if len(data.shape) == 1:
+    if len(cast(NumpyShape, transformed_data.shape)) == 1:
         nchan = 1
-    elif len(data.shape) == 2:
+    elif len(transformed_data.shape) == 2:
         # In wave files,channels are interleaved. E.g.,
         # "L1R1L2R2..." for stereo. See
         # http://msdn.microsoft.com/en-us/library/windows/hardware/dn653308(v=vs.85).aspx
         # for channel ordering
-        nchan = data.shape[0]
-        data = data.T.ravel()
+        nchan = transformed_data.shape[0]
+        transformed_data = transformed_data.T.ravel()
     else:
         raise StreamlitAPIException("Numpy array audio input must be a 1D or 2D array.")
 
-    if data.size == 0:
-        return data.astype(np.int16).tobytes(), nchan
+    if transformed_data.size == 0:
+        return transformed_data.astype(np.int16).tobytes(), nchan
 
-    max_abs_value = np.max(np.abs(data))
+    max_abs_value = np.max(np.abs(transformed_data))
     # 16-bit samples are stored as 2's-complement signed integers,
     # ranging from -32768 to 32767.
     # scaled_data is PCM 16 bit numpy array, that's why we multiply [-1, 1] float
     # values to 32_767 == 2 ** 15 - 1.
-    np_array = (data / max_abs_value) * 32767
+    np_array = (transformed_data / max_abs_value) * 32767
     scaled_data = np_array.astype(np.int16)
     return scaled_data.tobytes(), nchan
 
@@ -698,6 +714,7 @@ def marshall_audio(
     end_time: int | None = None,
     loop: bool = False,
     autoplay: bool = False,
+    form_id: str | None = None,
 ) -> None:
     """Marshalls an audio proto, using data and url processors as needed.
 
@@ -705,7 +722,7 @@ def marshall_audio(
     ----------
     coordinates : str
     proto : The proto to fill. Must have a string field called "url".
-    data : str, bytes, BytesIO, numpy.ndarray, or file opened with
+    data : str, Path, bytes, BytesIO, numpy.ndarray, or file opened with
             io.open()
         Raw audio data or a string with a URL pointing to the file to load.
         If passing the raw data, this must include headers and any other bytes
@@ -724,6 +741,9 @@ def marshall_audio(
     autoplay : bool
         Whether the audio should start playing automatically.
         Browsers will not autoplay audio files if the user has not interacted with the page yet.
+    form_id: str | None
+        The ID of the form that this element is placed in. Provide None if
+        the element is not placed in a form.
     """
 
     proto.start_time = start_time
@@ -731,20 +751,23 @@ def marshall_audio(
         proto.end_time = end_time
     proto.loop = loop
 
+    if isinstance(data, Path):
+        data = str(data)  # Convert Path to string
+
     if isinstance(data, str) and url_util.is_url(
         data, allowed_schemas=("http", "https", "data")
     ):
         proto.url = data
-
     else:
         data = _maybe_convert_to_wav_bytes(data, sample_rate)
         _marshall_av_media(coordinates, proto, data, mimetype)
 
     if autoplay:
-        ctx = get_script_run_ctx()
         proto.autoplay = autoplay
-        id = compute_widget_id(
+        proto.id = compute_and_register_element_id(
             "audio",
+            user_key=None,
+            form_id=form_id,
             url=proto.url,
             mimetype=mimetype,
             start_time=start_time,
@@ -752,6 +775,4 @@ def marshall_audio(
             end_time=end_time,
             loop=loop,
             autoplay=autoplay,
-            page=ctx.active_script_hash if ctx else None,
         )
-        proto.id = id

@@ -32,7 +32,7 @@ export interface TableProps {
   element: Quiver
 }
 
-export function ArrowTable(props: TableProps): ReactElement {
+export function ArrowTable(props: Readonly<TableProps>): ReactElement {
   const table = props.element
   const { cssId, cssStyles, caption } = table
   const { headerRows, rows, columns } = table.dimensions
@@ -41,14 +41,10 @@ export function ArrowTable(props: TableProps): ReactElement {
   const dataRows = allRows.slice(headerRows)
 
   return (
-    <StyledTableContainer data-testid="stTable">
+    <StyledTableContainer className="stTable" data-testid="stTable">
       {cssStyles && <style>{cssStyles}</style>}
       <StyledTable id={cssId} data-testid="stTableStyledTable">
-        {caption && (
-          <caption>
-            <small>{caption}</small>
-          </caption>
-        )}
+        {caption && <caption>{caption}</caption>}
         {columnHeaders.length > 0 && (
           <thead>
             {columnHeaders.map(rowIndex =>

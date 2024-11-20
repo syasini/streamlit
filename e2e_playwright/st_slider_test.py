@@ -18,12 +18,17 @@ from e2e_playwright.conftest import (
     ImageCompareFunction,
     wait_for_app_run,
 )
-from e2e_playwright.shared.app_utils import expect_help_tooltip
+from e2e_playwright.shared.app_utils import (
+    check_top_level_class,
+    click_form_button,
+    expect_help_tooltip,
+    get_element_by_key,
+)
 
 
 def test_slider_rendering(themed_app: Page, assert_snapshot: ImageCompareFunction):
     st_sliders = themed_app.get_by_test_id("stSlider")
-    expect(st_sliders).to_have_count(16)
+    expect(st_sliders).to_have_count(21)
 
     assert_snapshot(st_sliders.nth(4), name="st_slider-regular_with_format")
     assert_snapshot(st_sliders.nth(7), name="st_slider-disabled")
@@ -31,6 +36,11 @@ def test_slider_rendering(themed_app: Page, assert_snapshot: ImageCompareFunctio
     assert_snapshot(st_sliders.nth(9), name="st_slider-label_collapsed")
     assert_snapshot(st_sliders.nth(10), name="st_slider-labels_overlap_slider")
     assert_snapshot(st_sliders.nth(15), name="st_slider-time_value")
+    assert_snapshot(st_sliders.nth(16), name="st_slider-overlap_left")
+    assert_snapshot(st_sliders.nth(17), name="st_slider-overlap_near_left")
+    assert_snapshot(st_sliders.nth(18), name="st_slider-overlap_right")
+    assert_snapshot(st_sliders.nth(19), name="st_slider-overlap_near_right")
+    assert_snapshot(st_sliders.nth(20), name="st_slider-overlap_near_center")
 
 
 def test_help_tooltip_works(app: Page):
@@ -140,8 +150,7 @@ def test_slider_works_in_forms(app: Page):
 
     # need to wait for the actual component value to update and then submit
     app.wait_for_timeout(200)
-    app.get_by_test_id("baseButton-secondaryFormSubmit").click()
-    wait_for_app_run(app)
+    click_form_button(app, "Submit")
 
     expect(app.get_by_text("slider-in-form selection: 50")).to_be_visible()
 
@@ -170,3 +179,13 @@ def test_slider_with_float_formatting(app: Page, assert_snapshot: ImageCompareFu
     wait_for_app_run(app)
     expect(app.get_by_text("Slider 11: 0.8")).to_be_visible()
     assert_snapshot(slider, name="st_slider-float_formatting")
+
+
+def test_check_top_level_class(app: Page):
+    """Check that the top level class is correctly set."""
+    check_top_level_class(app, "stSlider")
+
+
+def test_custom_css_class_via_key(app: Page):
+    """Test that the element can have a custom css class via the key argument."""
+    expect(get_element_by_key(app, "slider8")).to_be_visible()

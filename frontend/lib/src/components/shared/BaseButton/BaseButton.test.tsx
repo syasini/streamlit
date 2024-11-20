@@ -17,7 +17,6 @@
 import React from "react"
 
 import { fireEvent, screen } from "@testing-library/react"
-import "@testing-library/jest-dom"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { lightTheme } from "@streamlit/lib/src/theme"
@@ -48,7 +47,7 @@ describe("Button element", () => {
     it(`renders ${kind} buttons correctly`, () => {
       render(<BaseButton {...getProps({ kind })}>Hello</BaseButton>)
 
-      const buttonWidget = screen.getByTestId(`baseButton-${kind}`)
+      const buttonWidget = screen.getByTestId(`stBaseButton-${kind}`)
 
       expect(buttonWidget).toBeInTheDocument()
     })
@@ -58,7 +57,7 @@ describe("Button element", () => {
         <BaseButton {...getProps({ kind, disabled: true })}>Hello</BaseButton>
       )
 
-      const buttonWidget = screen.getByTestId(`baseButton-${kind}`)
+      const buttonWidget = screen.getByTestId(`stBaseButton-${kind}`)
       expect(buttonWidget).toBeDisabled()
     })
   })
@@ -91,7 +90,7 @@ describe("Button element", () => {
   })
 
   it("calls onClick when button is clicked", () => {
-    const onClick = jest.fn()
+    const onClick = vi.fn()
     render(<BaseButton {...getProps({ onClick })}>Hello</BaseButton>)
     const buttonWidget = screen.getByRole("button")
     fireEvent.click(buttonWidget)

@@ -17,7 +17,6 @@
 import React from "react"
 
 import { fireEvent, screen } from "@testing-library/react"
-import "@testing-library/jest-dom"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { Block as BlockProto } from "@streamlit/lib/src/proto"
@@ -46,8 +45,9 @@ describe("Dialog container", () => {
       </Dialog>
     )
 
-    const dialogContainer = screen.getByTestId("stModal")
+    const dialogContainer = screen.getByTestId("stDialog")
     expect(dialogContainer).toBeInTheDocument()
+    expect(dialogContainer).toHaveClass("stDialog")
   })
 
   it("should render the text when open", () => {

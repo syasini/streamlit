@@ -16,8 +16,7 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
-import { fireEvent, screen } from "@testing-library/react"
+import { act, fireEvent, screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { ColorPicker as ColorPickerProto } from "@streamlit/lib/src/proto"
@@ -38,8 +37,8 @@ const getProps = (
   width: 0,
   disabled: false,
   widgetMgr: new WidgetStateManager({
-    sendRerunBackMsg: jest.fn(),
-    formsDataChanged: jest.fn(),
+    sendRerunBackMsg: vi.fn(),
+    formsDataChanged: vi.fn(),
   }),
   ...widgetProps,
 })
@@ -50,11 +49,12 @@ describe("ColorPicker widget", () => {
     render(<ColorPicker {...props} />)
     const colorPicker = screen.getByTestId("stColorPicker")
     expect(colorPicker).toBeInTheDocument()
+    expect(colorPicker).toHaveClass("stColorPicker")
   })
 
   it("sets widget value on mount", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
 
     render(<ColorPicker {...props} />)
 
@@ -68,7 +68,7 @@ describe("ColorPicker widget", () => {
 
   it("can pass fragmentId to setStringValue", () => {
     const props = getProps(undefined, { fragmentId: "myFragmentId" })
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
 
     render(<ColorPicker {...props} />)
 
@@ -84,7 +84,7 @@ describe("ColorPicker widget", () => {
     const props = getProps()
     render(<ColorPicker {...props} />)
 
-    const colorBlock = screen.getByTestId("stColorBlock")
+    const colorBlock = screen.getByTestId("stColorPickerBlock")
     fireEvent.click(colorBlock)
     expect(colorBlock).toHaveStyle("background-color: #000000")
 
@@ -94,12 +94,12 @@ describe("ColorPicker widget", () => {
 
   it("updates its widget value when it's changed", () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "setStringValue")
+    vi.spyOn(props.widgetMgr, "setStringValue")
 
     render(<ColorPicker {...props} />)
 
     const newColor = "#e91e63"
-    const colorBlock = screen.getByTestId("stColorBlock")
+    const colorBlock = screen.getByTestId("stColorPickerBlock")
     fireEvent.click(colorBlock)
 
     // Our widget should be updated.
@@ -120,14 +120,14 @@ describe("ColorPicker widget", () => {
   it("resets its value when form is cleared", () => {
     // Create a widget in a clearOnSubmit form
     const props = getProps({ formId: "form" })
-    jest.spyOn(props.widgetMgr, "setStringValue")
-    props.widgetMgr.setFormClearOnSubmit("form", true)
+    vi.spyOn(props.widgetMgr, "setStringValue")
+    props.widgetMgr.setFormSubmitBehaviors("form", true)
 
     render(<ColorPicker {...props} />)
 
     // Choose a new color
     const newColor = "#e91e63"
-    const colorBlock = screen.getByTestId("stColorBlock")
+    const colorBlock = screen.getByTestId("stColorPickerBlock")
     fireEvent.click(colorBlock)
 
     // Update the color
@@ -145,8 +145,10 @@ describe("ColorPicker widget", () => {
       undefined
     )
 
-    // "Submit" the form
-    props.widgetMgr.submitForm("form", undefined)
+    act(() => {
+      // "Submit" the form
+      props.widgetMgr.submitForm("form", undefined)
+    })
 
     // Our widget should be reset, and the widgetMgr should be updated
     expect(colorBlock).toHaveStyle("background-color: #000000")

@@ -39,7 +39,9 @@ export interface MetricProps {
   element: MetricProto
 }
 
-export default function Metric({ element }: MetricProps): ReactElement {
+export default function Metric({
+  element,
+}: Readonly<MetricProps>): ReactElement {
   const { colors }: EmotionTheme = useTheme()
   const { MetricColor, MetricDirection } = MetricProto
 
@@ -48,14 +50,14 @@ export default function Metric({ element }: MetricProps): ReactElement {
 
   switch (element.color) {
     case MetricColor.RED:
-      color = colors.red
+      color = colors.metricNegativeDeltaColor
       break
     case MetricColor.GREEN:
-      color = colors.green
+      color = colors.metricPositiveDeltaColor
       break
     // this must be grey
     default:
-      color = colors.fadedText60
+      color = colors.metricNeutralDeltaColor
       break
   }
 
@@ -77,7 +79,7 @@ export default function Metric({ element }: MetricProps): ReactElement {
   const deltaExists = element.delta !== ""
 
   return (
-    <div data-testid="stMetric">
+    <div className="stMetric" data-testid="stMetric">
       <StyledMetricLabelText
         data-testid="stMetricLabel"
         visibility={labelVisibilityProtoValueToEnum(

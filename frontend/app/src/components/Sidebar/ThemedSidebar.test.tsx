@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { emotionLightTheme, mockEndpoints, render } from "@streamlit/lib"
@@ -31,7 +30,7 @@ function getProps(
     endpoints: mockEndpoints(),
     appPages: [],
     navSections: [],
-    onPageChange: jest.fn(),
+    onPageChange: vi.fn(),
     currentPageScriptHash: "page_hash",
     hasElements: true,
     hideSidebarNav: false,
@@ -56,8 +55,16 @@ describe("ThemedSidebar Component", () => {
 
   it("plumbs appPages to main Sidebar component", () => {
     const appPages = [
-      { pageName: "streamlit_app", scriptPath: "streamlit_app.py" },
-      { pageName: "other_app_page", scriptPath: "other_app_page.py" },
+      {
+        pageName: "streamlit app",
+        scriptPath: "streamlit_app.py",
+        urlPathname: "streamlit_app",
+      },
+      {
+        pageName: "other app page",
+        scriptPath: "other_app_page.py",
+        urlPathname: "other_app_page",
+      },
     ]
     render(<ThemedSidebar {...getProps({ appPages })} />)
 

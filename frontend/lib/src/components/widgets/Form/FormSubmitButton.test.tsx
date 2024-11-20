@@ -15,7 +15,6 @@
  */
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { fireEvent, screen } from "@testing-library/react"
 import { enableAllPlugins } from "immer"
 
@@ -39,8 +38,8 @@ describe("FormSubmitButton", () => {
   beforeEach(() => {
     formsData = createFormsData()
     widgetMgr = new WidgetStateManager({
-      sendRerunBackMsg: jest.fn(),
-      formsDataChanged: jest.fn(newData => {
+      sendRerunBackMsg: vi.fn(),
+      formsDataChanged: vi.fn(newData => {
         formsData = newData
       }),
     })
@@ -48,16 +47,16 @@ describe("FormSubmitButton", () => {
 
   function getProps(
     props: Partial<Props> = {},
-    useContainerWidth = false,
-    helpText = "mockHelpText"
+    elementProps: Partial<ButtonProto> = {}
   ): Props {
     return {
       element: ButtonProto.create({
         id: "1",
         label: "Submit",
         formId: "mockFormId",
-        help: helpText,
-        useContainerWidth,
+        help: "mockHelpText",
+        useContainerWidth: false,
+        ...elementProps,
       }),
       disabled: false,
       hasInProgressUpload: false,
@@ -78,12 +77,11 @@ describe("FormSubmitButton", () => {
 
     const formSubmitButton = screen.getByTestId("stFormSubmitButton")
 
-    expect(formSubmitButton).toHaveClass("row-widget")
-    expect(formSubmitButton).toHaveClass("stButton")
+    expect(formSubmitButton).toHaveClass("stFormSubmitButton")
     expect(formSubmitButton).toHaveStyle(`width: ${props.width}px`)
   })
 
-  it("renders a label", () => {
+  it("renders a label within the button", () => {
     const props = getProps()
     render(<FormSubmitButton {...props} />)
 
@@ -96,7 +94,7 @@ describe("FormSubmitButton", () => {
 
   it("calls submitForm when clicked", async () => {
     const props = getProps()
-    jest.spyOn(props.widgetMgr, "submitForm")
+    vi.spyOn(props.widgetMgr, "submitForm")
     render(<FormSubmitButton {...props} />)
 
     const formSubmitButton = screen.getByRole("button")
@@ -111,7 +109,7 @@ describe("FormSubmitButton", () => {
 
   it("can pass fragmentId to submitForm", async () => {
     const props = getProps({ fragmentId: "myFragmentId" })
-    jest.spyOn(props.widgetMgr, "submitForm")
+    vi.spyOn(props.widgetMgr, "submitForm")
     render(<FormSubmitButton {...props} />)
 
     const formSubmitButton = screen.getByRole("button")
@@ -180,14 +178,18 @@ describe("FormSubmitButton", () => {
   })
 
   it("passes useContainerWidth property with help correctly", () => {
-    render(<FormSubmitButton {...getProps({}, true)} />)
+    render(<FormSubmitButton {...getProps({}, { useContainerWidth: true })} />)
 
     const formSubmitButton = screen.getByRole("button")
     expect(formSubmitButton).toHaveStyle(`width: ${250}px`)
   })
 
   it("passes useContainerWidth property without help correctly", () => {
-    render(<FormSubmitButton {...getProps({}, true, "")} />)
+    render(
+      <FormSubmitButton
+        {...getProps({}, { useContainerWidth: true, help: "" })}
+      />
+    )
 
     const formSubmitButton = screen.getByRole("button")
     expect(formSubmitButton).toHaveStyle("width: 100%")

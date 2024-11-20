@@ -16,11 +16,10 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { fireEvent, screen } from "@testing-library/react"
 
 import { mockSessionInfo, render } from "@streamlit/lib"
-import { SegmentMetricsManager } from "@streamlit/app/src/SegmentMetricsManager"
+import { MetricsManager } from "@streamlit/app/src/MetricsManager"
 
 import ToolbarActions, {
   ActionButton,
@@ -34,28 +33,32 @@ describe("ActionButton", () => {
   ): ActionButtonProps => ({
     label: "the label",
     icon: "star.svg",
-    onClick: jest.fn(),
+    onClick: vi.fn(),
     ...extended,
   })
 
   it("renders without crashing", () => {
     render(<ActionButton {...getProps()} />)
 
-    expect(screen.getByTestId("stActionButton")).toBeInTheDocument()
+    expect(screen.getByTestId("stToolbarActionButton")).toBeInTheDocument()
   })
 
   it("does not render icon if not provided", () => {
     render(<ActionButton {...getProps({ icon: undefined })} />)
 
-    expect(screen.getByTestId("stActionButton")).toBeInTheDocument()
-    expect(screen.queryByTestId("stActionButtonIcon")).not.toBeInTheDocument()
+    expect(screen.getByTestId("stToolbarActionButton")).toBeInTheDocument()
+    expect(
+      screen.queryByTestId("stToolbarActionButtonIcon")
+    ).not.toBeInTheDocument()
   })
 
   it("does not render label if not provided", () => {
     render(<ActionButton {...getProps({ label: undefined })} />)
 
-    expect(screen.getByTestId("stActionButton")).toBeInTheDocument()
-    expect(screen.queryByTestId("stActionButtonLabel")).not.toBeInTheDocument()
+    expect(screen.getByTestId("stToolbarActionButton")).toBeInTheDocument()
+    expect(
+      screen.queryByTestId("stToolbarActionButtonLabel")
+    ).not.toBeInTheDocument()
   })
 })
 
@@ -67,8 +70,8 @@ describe("ToolbarActions", () => {
       { key: "favorite", icon: "star.svg" },
       { key: "share", label: "Share" },
     ],
-    sendMessageToHost: jest.fn(),
-    metricsMgr: new SegmentMetricsManager(mockSessionInfo()),
+    sendMessageToHost: vi.fn(),
+    metricsMgr: new MetricsManager(mockSessionInfo()),
     ...extended,
   })
 
@@ -86,7 +89,7 @@ describe("ToolbarActions", () => {
     const props = getProps()
     render(<ToolbarActions {...props} />)
 
-    const favoriteButton = screen.getAllByTestId("baseButton-header")[0]
+    const favoriteButton = screen.getAllByTestId("stBaseButton-header")[0]
     fireEvent.click(favoriteButton)
     expect(props.sendMessageToHost).toHaveBeenLastCalledWith({
       type: "TOOLBAR_ITEM_CALLBACK",

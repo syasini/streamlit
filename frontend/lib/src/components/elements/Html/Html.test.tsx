@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
@@ -37,15 +36,17 @@ describe("HTML element", () => {
     const props = getProps()
     render(<Html {...props} />)
     const html = screen.getByTestId("stHtml")
+    expect(html).toBeInTheDocument()
     expect(html).toHaveTextContent("Test Html")
     expect(html).toHaveStyle("width: 100px")
+    expect(html).toHaveClass("stHtml")
   })
 
   it("handles <style> tags - applies style", () => {
     const props = getProps({
       body: `
         <style>
-            #random { color: orange; }
+            #random { color: rgb(255, 165, 0); }
         </style>
         <div id="random">Test Html</div>
     `,
@@ -54,10 +55,12 @@ describe("HTML element", () => {
     const html = screen.getByTestId("stHtml")
     expect(html).toHaveTextContent("Test Html")
     // Check that the style tag is applied to the div
-    expect(screen.getByText("Test Html")).toHaveStyle("color: orange")
+    expect(screen.getByText("Test Html")).toHaveStyle(
+      "color: rgb(255, 165, 0)"
+    )
     // Check that the unnecessary spacing handling by hiding parent
     // eslint-disable-next-line testing-library/no-node-access
-    expect(html.parentElement).toHaveClass("empty-html")
+    expect(html.parentElement).toHaveClass("stHtml-empty")
   })
 
   it("sanitizes <script> tags", () => {

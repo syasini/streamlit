@@ -19,8 +19,6 @@ import React from "react"
 import { BaseProvider, LightTheme } from "baseui"
 import { screen } from "@testing-library/react"
 
-import "@testing-library/jest-dom"
-
 import { Spinner as SpinnerProto } from "@streamlit/lib/src/proto"
 import { render } from "@streamlit/lib/src/test_util"
 
@@ -48,6 +46,7 @@ describe("Spinner component", () => {
 
     const spinnerContainer = screen.getByTestId("stSpinner")
     expect(spinnerContainer).toBeInTheDocument()
+    expect(spinnerContainer).toHaveClass("stSpinner")
   })
 
   it("sets the text and width correctly", () => {
@@ -76,7 +75,7 @@ describe("Spinner component", () => {
     expect(spinnerContainer).toBeInTheDocument()
 
     expect(spinnerContainer).toHaveClass("stSpinner")
-    expect(spinnerContainer).toHaveClass("cacheSpinner")
+    expect(spinnerContainer).toHaveClass("stCacheSpinner")
     expect(spinnerContainer).toHaveStyle("paddingBottom: 1rem")
   })
 })

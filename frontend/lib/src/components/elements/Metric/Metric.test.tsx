@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
@@ -40,7 +39,9 @@ describe("Metric element", () => {
   it("renders metric as expected", () => {
     const props = getProps()
     render(<Metric {...props} />)
-    expect(screen.getByTestId("stMetric")).toBeInTheDocument()
+    const metricElement = screen.getByTestId("stMetric")
+    expect(metricElement).toBeInTheDocument()
+    expect(metricElement).toHaveClass("stMetric")
   })
 
   it("renders metric label as expected", () => {

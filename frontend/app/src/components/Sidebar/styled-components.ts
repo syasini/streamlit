@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-import { transparentize } from "color2k"
 import styled from "@emotion/styled"
+import { transparentize } from "color2k"
 
-import {
-  getWrappedHeadersStyle,
-  hasLightBackgroundColor,
-} from "@streamlit/lib/src/theme/utils"
-import { StyledMaterialIcon } from "@streamlit/lib/src/components/shared/Icon/Material/styled-components"
+import { hasLightBackgroundColor } from "@streamlit/lib"
 
 // Check for custom text color & handle colors in SidebarNav accordingly
 const conditionalCustomColor = (
@@ -50,9 +46,9 @@ export const StyledSidebar = styled.section<StyledSidebarProps>(
     const maxWidth = isCollapsed ? 0 : Math.min(550, window.innerWidth * 0.9)
 
     return {
-      // Nudge the sidebar by 2px so the header decoration doesn't go below it
       position: "relative",
-      top: adjustTop ? "2px" : "0px",
+      // Nudge the sidebar by 2px so the header decoration doesn't go below it
+      top: adjustTop ? theme.sizes.headerDecorationHeight : theme.spacing.none,
       backgroundColor: theme.colors.bgColor,
       zIndex: theme.zIndices.header + 1,
 
@@ -84,44 +80,32 @@ export const StyledSidebar = styled.section<StyledSidebarProps>(
   }
 )
 
-export const StyledSidebarNavContainer = styled.div(() => ({
+export const StyledSidebarNavContainer = styled.div({
   position: "relative",
-}))
+})
 
-export interface StyledSidebarNavItemsProps {
-  isExpanded: boolean
-  hasSidebarElements: boolean
-}
-
-export const StyledSidebarNavItems = styled.ul<StyledSidebarNavItemsProps>(
-  ({ isExpanded, hasSidebarElements }) => {
-    return {
-      maxHeight: isExpanded ? "none" : "30vh",
-      listStyle: "none",
-      overflow:
-        isExpanded && hasSidebarElements ? ["auto", "overlay"] : "hidden",
-      margin: 0,
-      paddingBottom: "0.125rem",
-    }
+export const StyledSidebarNavItems = styled.ul(({ theme }) => {
+  return {
+    listStyle: "none",
+    margin: theme.spacing.none,
+    paddingBottom: theme.spacing.threeXS,
+    paddingTop: theme.spacing.none,
+    paddingRight: theme.spacing.none,
+    paddingLeft: theme.spacing.none,
   }
-)
+})
 
-export const StyledSidebarNavLinkContainer = styled.div(() => ({
+export const StyledSidebarNavLinkContainer = styled.div({
   display: "flex",
   flexDirection: "column",
-}))
+})
 
-export interface StyledSidebarNavLinkProps {
+export interface StyledSidebarNavIconProps {
   isActive: boolean
 }
 
-export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
-  ({ isActive, theme }) => {
-    const color = conditionalCustomColor(
-      theme,
-      theme.colors.bodyText,
-      theme.colors.navTextColor
-    )
+export const StyledSidebarNavIcon = styled.span<StyledSidebarNavIconProps>(
+  ({ theme, isActive }) => {
     const svgColor = conditionalCustomColor(
       theme,
       theme.colors.fadedText60,
@@ -133,9 +117,33 @@ export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
       theme.colors.navActiveTextColor
     )
 
+    return {
+      display: "inline-flex",
+      span: {
+        color: isActive ? activeSvgColor : svgColor,
+        fontWeight: isActive
+          ? theme.fontWeights.bold
+          : theme.fontWeights.normal,
+      },
+    }
+  }
+)
+
+export interface StyledSidebarNavLinkProps {
+  isActive: boolean
+}
+
+export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
+  ({ theme, isActive }) => {
+    const color = conditionalCustomColor(
+      theme,
+      theme.colors.bodyText,
+      theme.colors.navTextColor
+    )
+
     const defaultPageLinkStyles = {
       textDecoration: "none",
-      fontWeight: isActive ? 600 : 400,
+      fontWeight: isActive ? theme.fontWeights.bold : theme.fontWeights.normal,
     }
 
     return {
@@ -144,7 +152,7 @@ export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
       flexDirection: "row",
       alignItems: "center",
       gap: theme.spacing.sm,
-      borderRadius: theme.radii.lg,
+      borderRadius: theme.radii.default,
       paddingLeft: theme.spacing.sm,
       paddingRight: theme.spacing.sm,
       marginLeft: theme.spacing.twoXL,
@@ -155,11 +163,6 @@ export const StyledSidebarNavLink = styled.a<StyledSidebarNavLinkProps>(
 
       color,
       backgroundColor: isActive ? theme.colors.darkenedBgMix25 : "transparent",
-
-      [StyledMaterialIcon as any]: {
-        color: isActive ? activeSvgColor : svgColor,
-        fontWeight: isActive ? 600 : 400,
-      },
 
       "&:hover": {
         backgroundColor: transparentize(theme.colors.darkenedBgMix25, 0.1),
@@ -217,8 +220,6 @@ export const StyledSidebarUserContent =
     paddingBottom: theme.sizes.sidebarTopSpace,
     paddingLeft: theme.spacing.twoXL,
     paddingRight: theme.spacing.twoXL,
-
-    ...getWrappedHeadersStyle(theme),
   }))
 
 export const StyledSidebarContent = styled.div(({}) => ({
@@ -228,9 +229,11 @@ export const StyledSidebarContent = styled.div(({}) => ({
   overflow: ["auto", "overlay"],
 }))
 
+export const RESIZE_HANDLE_WIDTH = "8px"
+
 export const StyledResizeHandle = styled.div(({ theme }) => ({
   position: "absolute",
-  width: "8px",
+  width: RESIZE_HANDLE_WIDTH,
   height: "100%",
   cursor: "col-resize",
   zIndex: theme.zIndices.sidebarMobile,
@@ -244,7 +247,9 @@ export const StyledSidebarHeaderContainer = styled.div(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "start",
-  padding: `${theme.spacing.xl} ${theme.spacing.twoXL} ${theme.spacing.twoXL} ${theme.spacing.twoXL}`,
+  padding: theme.spacing.twoXL,
+  // Adjust top padding based on the header decoration height
+  paddingTop: `calc(${theme.spacing.twoXL} - ${theme.sizes.headerDecorationHeight})`,
 }))
 
 export const StyledLogoLink = styled.a(({}) => ({
@@ -253,35 +258,58 @@ export const StyledLogoLink = styled.a(({}) => ({
   },
 }))
 
-export const StyledLogo = styled.img(({ theme }) => ({
-  height: "1.5rem",
-  maxWidth: "15rem",
-  margin: "0.25rem 0.5rem 0.25rem 0",
-  zIndex: theme.zIndices.header,
-}))
+export interface StyledLogoProps {
+  size: string
+  sidebarWidth?: string
+}
 
-export const StyledNoLogoSpacer = styled.div(({}) => ({
-  height: "2.0rem",
+function translateLogoHeight(theme: any, size: string): string {
+  if (size === "small") {
+    return theme.sizes.smallLogoHeight
+  } else if (size === "large") {
+    return theme.sizes.largeLogoHeight
+  }
+  // Default logo size
+  return theme.sizes.defaultLogoHeight
+}
+
+export const StyledLogo = styled.img<StyledLogoProps>(
+  ({ theme, size, sidebarWidth }) => ({
+    height: translateLogoHeight(theme, size),
+    // Extra margin to align small logo with sidebar collapse arrow
+    marginTop: size == "small" ? theme.spacing.xs : theme.spacing.twoXS,
+    marginBottom: size == "small" ? theme.spacing.xs : theme.spacing.twoXS,
+    marginRight: theme.spacing.sm,
+    marginLeft: theme.spacing.none,
+    zIndex: theme.zIndices.header,
+    objectFit: "contain",
+    verticalAlign: "middle",
+    ...(sidebarWidth && {
+      // Control max width of logo so sidebar collapse button always shows (issue #8707)
+      // L & R padding (twoXL) + R margin (sm) + collapse button (2.25rem)
+      maxWidth: `calc(${sidebarWidth}px - 2 * ${theme.spacing.twoXL} - ${theme.spacing.sm} - 2.25rem)`,
+    }),
+  })
+)
+
+export const StyledNoLogoSpacer = styled.div(({ theme }) => ({
+  height: theme.sizes.largeLogoHeight,
 }))
 
 export interface StyledSidebarOpenContainerProps {
   chevronDownshift: number
-  isCollapsed: boolean
 }
 
 export const StyledSidebarOpenContainer =
   styled.div<StyledSidebarOpenContainerProps>(
-    ({ theme, chevronDownshift, isCollapsed }) => ({
+    ({ theme, chevronDownshift }) => ({
       position: "fixed",
       top: chevronDownshift ? `${chevronDownshift}px` : theme.spacing.xl,
-      left: isCollapsed ? theme.spacing.twoXL : `-${theme.spacing.twoXL}`,
+      left: theme.spacing.twoXL,
       zIndex: theme.zIndices.header,
       display: "flex",
       justifyContent: "center",
-      alignItems: "start",
-
-      transition: "left 300ms",
-      transitionDelay: "left 300ms",
+      alignItems: "center",
 
       [`@media print`]: {
         position: "static",
@@ -299,6 +327,7 @@ export const StyledOpenSidebarButton = styled.div(({ theme }) => {
   return {
     zIndex: theme.zIndices.header,
     color,
+    marginTop: theme.spacing.twoXS,
 
     button: {
       "&:hover": {
@@ -354,7 +383,7 @@ export const StyledSidebarNavSectionHeader = styled.header(({ theme }) => {
     fontSize: theme.fontSizes.sm,
     fontWeight: theme.fontWeights.bold,
     color,
-    lineHeight: theme.lineHeights.table,
+    lineHeight: theme.lineHeights.small,
     paddingRight: theme.spacing.sm,
     marginLeft: theme.spacing.twoXL,
     marginRight: theme.spacing.twoXL,
@@ -372,13 +401,16 @@ export const StyledViewButton = styled.button(({ theme }) => {
 
   return {
     fontSize: theme.fontSizes.sm,
-    lineHeight: "1.4rem",
+    fontFamily: "inherit",
+    lineHeight: theme.lineHeights.base,
     color,
     backgroundColor: theme.colors.transparent,
     border: "none",
-    borderRadius: theme.radii.lg,
+    borderRadius: theme.radii.default,
     marginTop: theme.spacing.twoXS,
     marginLeft: theme.spacing.xl,
+    marginBottom: theme.spacing.none,
+    marginRight: theme.spacing.none,
     padding: `${theme.spacing.threeXS} ${theme.spacing.sm}`,
     "&:hover, &:active, &:focus": {
       border: "none",
@@ -393,5 +425,5 @@ export const StyledViewButton = styled.button(({ theme }) => {
 
 export const StyledSidebarNavSeparator = styled.div(({ theme }) => ({
   paddingTop: theme.spacing.lg,
-  borderBottom: `1px solid ${theme.colors.fadedText10}`,
+  borderBottom: `${theme.sizes.borderWidth} solid ${theme.colors.borderColor}`,
 }))

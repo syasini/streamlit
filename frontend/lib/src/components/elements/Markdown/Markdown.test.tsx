@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { fireEvent, screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
@@ -44,6 +43,7 @@ describe("Markdown element", () => {
     render(<Markdown {...props} />)
     const markdown = screen.getByTestId("stMarkdown")
     expect(markdown).toBeInTheDocument()
+    expect(markdown).toHaveClass("stMarkdown")
     expect(markdown).toHaveStyle("width: 100px")
   })
 })

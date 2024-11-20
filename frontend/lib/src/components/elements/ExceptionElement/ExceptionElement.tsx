@@ -22,10 +22,13 @@ import AlertContainer, {
 } from "@streamlit/lib/src/components/shared/AlertContainer"
 import StreamlitMarkdown from "@streamlit/lib/src/components/shared/StreamlitMarkdown"
 import { Exception as ExceptionProto } from "@streamlit/lib/src/proto"
+import { StyledCode } from "@streamlit/lib/src/components/elements/CodeBlock/styled-components"
+import { StyledStackTrace } from "@streamlit/lib/src/components/shared/ErrorElement/styled-components"
 
 import {
+  StyledExceptionMessage,
   StyledMessageType,
-  StyledStackTrace,
+  StyledStackTraceContent,
   StyledStackTraceRow,
   StyledStackTraceTitle,
 } from "./styled-components"
@@ -56,7 +59,7 @@ function ExceptionMessage({
   type,
   message,
   messageIsMarkdown,
-}: ExceptionMessageProps): ReactElement {
+}: Readonly<ExceptionMessageProps>): ReactElement {
   // Build the message display.
   // On the backend, we use the StreamlitException type for errors that
   // originate from inside Streamlit. These errors have Markdown-formatted
@@ -77,19 +80,24 @@ function ExceptionMessage({
   )
 }
 
-function StackTrace({ stackTrace }: StackTraceProps): ReactElement {
+function StackTrace({ stackTrace }: Readonly<StackTraceProps>): ReactElement {
   // Build the stack trace display, if we got a stack trace.
   return (
     <>
       <StyledStackTraceTitle>Traceback:</StyledStackTraceTitle>
       <StyledStackTrace>
-        <code>
-          {stackTrace.map((row: string, index: number) => (
-            <StyledStackTraceRow key={index} data-testid="stExceptionTraceRow">
-              {row}
-            </StyledStackTraceRow>
-          ))}
-        </code>
+        <StyledStackTraceContent>
+          <StyledCode>
+            {stackTrace.map((row: string, index: number) => (
+              <StyledStackTraceRow
+                key={index}
+                data-testid="stExceptionTraceRow"
+              >
+                {row}
+              </StyledStackTraceRow>
+            ))}
+          </StyledCode>
+        </StyledStackTraceContent>
       </StyledStackTrace>
     </>
   )
@@ -101,20 +109,20 @@ function StackTrace({ stackTrace }: StackTraceProps): ReactElement {
 export default function ExceptionElement({
   element,
   width,
-}: ExceptionElementProps): ReactElement {
+}: Readonly<ExceptionElementProps>): ReactElement {
   return (
     <div className="stException" data-testid="stException">
       <AlertContainer
         kind={element.isWarning ? Kind.WARNING : Kind.ERROR}
         width={width}
       >
-        <div className="message">
+        <StyledExceptionMessage data-testid="stExceptionMessage">
           <ExceptionMessage
             type={element.type}
             message={element.message}
             messageIsMarkdown={element.messageIsMarkdown}
           />
-        </div>
+        </StyledExceptionMessage>
         {element.stackTrace && element.stackTrace.length > 0 ? (
           <StackTrace stackTrace={element.stackTrace} />
         ) : null}

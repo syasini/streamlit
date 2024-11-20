@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen, waitFor } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
@@ -78,15 +77,15 @@ function getProps(
     scriptRunState: ScriptRunState.RUNNING,
     sessionInfo: sessionInfo,
     widgetMgr: new WidgetStateManager({
-      sendRerunBackMsg: jest.fn(),
-      formsDataChanged: jest.fn(),
+      sendRerunBackMsg: vi.fn(),
+      formsDataChanged: vi.fn(),
     }),
     widgetsDisabled: false,
     uploadClient: new FileUploadClient({
       sessionInfo: sessionInfo,
       endpoints,
       formsWithPendingRequestsChanged: () => {},
-      requestFileURLs: jest.fn(),
+      requestFileURLs: vi.fn(),
     }),
     componentRegistry: new ComponentRegistry(endpoints),
     formsData: createFormsData(),
@@ -108,8 +107,9 @@ describe("ElementNodeRenderer Block Component", () => {
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()
       )
-      const elementNodeRenderer = screen.getByTestId("element-container")
+      const elementNodeRenderer = screen.getByTestId("stElementContainer")
       expect(elementNodeRenderer).toBeInTheDocument()
+      expect(elementNodeRenderer).toHaveClass("stElementContainer")
       // eslint-disable-next-line testing-library/no-node-access
       expect(elementNodeRenderer.children).toHaveLength(0)
     })
@@ -125,12 +125,12 @@ describe("ElementNodeRenderer Block Component", () => {
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()
       )
-      const elementNodeRenderer = screen.getByTestId("element-container")
+      const elementNodeRenderer = screen.getByTestId("stElementContainer")
       expect(elementNodeRenderer).toBeInTheDocument()
       // eslint-disable-next-line testing-library/no-node-access
       const elementRendererChildren = elementNodeRenderer.children
       expect(elementRendererChildren).toHaveLength(1)
-      expect(elementRendererChildren[0]).toHaveClass("balloons")
+      expect(elementRendererChildren[0]).toHaveClass("stBalloons")
     })
   })
 
@@ -146,7 +146,7 @@ describe("ElementNodeRenderer Block Component", () => {
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()
       )
-      const elementNodeRenderer = screen.getByTestId("element-container")
+      const elementNodeRenderer = screen.getByTestId("stElementContainer")
       expect(elementNodeRenderer).toBeInTheDocument()
       // eslint-disable-next-line testing-library/no-node-access
       expect(elementNodeRenderer.children).toHaveLength(0)
@@ -163,12 +163,12 @@ describe("ElementNodeRenderer Block Component", () => {
       await waitFor(() =>
         expect(screen.queryByTestId("stSkeleton")).toBeNull()
       )
-      const elementNodeRenderer = screen.getByTestId("element-container")
+      const elementNodeRenderer = screen.getByTestId("stElementContainer")
       expect(elementNodeRenderer).toBeInTheDocument()
       // eslint-disable-next-line testing-library/no-node-access
       const elementRendererChildren = elementNodeRenderer.children
       expect(elementRendererChildren).toHaveLength(1)
-      expect(elementRendererChildren[0]).toHaveClass("snow")
+      expect(elementRendererChildren[0]).toHaveClass("stSnow")
     })
   })
 })

@@ -16,10 +16,11 @@
 
 import React, { ReactElement } from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
+import * as Utils from "@streamlit/lib/src/theme/utils"
+import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
 
 import VirtualDropdown from "./VirtualDropdown"
 
@@ -32,10 +33,20 @@ function Option(props: OptionProps): ReactElement {
 }
 
 describe("VirtualDropdown element", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  beforeEach(() => {
+    vi.spyOn(Utils, "convertRemToPx").mockImplementation(mockConvertRemToPx)
+  })
+
   it("renders a StyledEmptyState when it has no children", () => {
     render(<VirtualDropdown />)
 
-    expect(screen.getByTestId("stVirtualDropdownEmpty")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stSelectboxVirtualDropdownEmpty")
+    ).toBeInTheDocument()
   })
 
   it("renders a StyledEmptyState when it has children with no item", () => {
@@ -45,7 +56,9 @@ describe("VirtualDropdown element", () => {
       </VirtualDropdown>
     )
 
-    expect(screen.getByTestId("stVirtualDropdownEmpty")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stSelectboxVirtualDropdownEmpty")
+    ).toBeInTheDocument()
   })
 
   it("renders a FixedSizeList when it has children", () => {
@@ -55,7 +68,9 @@ describe("VirtualDropdown element", () => {
       </VirtualDropdown>
     )
 
-    expect(screen.getByTestId("stVirtualDropdown")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stSelectboxVirtualDropdown")
+    ).toBeInTheDocument()
 
     // each option will have a tooltip attached to it
     expect(screen.getAllByTestId("stTooltipHoverTarget")).toHaveLength(1)

@@ -35,12 +35,15 @@ export interface MarkdownProps {
 export default function Markdown({
   width,
   element,
-}: MarkdownProps): ReactElement {
+}: Readonly<MarkdownProps>): ReactElement {
   const styleProp = { width }
+
   return (
-    <div className="stMarkdown" style={styleProp} data-testid="stMarkdown">
+    <div className="stMarkdown" data-testid="stMarkdown" style={styleProp}>
       {element.help ? (
-        <StyledLabelHelpWrapper>
+        <StyledLabelHelpWrapper
+          isLatex={element.elementType === MarkdownProto.Type.LATEX}
+        >
           <StreamlitMarkdown
             isCaption={element.isCaption}
             source={element.body}

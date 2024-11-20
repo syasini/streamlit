@@ -58,8 +58,8 @@ export const ExpanderIcon = (props: ExpanderIconProps): ReactElement => {
 
   const iconProps = {
     size: "lg" as IconSize,
-    margin: "",
-    padding: "",
+    margin: "0",
+    padding: "0",
   }
 
   const statusIconTestIds: Record<string, string> = {
@@ -168,7 +168,7 @@ const Expander: React.FC<React.PropsWithChildren<ExpanderProps>> = ({
       }
     )
 
-    animation.onfinish = () => onAnimationFinish(isOpen)
+    animation.addEventListener("finish", () => onAnimationFinish(isOpen))
     animationRef.current = animation
   }
 
@@ -230,7 +230,7 @@ const Expander: React.FC<React.PropsWithChildren<ExpanderProps>> = ({
   }
 
   return (
-    <StyledExpandableContainer data-testid="stExpander">
+    <StyledExpandableContainer className="stExpander" data-testid="stExpander">
       <StyledDetails isStale={isStale} ref={detailsRef}>
         <StyledSummary onClick={toggle} empty={empty} ref={summaryRef}>
           <StyledSummaryHeading>

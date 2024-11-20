@@ -15,7 +15,6 @@
  */
 
 import React from "react"
-import "@testing-library/jest-dom"
 
 import { screen, within } from "@testing-library/react"
 
@@ -49,12 +48,16 @@ const getProps = (props?: Partial<TabProps>): TabProps =>
     node: makeTabsNode(5),
     isStale: false,
     ...props,
-    renderTabContent: jest.fn(),
+    renderTabContent: vi.fn(),
   })
 
 describe("st.tabs", () => {
   it("renders without crashing", () => {
     render(<Tabs {...getProps()} />)
+
+    const tabsElement = screen.getByTestId("stTabs")
+    expect(tabsElement).toBeInTheDocument()
+    expect(tabsElement).toHaveClass("stTabs")
 
     const tabsContainer = screen.getByRole("tablist")
     expect(tabsContainer).toBeInTheDocument()

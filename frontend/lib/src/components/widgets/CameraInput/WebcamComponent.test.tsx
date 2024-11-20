@@ -15,7 +15,6 @@
  */
 
 import React from "react"
-import "@testing-library/jest-dom"
 
 import { fireEvent, screen, within } from "@testing-library/react"
 
@@ -24,9 +23,9 @@ import { render } from "@streamlit/lib/src/test_util"
 import { FacingMode } from "./SwitchFacingModeButton"
 import WebcamComponent, { Props, WebcamPermission } from "./WebcamComponent"
 
-jest.mock("react-webcam")
+vi.mock("react-webcam")
 
-jest.mock("react-device-detect", () => {
+vi.mock("react-device-detect", () => {
   return {
     isMobile: true,
   }
@@ -34,13 +33,13 @@ jest.mock("react-device-detect", () => {
 
 const getProps = (props: Partial<Props> = {}): Props => {
   return {
-    handleCapture: jest.fn(),
+    handleCapture: vi.fn(),
     width: 500,
     disabled: false,
-    setClearPhotoInProgress: jest.fn(),
+    setClearPhotoInProgress: vi.fn(),
     clearPhotoInProgress: false,
     facingMode: FacingMode.USER,
-    setFacingMode: jest.fn(),
+    setFacingMode: vi.fn(),
     testOverride: WebcamPermission.PENDING,
     ...props,
   }
@@ -50,13 +49,17 @@ describe("Test Webcam Component", () => {
   it("renders without crashing", () => {
     const props = getProps()
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
   })
 
   it("renders ask permission screen when pending state", () => {
     const props = getProps()
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
     expect(
       screen.getByText("This app would like to use your camera.")
     ).toBeInTheDocument()
@@ -64,13 +67,17 @@ describe("Test Webcam Component", () => {
       "Learn how to allow access."
     )
     // hidden style should be there and webcam should not show
-    expect(screen.getByTestId("stWebcamStyledBox")).toHaveAttribute("hidden")
+    expect(screen.getByTestId("stCameraInputWebcamStyledBox")).toHaveAttribute(
+      "hidden"
+    )
   })
 
   it("renders ask permission screen when error state", () => {
     const props = getProps({ testOverride: WebcamPermission.ERROR })
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
 
     expect(
       screen.getByText("This app would like to use your camera.")
@@ -79,35 +86,41 @@ describe("Test Webcam Component", () => {
       "Learn how to allow access."
     )
     // hidden style should be there and webcam should not show
-    expect(screen.getByTestId("stWebcamStyledBox")).toHaveAttribute("hidden")
+    expect(screen.getByTestId("stCameraInputWebcamStyledBox")).toHaveAttribute(
+      "hidden"
+    )
   })
 
   it("does not render ask permission screen in success state", () => {
     const props = getProps({ testOverride: WebcamPermission.SUCCESS })
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
 
     // hidden style should not be there and webcam should show
-    expect(screen.getByTestId("stWebcamStyledBox")).not.toHaveAttribute(
-      "hidden"
-    )
+    expect(
+      screen.getByTestId("stCameraInputWebcamStyledBox")
+    ).not.toHaveAttribute("hidden")
   })
 
   it("shows a SwitchFacingMode button", () => {
     const props = getProps({ testOverride: WebcamPermission.SUCCESS })
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
-    expect(screen.getByTestId("stCameraSwitchButton")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
+    expect(screen.getByTestId("stCameraInputSwitchButton")).toBeInTheDocument()
   })
 
   it("changes `facingMode` when SwitchFacingMode button clicked", () => {
     const props = getProps({ testOverride: WebcamPermission.SUCCESS })
     render(<WebcamComponent {...props} />)
 
-    expect(screen.getByTestId("stCameraSwitchButton")).toBeInTheDocument()
+    expect(screen.getByTestId("stCameraInputSwitchButton")).toBeInTheDocument()
 
     const switchButton = within(
-      screen.getByTestId("stCameraSwitchButton")
+      screen.getByTestId("stCameraInputSwitchButton")
     ).getByRole("button")
 
     fireEvent.click(switchButton)
@@ -118,7 +131,9 @@ describe("Test Webcam Component", () => {
   it("test handle capture function", async () => {
     const props = getProps({ testOverride: WebcamPermission.SUCCESS })
     render(<WebcamComponent {...props} />)
-    expect(screen.getByTestId("stWebcamComponent")).toBeInTheDocument()
+    expect(
+      screen.getByTestId("stCameraInputWebcamComponent")
+    ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "Take Photo" }))
 

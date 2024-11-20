@@ -30,7 +30,7 @@ export const StyledTruncateText = styled.div(({ theme }) => ({
   overflow: "hidden",
   whiteSpace: "nowrap",
   fontFamily: theme.genericFonts.bodyFont,
-  lineHeight: theme.lineHeights.normal,
+  lineHeight: "normal",
   verticalAlign: "middle",
 
   // Styles to truncate the text inside the StyledStreamlitMarkdown div.
@@ -57,7 +57,7 @@ export const StyledMetricLabelText = styled(
 
 export const StyledMetricValueText = styled.div(({ theme }) => ({
   fontSize: theme.fontSizes.threeXL,
-  color: theme.colors.textColor,
+  color: theme.colors.bodyText,
   paddingBottom: theme.spacing.twoXS,
 }))
 

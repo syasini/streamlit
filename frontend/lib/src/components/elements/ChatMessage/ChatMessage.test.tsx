@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { mockEndpoints } from "@streamlit/lib/src/mocks/mocks"
@@ -35,7 +34,7 @@ const getProps = (
     ...elementProps,
   }),
   endpoints: mockEndpoints({
-    buildMediaURL: jest.fn().mockImplementation(url => url),
+    buildMediaURL: vi.fn().mockImplementation(url => url),
   }),
 })
 
@@ -44,8 +43,9 @@ describe("ChatMessage", () => {
     const props = getProps()
     render(<ChatMessage {...props} />)
 
-    const chatContent = screen.getByTestId("stChatMessageContent")
-    expect(chatContent).toBeInTheDocument()
+    const chatMessage = screen.getByTestId("stChatMessage")
+    expect(chatMessage).toBeInTheDocument()
+    expect(chatMessage).toHaveClass("stChatMessage")
   })
 
   it("renders message children content", () => {
@@ -93,7 +93,7 @@ describe("ChatMessage", () => {
     })
     render(<ChatMessage {...props} />)
 
-    const userAvatarIcon = screen.getByTestId("chatAvatarIcon-user")
+    const userAvatarIcon = screen.getByTestId("stChatMessageAvatarUser")
     expect(userAvatarIcon).toBeInTheDocument()
   })
 
@@ -105,7 +105,9 @@ describe("ChatMessage", () => {
     })
     render(<ChatMessage {...props} />)
 
-    const assistantAvatarIcon = screen.getByTestId("chatAvatarIcon-assistant")
+    const assistantAvatarIcon = screen.getByTestId(
+      "stChatMessageAvatarAssistant"
+    )
     expect(assistantAvatarIcon).toBeInTheDocument()
   })
 

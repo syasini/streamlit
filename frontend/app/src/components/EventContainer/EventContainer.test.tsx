@@ -18,8 +18,7 @@ import React from "react"
 
 import { screen } from "@testing-library/react"
 
-import "@testing-library/jest-dom"
-import { render } from "@streamlit/lib/src/test_util"
+import { render } from "@streamlit/lib"
 
 import EventContainer from "./EventContainer"
 
@@ -27,7 +26,8 @@ describe("EventContainer Component", () => {
   test("renders Toast Container", () => {
     render(<EventContainer scriptRunId="123" />)
 
-    const toastContainer = screen.getByTestId("toastContainer")
+    const toastContainer = screen.getByTestId("stToastContainer")
     expect(toastContainer).toBeInTheDocument()
+    expect(toastContainer).toHaveClass("stToastContainer")
   })
 })

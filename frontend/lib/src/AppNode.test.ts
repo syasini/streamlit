@@ -15,8 +15,9 @@
  */
 
 import { Writer } from "protobufjs"
-import { vectorFromArray } from "apache-arrow"
+import { MockInstance } from "vitest"
 
+import { arrayFromVector } from "@streamlit/lib/src/test_util"
 import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
 
 import {
@@ -26,6 +27,7 @@ import {
   Element,
   ForwardMsgMetadata,
   IArrowVegaLiteChart,
+  Logo as LogoProto,
 } from "./proto"
 import { AppNode, AppRoot, BlockNode, ElementNode } from "./AppNode"
 import { IndexTypeName } from "./dataframes/Quiver"
@@ -103,7 +105,7 @@ describe("ElementNode.quiverElement", () => {
     const node = arrowTable()
     const q = node.quiverElement
 
-    expect(q.index).toEqual([vectorFromArray(["i1", "i2"])])
+    expect(arrayFromVector(q.index)).toEqual([["i1", "i2"]])
     expect(q.columns).toEqual([["c1", "c2"]])
     expect(q.data.toArray().map(a => a?.toArray())).toEqual([
       ["foo", "1"],
@@ -136,7 +138,7 @@ describe("ElementNode.quiverElement", () => {
     const node = arrowDataFrame()
     const q = node.quiverElement
 
-    expect(q.index).toEqual([vectorFromArray(["i1", "i2"])])
+    expect(arrayFromVector(q.index)).toEqual([["i1", "i2"]])
     expect(q.columns).toEqual([["c1", "c2"]])
     expect(q.data.toArray().map(a => a?.toArray())).toEqual([
       ["foo", "1"],
@@ -208,7 +210,7 @@ describe("ElementNode.vegaLiteChartElement", () => {
     expect(element.spec).toEqual(MOCK_VEGA_LITE_CHART.spec)
 
     // data
-    expect(element.data?.index).toEqual([vectorFromArray(["i1", "i2"])])
+    expect(arrayFromVector(element.data?.index)).toEqual([["i1", "i2"]])
     expect(element.data?.columns).toEqual([["c1", "c2"]])
     expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
       ["foo", "1"],
@@ -276,8 +278,8 @@ describe("ElementNode.vegaLiteChartElement", () => {
     expect(element.datasets[0].name).toEqual(
       MOCK_VEGA_LITE_CHART.datasets[0].name
     )
-    expect(element.datasets[0].data.index).toEqual([
-      vectorFromArray(["i1", "i2"]),
+    expect(arrayFromVector(element.datasets[0].data.index)).toEqual([
+      ["i1", "i2"],
     ])
     expect(element.datasets[0].data.columns).toEqual([["c1", "c2"]])
     expect(
@@ -365,7 +367,7 @@ describe("ElementNode.arrowAddRows", () => {
       const newNode = node.arrowAddRows(MOCK_UNNAMED_DATASET, NO_SCRIPT_RUN_ID)
       const q = newNode.quiverElement
 
-      expect(q.index).toEqual([vectorFromArray(["i1", "i2", "i1", "i2"])])
+      expect(arrayFromVector(q.index)).toEqual([["i1", "i2", "i1", "i2"]])
       expect(q.columns).toEqual([["c1", "c2"]])
       expect(q.data.toArray().map(a => a?.toArray())).toEqual([
         ["foo", "1"],
@@ -412,7 +414,7 @@ describe("ElementNode.arrowAddRows", () => {
       const newNode = node.arrowAddRows(MOCK_UNNAMED_DATASET, NO_SCRIPT_RUN_ID)
       const q = newNode.quiverElement
 
-      expect(q.index).toEqual([vectorFromArray(["i1", "i2", "i1", "i2"])])
+      expect(arrayFromVector(q.index)).toEqual([["i1", "i2", "i1", "i2"]])
       expect(q.columns).toEqual([["c1", "c2"]])
       expect(q.data.toArray().map(a => a?.toArray())).toEqual([
         ["foo", "1"],
@@ -480,8 +482,8 @@ describe("ElementNode.arrowAddRows", () => {
         const newNode = node.arrowAddRows(MOCK_NAMED_DATASET, NO_SCRIPT_RUN_ID)
         const element = newNode.vegaLiteChartElement
 
-        expect(element.datasets[0].data.index).toEqual([
-          vectorFromArray(["i1", "i2", "i1", "i2"]),
+        expect(arrayFromVector(element.datasets[0].data.index)).toEqual([
+          ["i1", "i2", "i1", "i2"],
         ])
         expect(element.datasets[0].data.columns).toEqual([["c1", "c2"]])
         expect(
@@ -522,8 +524,8 @@ describe("ElementNode.arrowAddRows", () => {
         const newNode = node.arrowAddRows(MOCK_NAMED_DATASET, NO_SCRIPT_RUN_ID)
         const element = newNode.vegaLiteChartElement
 
-        expect(element.datasets[0].data.index).toEqual([
-          vectorFromArray(["i1", "i2", "i1", "i2"]),
+        expect(arrayFromVector(element.datasets[0].data.index)).toEqual([
+          ["i1", "i2", "i1", "i2"],
         ])
         expect(element.datasets[0].data.columns).toEqual([["c1", "c2"]])
         expect(
@@ -562,8 +564,8 @@ describe("ElementNode.arrowAddRows", () => {
         const newNode = node.arrowAddRows(MOCK_NAMED_DATASET, NO_SCRIPT_RUN_ID)
         const element = newNode.vegaLiteChartElement
 
-        expect(element.data?.index).toEqual([
-          vectorFromArray(["i1", "i2", "i1", "i2"]),
+        expect(arrayFromVector(element.data?.index)).toEqual([
+          ["i1", "i2", "i1", "i2"],
         ])
         expect(element.data?.columns).toEqual([["c1", "c2"]])
         expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
@@ -605,7 +607,7 @@ describe("ElementNode.arrowAddRows", () => {
         const newNode = node.arrowAddRows(MOCK_NAMED_DATASET, NO_SCRIPT_RUN_ID)
         const element = newNode.vegaLiteChartElement
 
-        expect(element.data?.index).toEqual([vectorFromArray(["i1", "i2"])])
+        expect(arrayFromVector(element.data?.index)).toEqual([["i1", "i2"]])
         expect(element.data?.columns).toEqual([["c1", "c2"]])
         expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
           ["foo", "1"],
@@ -639,7 +641,7 @@ describe("ElementNode.arrowAddRows", () => {
         const newNode = node.arrowAddRows(MOCK_NAMED_DATASET, NO_SCRIPT_RUN_ID)
         const element = newNode.vegaLiteChartElement
 
-        expect(element.data?.index).toEqual([vectorFromArray(["i1", "i2"])])
+        expect(arrayFromVector(element.data?.index)).toEqual([["i1", "i2"]])
         expect(element.data?.columns).toEqual([["c1", "c2"]])
         expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
           ["foo", "1"],
@@ -678,8 +680,8 @@ describe("ElementNode.arrowAddRows", () => {
         )
         const element = newNode.vegaLiteChartElement
 
-        expect(element.datasets[0].data.index).toEqual([
-          vectorFromArray(["i1", "i2", "i1", "i2"]),
+        expect(arrayFromVector(element.datasets[0].data.index)).toEqual([
+          ["i1", "i2", "i1", "i2"],
         ])
         expect(element.datasets[0].data.columns).toEqual([["c1", "c2"]])
         expect(
@@ -721,8 +723,8 @@ describe("ElementNode.arrowAddRows", () => {
         )
         const element = newNode.vegaLiteChartElement
 
-        expect(element.data?.index).toEqual([
-          vectorFromArray(["i1", "i2", "i1", "i2"]),
+        expect(arrayFromVector(element.data?.index)).toEqual([
+          ["i1", "i2", "i1", "i2"],
         ])
         expect(element.data?.columns).toEqual([["c1", "c2"]])
         expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
@@ -762,7 +764,7 @@ describe("ElementNode.arrowAddRows", () => {
         )
         const element = newNode.vegaLiteChartElement
 
-        expect(element.data?.index).toEqual([vectorFromArray(["i1", "i2"])])
+        expect(arrayFromVector(element.data?.index)).toEqual([["i1", "i2"]])
         expect(element.data?.columns).toEqual([["c1", "c2"]])
         expect(element.data?.data.toArray().map(a => a?.toArray())).toEqual([
           ["foo", "1"],
@@ -802,10 +804,10 @@ describe("ElementNode.arrowAddRows", () => {
 })
 
 describe("AppRoot.empty", () => {
-  let windowSpy: jest.SpyInstance
+  let windowSpy: MockInstance
 
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, "window", "get")
+    windowSpy = vi.spyOn(window, "window", "get")
   })
 
   afterEach(() => {
@@ -813,6 +815,11 @@ describe("AppRoot.empty", () => {
   })
 
   it("creates empty tree except for a skeleton", async () => {
+    windowSpy.mockImplementation(() => ({
+      location: {
+        search: "",
+      },
+    }))
     const empty = AppRoot.empty(FAKE_SCRIPT_HASH)
 
     // The linter is misfiring here. We're not accessing a DOM node.
@@ -825,6 +832,11 @@ describe("AppRoot.empty", () => {
   })
 
   it("sets the main script hash and active script hash", () => {
+    windowSpy.mockImplementation(() => ({
+      location: {
+        search: "",
+      },
+    }))
     const empty = AppRoot.empty(FAKE_SCRIPT_HASH)
 
     expect(empty.mainScriptHash).toBe(FAKE_SCRIPT_HASH)
@@ -896,6 +908,26 @@ describe("AppRoot.empty", () => {
     expect(empty.main.isEmpty).toBe(true)
     expect(empty.sidebar.isEmpty).toBe(true)
   })
+
+  it("passes logo to new Root if empty is called with logo", async () => {
+    windowSpy.mockImplementation(() => ({
+      location: {
+        search: "",
+      },
+    }))
+    const logo = LogoProto.create({
+      image:
+        "https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/8/8cb5b6c0e1fe4e4ebfd30b769204c0d30c332fec.png",
+    })
+
+    // Replicate .empty call on initial render
+    const empty = AppRoot.empty("", true)
+    expect(empty.logo).toBeNull()
+
+    // Replicate .empty call in AppNav's clearPageElements for MPA V1
+    const empty2 = AppRoot.empty(FAKE_SCRIPT_HASH, false, undefined, logo)
+    expect(empty2.logo).not.toBeNull()
+  })
 })
 
 describe("AppRoot.filterMainScriptElements", () => {
@@ -949,6 +981,7 @@ describe("AppRoot.applyDelta", () => {
     // Check that our new scriptRunId has been set only on the touched nodes
     expect(newRoot.main.scriptRunId).toBe("new_session_id")
     expect(newRoot.main.fragmentId).toBe(undefined)
+    expect(newRoot.main.deltaMsgReceivedAt).toBe(undefined)
     expect(newRoot.main.getIn([0])?.scriptRunId).toBe(NO_SCRIPT_RUN_ID)
     expect(newRoot.main.getIn([1])?.scriptRunId).toBe("new_session_id")
     expect(newRoot.main.getIn([1, 0])?.scriptRunId).toBe(NO_SCRIPT_RUN_ID)
@@ -971,12 +1004,101 @@ describe("AppRoot.applyDelta", () => {
     // Check that our new scriptRunId has been set only on the touched nodes
     expect(newRoot.main.scriptRunId).toBe("new_session_id")
     expect(newRoot.main.fragmentId).toBe(undefined)
+    expect(newRoot.main.deltaMsgReceivedAt).toBe(undefined)
     expect(newRoot.main.getIn([0])?.scriptRunId).toBe(NO_SCRIPT_RUN_ID)
     expect(newRoot.main.getIn([1])?.scriptRunId).toBe("new_session_id")
     expect(newRoot.main.getIn([1, 0])?.scriptRunId).toBe(NO_SCRIPT_RUN_ID)
     expect(newRoot.main.getIn([1, 1])?.scriptRunId).toBe("new_session_id")
     expect(newNode.activeScriptHash).toBe(FAKE_SCRIPT_HASH)
     expect(newRoot.sidebar.scriptRunId).toBe(NO_SCRIPT_RUN_ID)
+  })
+
+  it("removes a block's children if the block type changes for the same delta path", () => {
+    const newRoot = ROOT.applyDelta(
+      "script_run_id",
+      makeProto(DeltaProto, {
+        addBlock: {
+          expandable: {
+            expanded: true,
+            label: "label",
+            icon: "",
+          },
+        },
+      }),
+      forwardMsgMetadata([0, 1, 1])
+    ).applyDelta(
+      "script_run_id",
+      makeProto(DeltaProto, {
+        newElement: { text: { body: "newElement!" } },
+      }),
+      forwardMsgMetadata([0, 1, 1, 0])
+    )
+
+    const newNode = newRoot.main.getIn([1, 1]) as BlockNode
+    expect(newNode).toBeDefined()
+    expect(newNode.deltaBlock.type).toBe("expandable")
+    expect(newNode.children.length).toBe(1)
+
+    const newRoot2 = newRoot.applyDelta(
+      "new_script_run_id",
+      makeProto(DeltaProto, {
+        addBlock: {
+          tabContainer: {},
+        },
+      }),
+      forwardMsgMetadata([0, 1, 1])
+    )
+
+    const replacedBlock = newRoot2.main.getIn([1, 1]) as BlockNode
+    expect(replacedBlock).toBeDefined()
+    expect(replacedBlock.deltaBlock.type).toBe("tabContainer")
+    expect(replacedBlock.children.length).toBe(0)
+  })
+
+  it("will not remove a block's children if the block type is the same for the same delta path", () => {
+    const newRoot = ROOT.applyDelta(
+      "script_run_id",
+      makeProto(DeltaProto, {
+        addBlock: {
+          expandable: {
+            expanded: true,
+            label: "label",
+            icon: "",
+          },
+        },
+      }),
+      forwardMsgMetadata([0, 1, 1])
+    ).applyDelta(
+      "script_run_id",
+      makeProto(DeltaProto, {
+        newElement: { text: { body: "newElement!" } },
+      }),
+      forwardMsgMetadata([0, 1, 1, 0])
+    )
+
+    const newNode = newRoot.main.getIn([1, 1]) as BlockNode
+    expect(newNode).toBeDefined()
+    expect(newNode.deltaBlock.type).toBe("expandable")
+    expect(newNode.children.length).toBe(1)
+
+    const newRoot2 = newRoot.applyDelta(
+      "new_script_run_id",
+      makeProto(DeltaProto, {
+        addBlock: {
+          expandable: {
+            expanded: true,
+            label: "other label",
+            icon: "",
+          },
+        },
+      }),
+      forwardMsgMetadata([0, 1, 1])
+    )
+
+    const replacedBlock = newRoot2.main.getIn([1, 1]) as BlockNode
+    expect(replacedBlock).toBeDefined()
+    expect(replacedBlock.deltaBlock.type).toBe("expandable")
+    expect(replacedBlock.children.length).toBe(1)
   })
 
   it("specifies active script hash on 'newElement' deltas", () => {
@@ -1044,6 +1166,22 @@ describe("AppRoot.applyDelta", () => {
     const newNode = newRoot.main.getIn([1, 1]) as BlockNode
     expect(newNode.fragmentId).toBe("myFragmentId")
   })
+
+  it("timestamp is set on BlockNode as message id", () => {
+    const timestamp = new Date(Date.UTC(2017, 1, 14)).valueOf()
+    Date.now = vi.fn(() => timestamp)
+    const delta = makeProto(DeltaProto, {
+      addBlock: {},
+    })
+    const newRoot = ROOT.applyDelta(
+      "new_session_id",
+      delta,
+      forwardMsgMetadata([0, 1, 1])
+    )
+
+    const newNode = newRoot.main.getIn([1, 1]) as BlockNode
+    expect(newNode.deltaMsgReceivedAt).toBe(timestamp)
+  })
 })
 
 describe("AppRoot.clearStaleNodes", () => {
@@ -1061,6 +1199,21 @@ describe("AppRoot.clearStaleNodes", () => {
     // We should now only have a single element, inside a single block
     expect(newRoot.main.getIn([0, 0])).toBeTextNode("newElement!")
     expect(newRoot.getElements().size).toBe(1)
+  })
+
+  it("clears a stale logo", () => {
+    const logo = LogoProto.create({
+      image:
+        "https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/8/8cb5b6c0e1fe4e4ebfd30b769204c0d30c332fec.png",
+    })
+    const newRoot = ROOT.appRootWithLogo(logo, {
+      activeScriptHash: "hash",
+      scriptRunId: "script_run_id",
+    })
+    expect(newRoot.logo).not.toBeNull()
+
+    const newNewRoot = newRoot.clearStaleNodes("new_script_run_id", [])
+    expect(newNewRoot.logo).toBeNull()
   })
 
   it("handles currentFragmentId correctly", () => {
@@ -1173,6 +1326,66 @@ describe("AppRoot.clearStaleNodes", () => {
       (pruned.main.getIn([2, 0]) as BlockNode).deltaBlock.tab?.label
     ).toContain("tab1")
   })
+
+  it("clear childNodes of a block node in fragment run", () => {
+    // Add a new element and clear stale nodes
+    const delta = makeProto(DeltaProto, {
+      newElement: { text: { body: "newElement!" } },
+      fragmentId: "my_fragment_id",
+    })
+    const newRoot = AppRoot.empty(FAKE_SCRIPT_HASH)
+      // Block corresponding to my_fragment_id
+      .applyDelta(
+        "new_session_id",
+        makeProto(DeltaProto, {
+          addBlock: { vertical: {}, allowEmpty: false },
+          fragmentId: "my_fragment_id",
+        }),
+        forwardMsgMetadata([0, 0])
+      )
+      .applyDelta("new_session_id", delta, forwardMsgMetadata([0, 0, 0]))
+      // Block with child where scriptRunId is different
+      .applyDelta(
+        "new_session_id",
+        makeProto(DeltaProto, {
+          addBlock: { vertical: {}, allowEmpty: false },
+          fragmentId: "my_fragment_id",
+        }),
+        forwardMsgMetadata([0, 1])
+      )
+      .applyDelta("new_session_id", delta, forwardMsgMetadata([0, 1, 0]))
+      .applyDelta("new_session_id", delta, forwardMsgMetadata([0, 1, 1]))
+      // this child is a nested fragment_id from an old run and should be pruned
+      .applyDelta(
+        "old_session_id",
+        makeProto(DeltaProto, {
+          newElement: { text: { body: "oldElement!" } },
+          fragmentId: "my_nested_fragment_id",
+        }),
+        forwardMsgMetadata([0, 1, 2])
+      )
+      // this child is a nested fragment_id from the same run and should be preserved
+      .applyDelta(
+        "new_session_id",
+        makeProto(DeltaProto, {
+          newElement: { text: { body: "newElement!" } },
+          fragmentId: "my_nested_fragment_id",
+        }),
+        forwardMsgMetadata([0, 1, 3])
+      )
+
+    expect((newRoot.main.getIn([1]) as BlockNode).children).toHaveLength(4)
+
+    const pruned = newRoot.clearStaleNodes("new_session_id", [
+      "my_fragment_id",
+    ])
+
+    expect(pruned.main.getIn([0])).toBeInstanceOf(BlockNode)
+    expect((pruned.main.getIn([0]) as BlockNode).children).toHaveLength(1)
+    expect(pruned.main.getIn([1])).toBeInstanceOf(BlockNode)
+    // the stale nested fragment child should have been pruned
+    expect((pruned.main.getIn([1]) as BlockNode).children).toHaveLength(3)
+  })
 })
 
 describe("AppRoot.getElements", () => {
@@ -1278,15 +1491,24 @@ function makeProto<Type, Props>(
 // Custom Jest matchers for dealing with AppNodes
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace jest {
+  namespace vi {
     interface Matchers<R> {
       toBeTextNode(text: string): R
     }
   }
 }
 
+interface CustomMatchers<R = unknown> {
+  toBeTextNode(text: string): R
+}
+
+declare module "vitest" {
+  interface Assertion<T = any> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
+}
+
 expect.extend({
-  toBeTextNode(received, text): jest.CustomMatcherResult {
+  toBeTextNode(received, text): any {
     const elementNode = received as ElementNode
     if (isNullOrUndefined(elementNode)) {
       return {

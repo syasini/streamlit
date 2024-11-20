@@ -15,6 +15,7 @@
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run, wait_until
+from e2e_playwright.shared.app_utils import check_top_level_class
 
 
 def get_first_graph_svg(app: Page):
@@ -22,7 +23,7 @@ def get_first_graph_svg(app: Page):
 
 
 def click_fullscreen(app: Page):
-    app.get_by_test_id("StyledFullScreenButton").nth(0).click()
+    app.get_by_role("button", name="Fullscreen").nth(0).click()
     # Wait for the animation to finish
     app.wait_for_timeout(1000)
 
@@ -31,7 +32,7 @@ def test_initial_setup(app: Page):
     """Initial setup: ensure charts are loaded."""
     expect(
         app.get_by_test_id("stGraphVizChart").locator("svg > g > title")
-    ).to_have_count(6)
+    ).to_have_count(7)
 
 
 def test_shows_left_and_right_graph(app: Page):
@@ -123,4 +124,17 @@ def test_dot_string(app: Page, assert_snapshot: ImageCompareFunction):
     assert_snapshot(
         app.get_by_test_id("stGraphVizChart").nth(5).locator("svg"),
         name="st_graphviz-chart_dot_string",
+    )
+
+
+def test_check_top_level_class(app: Page):
+    """Check that the top level class is correctly set."""
+    check_top_level_class(app, "stGraphVizChart")
+
+
+def test_use_container_width_true(app: Page, assert_snapshot: ImageCompareFunction):
+    """Test that it renders correctly with use_container_width=True."""
+    assert_snapshot(
+        app.get_by_test_id("stGraphVizChart").nth(6).locator("svg"),
+        name="st_graphviz_chart_use_container_width_true",
     )

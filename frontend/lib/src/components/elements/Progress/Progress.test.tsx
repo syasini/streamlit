@@ -16,7 +16,6 @@
 
 import React from "react"
 
-import "@testing-library/jest-dom"
 import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
@@ -38,7 +37,9 @@ describe("Progress component", () => {
   it("renders without crashing", () => {
     render(<Progress {...getProps()} />)
 
-    expect(screen.getByTestId("stProgress")).toBeInTheDocument()
+    const progressElement = screen.getByTestId("stProgress")
+    expect(progressElement).toBeInTheDocument()
+    expect(progressElement).toHaveClass("stProgress")
   })
 
   it("sets the value correctly", () => {

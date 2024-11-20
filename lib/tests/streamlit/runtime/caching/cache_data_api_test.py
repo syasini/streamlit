@@ -35,12 +35,9 @@ from streamlit.runtime import Runtime
 from streamlit.runtime.caching import cached_message_replay
 from streamlit.runtime.caching.cache_data_api import get_data_cache_stats_provider
 from streamlit.runtime.caching.cache_errors import CacheError
-from streamlit.runtime.caching.cache_type import CacheType
 from streamlit.runtime.caching.cached_message_replay import (
     CachedResult,
     ElementMsgData,
-    MultiCacheResults,
-    _make_widget_key,
 )
 from streamlit.runtime.caching.hashing import UserHashError
 from streamlit.runtime.caching.storage import (
@@ -73,23 +70,20 @@ from tests.streamlit.runtime.caching.common_cache_test import (
 from tests.testutil import create_mock_script_run_ctx
 
 
-def as_cached_result(value: Any) -> MultiCacheResults:
-    return _as_cached_result(value, CacheType.DATA)
+def as_cached_result(value: Any) -> CachedResult:
+    return _as_cached_result(value)
 
 
-def as_replay_test_data() -> MultiCacheResults:
+def as_replay_test_data() -> CachedResult:
     """Creates cached results for a function that returned 1
     and executed `st.text(1)`.
     """
-    widget_key = _make_widget_key([], CacheType.DATA)
-    d = {}
-    d[widget_key] = CachedResult(
+    return CachedResult(
         1,
         [ElementMsgData("text", TextProto(body="1"), st._main.id, "")],
         st._main.id,
         st.sidebar.id,
     )
-    return MultiCacheResults(set(), d)
 
 
 class CacheDataTest(unittest.TestCase):
@@ -234,7 +228,7 @@ If you think this is actually a Streamlit bug, please
         foo.clear(1)
         assert foo(1) == 2
 
-    def test_cached_st_method_clear_args(self):
+    def test_cached_class_method_clear_args(self):
         self.x = 0
 
         class ExampleClass:
@@ -257,6 +251,30 @@ If you think this is actually a Streamlit bug, please
         # calling foo.clear(1) should clear the cache for the argument 1,
         # therefore calling foo(1) should return the new value 2
         example_instance.foo.clear(1)
+        assert example_instance.foo(1) == 2
+
+        # Try the same with a keyword argument:
+        example_instance.foo.clear(y=1)
+        assert example_instance.foo(1) == 3
+
+    def test_cached_class_method_clear(self):
+        self.x = 0
+
+        class ExampleClass:
+            @st.cache_data
+            def foo(_self, y):
+                self.x += y
+                return self.x
+
+        example_instance = ExampleClass()
+        # Calling method foo produces the side effect of incrementing self.x
+        # and returning it as the result.
+
+        # calling foo(1) should return 1
+        assert example_instance.foo(1) == 1
+        example_instance.foo.clear()
+        # calling foo.clear() should clear all cached values:
+        # So the call to foo() should return the new value 2
         assert example_instance.foo(1) == 2
 
 
@@ -642,6 +660,11 @@ class CacheDataMessageReplayTest(DeltaGeneratorTestCase):
         self, _widget_name: str, widget_producer: ELEMENT_PRODUCER
     ):
         """Test that a warning is shown when a widget is created inside a cached function."""
+
+        if _widget_name == "experimental_audio_input":
+            # The experimental_audio_input element produces also a deprecation warning
+            # which makes this test irrelevant
+            return
 
         @st.cache_data(show_spinner=False)
         def cache_widget():

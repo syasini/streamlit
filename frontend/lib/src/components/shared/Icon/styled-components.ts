@@ -44,11 +44,11 @@ export const StyledSpinnerIcon = styled(Spinner, {
       justifyContents: "center",
       margin: computeSpacingStyle(margin, theme),
       padding: computeSpacingStyle(padding, theme),
-      borderColor: theme.colors.fadedText10,
+      borderColor: theme.colors.borderColor,
       borderTopColor: usingCustomTheme
         ? theme.colors.primary
         : theme.colors.blue70,
-      borderWidth: "0.15em",
+      borderWidth: theme.sizes.spinnerThickness,
       flexGrow: 0,
       flexShrink: 0,
     }
