@@ -24,7 +24,7 @@ from e2e_playwright.shared.app_utils import get_button, get_markdown
 @pytest.fixture(scope="module")
 def app_port() -> int:
     """Fixture that returns an available port on localhost."""
-    return 8555
+    return 7999
 
 
 def test_login_successful(app: Page, fake_oidc_server):
