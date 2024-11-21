@@ -35,10 +35,14 @@ import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { StyledModalButton } from "./styled-components"
 
 export interface ModalHeaderProps {
+  styleOverrides?: React.CSSProperties
   children: ReactNode
 }
 
-function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
+function ModalHeader({
+  styleOverrides,
+  children,
+}: Readonly<ModalHeaderProps>): ReactElement {
   const {
     genericFonts,
     fontSizes,
@@ -68,6 +72,7 @@ function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
         alignItems: "center",
         maxHeight: "80vh",
         flexDirection: "row",
+        ...styleOverrides,
       }}
     >
       {children}
@@ -76,10 +81,14 @@ function ModalHeader({ children }: Readonly<ModalHeaderProps>): ReactElement {
 }
 
 export interface ModalBodyProps {
+  styleOverrides?: React.CSSProperties
   children: ReactNode
 }
 
-function ModalBody({ children }: Readonly<ModalBodyProps>): ReactElement {
+function ModalBody({
+  styleOverrides,
+  children,
+}: Readonly<ModalBodyProps>): ReactElement {
   const { colors, fontSizes, spacing }: EmotionTheme = useTheme()
 
   return (
@@ -96,6 +105,7 @@ function ModalBody({ children }: Readonly<ModalBodyProps>): ReactElement {
         color: colors.bodyText,
         fontSize: fontSizes.md,
         overflowY: "auto",
+        ...styleOverrides,
       }}
     >
       {children}
@@ -104,10 +114,14 @@ function ModalBody({ children }: Readonly<ModalBodyProps>): ReactElement {
 }
 
 export interface ModalFooterProps {
+  styleOverrides?: React.CSSProperties
   children: ReactNode
 }
 
-function ModalFooter({ children }: Readonly<ModalFooterProps>): ReactElement {
+function ModalFooter({
+  styleOverrides,
+  children,
+}: Readonly<ModalFooterProps>): ReactElement {
   const { spacing }: EmotionTheme = useTheme()
 
   return (
@@ -121,6 +135,7 @@ function ModalFooter({ children }: Readonly<ModalFooterProps>): ReactElement {
         paddingRight: spacing.md,
         paddingBottom: spacing.md,
         paddingLeft: spacing.md,
+        ...styleOverrides,
       }}
     >
       <div>{children}</div>

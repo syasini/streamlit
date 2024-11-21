@@ -16,6 +16,8 @@
 
 import React, { ReactElement, useEffect, useState } from "react"
 
+import { useTheme } from "@emotion/react"
+
 import Modal, {
   ModalBody,
   ModalHeader,
@@ -23,6 +25,7 @@ import Modal, {
 import { Block as BlockProto } from "@streamlit/lib/src/proto"
 import IsDialogContext from "@streamlit/lib/src/components/core/IsDialogContext"
 import { notNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import { EmotionTheme } from "@streamlit/lib/src/theme"
 
 export interface Props {
   element: BlockProto.Dialog
@@ -34,6 +37,8 @@ const Dialog: React.FC<React.PropsWithChildren<Props>> = ({
   deltaMsgReceivedAt,
   children,
 }): ReactElement => {
+  const theme: EmotionTheme = useTheme()
+
   const { title, dismissible, width, isOpen: initialIsOpen } = element
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -60,8 +65,12 @@ const Dialog: React.FC<React.PropsWithChildren<Props>> = ({
       onClose={() => setIsOpen(false)}
       size={width === BlockProto.Dialog.DialogWidth.LARGE ? "full" : "default"}
     >
-      <ModalHeader>{title}</ModalHeader>
-      <ModalBody>{children}</ModalBody>
+      <ModalHeader styleOverrides={{ paddingBottom: theme.spacing.none }}>
+        {title}
+      </ModalHeader>
+      <ModalBody styleOverrides={{ paddingTop: theme.spacing.threeXL }}>
+        {children}
+      </ModalBody>
     </Modal>
   )
 }
