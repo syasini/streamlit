@@ -1089,7 +1089,7 @@ export class App extends PureComponent<Props, State> {
     if (isNullOrUndefined(targetAppPage) || (hasAnchor && isSamePage)) {
       return
     }
-    this.onPageChange(targetAppPage.pageScriptHash as string)
+    this.onPageChange(targetAppPage.pageScriptHash as string, false)
   }
 
   /**
@@ -1424,8 +1424,8 @@ export class App extends PureComponent<Props, State> {
     )
   }
 
-  onPageChange = (pageScriptHash: string): void => {
-    const { elements, mainScriptHash } = this.state
+  onPageChange = (pageScriptHash: string, clearQueryParams = true): void => {
+    const { elements, currentPageScriptHash, mainScriptHash } = this.state
 
     // We are about to change the page, so clear all auto reruns
     // This also happens in handleNewSession, but it might be too late compared
@@ -1446,11 +1446,28 @@ export class App extends PureComponent<Props, State> {
         .filter(notUndefined)
     )
 
-    this.sendRerunBackMsg(
-      this.widgetMgr.getActiveWidgetStates(activeWidgetIds),
-      undefined,
-      pageScriptHash
-    )
+    if (currentPageScriptHash !== pageScriptHash && clearQueryParams) {
+      // clear non-embed query parameters within a page change
+      const queryString = preserveEmbedQueryParams()
+      this.hostCommunicationMgr.sendMessageToHost({
+        type: "SET_QUERY_PARAM",
+        queryParams: queryString,
+      })
+
+      this.sendRerunBackMsg(
+        this.widgetMgr.getActiveWidgetStates(activeWidgetIds),
+        undefined,
+        pageScriptHash,
+        false,
+        queryString
+      )
+    } else {
+      this.sendRerunBackMsg(
+        this.widgetMgr.getActiveWidgetStates(activeWidgetIds),
+        undefined,
+        pageScriptHash
+      )
+    }
   }
 
   isAppInReadyState = (prevState: Readonly<State>): boolean => {
@@ -1466,7 +1483,8 @@ export class App extends PureComponent<Props, State> {
     widgetStates?: WidgetStates,
     fragmentId?: string,
     pageScriptHash?: string,
-    isAutoRerun?: boolean
+    isAutoRerun?: boolean,
+    queryString: string = this.getQueryString()
   ): void => {
     const baseUriParts = this.getBaseUriParts()
     if (!baseUriParts) {
@@ -1480,26 +1498,14 @@ export class App extends PureComponent<Props, State> {
 
     const { currentPageScriptHash } = this.state
     const { basePath } = baseUriParts
-    let queryString = this.getQueryString()
     let pageName = ""
 
-    if (pageScriptHash) {
-      // The user specified exactly which page to run. We can simply use this
-      // value in the BackMsg we send to the server.
-      if (pageScriptHash != currentPageScriptHash) {
-        // clear non-embed query parameters within a page change
-        queryString = preserveEmbedQueryParams()
-        this.hostCommunicationMgr.sendMessageToHost({
-          type: "SET_QUERY_PARAM",
-          queryParams: queryString,
-        })
-      }
-    } else if (currentPageScriptHash) {
+    if (!pageScriptHash && currentPageScriptHash) {
       // The user didn't specify which page to run, which happens when they
       // click the "Rerun" button in the main menu. In this case, we
       // rerun the current page.
       pageScriptHash = currentPageScriptHash
-    } else {
+    } else if (!pageScriptHash) {
       // We must be in the case where the user is navigating directly to a
       // non-main page of this app. Since we haven't received the list of the
       // app's pages from the server at this point, we fall back to requesting
