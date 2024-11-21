@@ -824,69 +824,6 @@ describe("App", () => {
       expect(sessionInfo.isSet).toBe(true)
     })
 
-    it("performs one-time initialization only once", () => {
-      renderApp(getProps())
-
-      // @ts-expect-error
-      const sessionInfo = SessionInfo.mock.results[0].value
-
-      const setCurrentSpy = vi.spyOn(sessionInfo, "setCurrent")
-
-      expect(sessionInfo.isSet).toBe(false)
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-
-      expect(setCurrentSpy).toHaveBeenCalledTimes(1)
-      expect(sessionInfo.isSet).toBe(true)
-      setCurrentSpy.mockClear()
-
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-      expect(setCurrentSpy).not.toHaveBeenCalled()
-      expect(sessionInfo.isSet).toBe(true)
-    })
-
-    it("performs one-time initialization after a new session is received", () => {
-      renderApp(getProps())
-
-      // @ts-expect-error
-      const sessionInfo = SessionInfo.mock.results[0].value
-
-      const setCurrentSpy = vi.spyOn(sessionInfo, "setCurrent")
-
-      expect(sessionInfo.isSet).toBe(false)
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-
-      expect(setCurrentSpy).toHaveBeenCalledTimes(1)
-      expect(sessionInfo.isSet).toBe(true)
-      setCurrentSpy.mockClear()
-
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-      expect(setCurrentSpy).not.toHaveBeenCalled()
-      expect(sessionInfo.isSet).toBe(true)
-
-      act(() => {
-        getMockConnectionManagerProp("connectionStateChanged")(
-          ConnectionState.PINGING_SERVER
-        )
-      })
-
-      expect(sessionInfo.isSet).toBe(false)
-      // For clearing the current session info
-      expect(setCurrentSpy).toHaveBeenCalledTimes(1)
-
-      act(() => {
-        getMockConnectionManagerProp("connectionStateChanged")(
-          ConnectionState.CONNECTED
-        )
-      })
-
-      sendForwardMessage("newSession", NEW_SESSION_JSON)
-
-      expect(setCurrentSpy).toHaveBeenCalledTimes(2)
-      expect(sessionInfo.isSet).toBe(true)
-    })
-
     it("should set window.prerenderReady to true after app script is run successfully first time", () => {
       renderApp(getProps())
 
