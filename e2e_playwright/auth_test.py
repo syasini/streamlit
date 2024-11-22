@@ -20,15 +20,30 @@ from typing import Generator
 import pytest
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import AsyncSubprocess, wait_for_app_run
+from e2e_playwright.conftest import (
+    AsyncSubprocess,
+    find_available_port,
+    wait_for_app_run,
+)
 from e2e_playwright.shared.app_utils import get_button, get_markdown
 
 
 @pytest.fixture(scope="module")
-def fake_oidc_server() -> Generator[AsyncSubprocess, None, None]:
+def oidc_server_port() -> int:
+    """Fixture that returns the port of the OIDC server."""
+    return find_available_port()
+
+
+@pytest.fixture(scope="module")
+def fake_oidc_server(oidc_server_port: int) -> Generator[AsyncSubprocess, None, None]:
     """Fixture that starts and stops the Streamlit app server."""
     oidc_server_proc = AsyncSubprocess(
-        ["python", "shared/oidc_mock_server.py"],
+        [
+            "python",
+            "shared/oidc_mock_server.py",
+            "--port",
+            str(oidc_server_port),
+        ],
         cwd=".",
     )
 
@@ -41,32 +56,34 @@ def fake_oidc_server() -> Generator[AsyncSubprocess, None, None]:
 
 @pytest.fixture(scope="module")
 @pytest.mark.early
-def prepare_secrets_file(app_port: int) -> None:
+def prepare_secrets_file(app_port: int, oidc_server_port: int) -> None:
     """Fixture that inject the correct port to auth_secrets.toml file redirect_uri."""
     # Read in the file
     with open("./test_assets/auth_secrets.toml") as file:
         filedata = file.read()
+
+    original_filedata = filedata
+
     # Replace the target string
     filedata = filedata.replace(
         "http://localhost:8501/oauth2callback",
         f"http://localhost:{app_port}/oauth2callback",
     )
+
+    filedata = filedata.replace(
+        "http://localhost:9999/",
+        f"http://localhost:{oidc_server_port}/",
+    )
+
     # Write the file out again
     with open("./test_assets/auth_secrets.toml", "w") as file:
         file.write(filedata)
 
     yield
 
-    with open("./test_assets/auth_secrets.toml") as file:
-        filedata = file.read()
-    # Replace the target string
-    filedata = filedata.replace(
-        f"http://localhost:{app_port}/oauth2callback",
-        "http://localhost:8501/oauth2callback",
-    )
     # Write the file out again
     with open("./test_assets/auth_secrets.toml", "w") as file:
-        file.write(filedata)
+        file.write(original_filedata)
 
 
 def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import argparse
 import base64
 import json
 import time
@@ -69,12 +69,13 @@ def generate_token(payload):
 
 def oidc_app(environ, start_response):
     path = environ["PATH_INFO"]
+    current_port = environ["SERVER_PORT"]
 
     if path == "/.well-known/openid-configuration":
         response = {
-            "authorization_endpoint": "http://localhost:9999/auth",
-            "token_endpoint": "http://localhost:9999/token",
-            "jwks_uri": "http://localhost:9999/jwks",
+            "authorization_endpoint": f"http://localhost:{current_port}/auth",
+            "token_endpoint": f"http://localhost:{current_port}/token",
+            "jwks_uri": f"http://localhost:{current_port}/jwks",
         }
         status = "200 OK"
         headers = [("Content-Type", "application/json")]
@@ -112,7 +113,7 @@ def oidc_app(environ, start_response):
             "id_token": generate_token(
                 {
                     "aud": "test-client-id",
-                    "iss": "http://localhost:9999",
+                    "iss": f"http://localhost:{current_port}",
                     "sub": str(uuid.uuid4()),
                     "iat": int(time.time()),
                     "name": "John Doe",
@@ -152,6 +153,14 @@ def oidc_app(environ, start_response):
 
 
 if __name__ == "__main__":
-    httpd = make_server("", 9999, oidc_app)
-    print("Serving on port 9999...")
+    # read script arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, default=9999)
+
+    args = parser.parse_args()
+
+    port = args.port
+
+    httpd = make_server("", port, oidc_app)
+    print(f"Serving on port {port}...")
     httpd.serve_forever()
