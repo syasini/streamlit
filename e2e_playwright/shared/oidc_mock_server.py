@@ -27,6 +27,7 @@ private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 public_key = private_key.public_key()
 
 numbers = public_key.public_numbers()
+
 n = (
     base64.urlsafe_b64encode(
         numbers.n.to_bytes((numbers.n.bit_length() + 7) // 8, byteorder="big")
@@ -158,7 +159,6 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=9999)
 
     args = parser.parse_args()
-
     port = args.port
 
     httpd = make_server("", port, oidc_app)
