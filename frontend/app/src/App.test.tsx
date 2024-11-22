@@ -39,6 +39,7 @@ import {
   getHostSpecifiedTheme,
   HOST_COMM_VERSION,
   HostCommunicationManager,
+  IAuthRedirect,
   IAutoRerun,
   ILogo,
   INavigation,
@@ -48,6 +49,7 @@ import {
   IPageNotFound,
   IPagesChanged,
   IParentMessage,
+  isInChildFrame,
   lightTheme,
   LocalStore,
   mockEndpoints,
@@ -326,6 +328,7 @@ type DeltaWithElement = Omit<Delta, "fragmentId" | "newElement" | "toJSON"> & {
 type ForwardMsgType =
   | DeltaWithElement
   | ForwardMsg.ScriptFinishedStatus
+  | IAuthRedirect
   | IAutoRerun
   | ILogo
   | INavigation
@@ -1922,6 +1925,23 @@ describe("App", () => {
           screen.queryByText("Here is some other text")
         ).not.toBeInTheDocument()
       })
+    })
+  })
+
+  describe("authRedirect handling", () => {
+    it("redirects to the auth URL", () => {
+      renderApp(getProps())
+
+      // A HACK to mock `window.location.reload`.
+      // NOTE: The mocking must be done after mounting, but before `handleMessage` is called.
+      // @ts-expect-error
+      delete window.location
+      // @ts-expect-error
+      window.location = {}
+
+      sendForwardMessage("authRedirect", { url: "https://example.com" })
+
+      expect(window.location.href).toBe("https://example.com")
     })
   })
 
