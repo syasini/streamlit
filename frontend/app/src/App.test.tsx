@@ -49,7 +49,6 @@ import {
   IPageNotFound,
   IPagesChanged,
   IParentMessage,
-  isInChildFrame,
   lightTheme,
   LocalStore,
   mockEndpoints,
