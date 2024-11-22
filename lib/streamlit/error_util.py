@@ -96,13 +96,24 @@ def handle_uncaught_app_exception(ex: BaseException) -> None:
             # Catching all exceptions because we don't want to leave any possibility of breaking here.
             error_logged = False
 
-    if config.get_option("client.showErrorDetails"):
-        if not error_logged:
-            _LOGGER.warning("Uncaught app exception", exc_info=ex)
-        _show_exception(ex)
-    else:
-        if not error_logged:
-            # Use LOGGER.error, rather than LOGGER.debug, since we don't
-            # show debug logs by default.
-            _LOGGER.error("Uncaught app exception", exc_info=ex)
-        _show_exception(UncaughtAppException(ex))
+    show_error_details = config.get_option("client.showErrorDetails")
+
+    # options for show error details config
+    FULL = "full"
+    STACKTRACE = "stacktrace"
+    TYPE = "type"
+    TRUE = "true"
+
+    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE]
+    show_type = show_error_details in [FULL, STACKTRACE, TYPE, True, TRUE]
+    show_message = show_error_details in [FULL, True, TRUE]
+    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE]
+
+    if not error_logged:
+        _LOGGER.warning("Uncaught app execution", exc_info=ex)
+
+    _show_exception(
+        UncaughtAppException(
+            ex, show_message=show_message, show_trace=show_trace, show_type=show_type
+        )
+    )

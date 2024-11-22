@@ -68,14 +68,18 @@ function ExceptionMessage({
   if (messageIsMarkdown) {
     let markdown = `**${type}**`
     if (message) {
-      markdown += `: ${message}`
+      if (type.length !== 0) {
+        markdown += `: `
+      }
+      markdown += `${message}`
     }
     return <StreamlitMarkdown source={markdown} allowHTML={false} />
   }
   return (
     <>
       <StyledMessageType>{type}</StyledMessageType>
-      {isNonEmptyString(message) ? `: ${message}` : null}
+      {type.length !== 0 && `: `}
+      {isNonEmptyString(message) ? message : null}
     </>
   )
 }

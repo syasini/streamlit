@@ -132,9 +132,15 @@ Traceback:
 
     if is_uncaught_app_exception:
         uae = cast(UncaughtAppException, exception)
-        exception_proto.message = _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-        type_str = str(type(uae.exc))
-        exception_proto.type = type_str.replace("<class '", "").replace("'>", "")
+        if not uae.show_message:
+            exception_proto.message = _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+        if not uae.show_type:
+            exception_proto.type = ""
+        else:
+            type_str = str(type(uae.exc))
+            exception_proto.type = type_str.replace("<class '", "").replace("'>", "")
+        if not uae.show_trace:
+            exception_proto.ClearField("stack_trace")
 
 
 def _format_syntax_error_message(exception: SyntaxError) -> str:
