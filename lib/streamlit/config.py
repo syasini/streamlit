@@ -468,8 +468,8 @@ _create_option(
         traceback show in the browser also, but they will be removed in the
         future.
     """,
-    default_val=True,
-    type_=bool,
+    default_val="full",
+    type_=str,
     scriptable=True,
 )
 
