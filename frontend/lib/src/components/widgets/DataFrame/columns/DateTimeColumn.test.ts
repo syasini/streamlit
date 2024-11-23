@@ -19,8 +19,8 @@
 import { GridCellKind } from "@glideapps/glide-data-grid"
 import { DatePickerType } from "@glideapps/glide-data-grid-cells"
 
-import { BaseColumnProps, isErrorCell } from "./utils"
 import DateTimeColumn, { DateColumn, TimeColumn } from "./DateTimeColumn"
+import { BaseColumnProps, isErrorCell } from "./utils"
 
 const MOCK_DATETIME_COLUMN_TEMPLATE: BaseColumnProps = {
   id: "1",

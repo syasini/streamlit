@@ -287,7 +287,7 @@ export default function DateTimeColumn(props: BaseColumnProps): BaseColumn {
     defaultFormat = "YYYY-MM-DD HH:mm:ss.SSS"
   }
 
-  const timezone: string | undefined = props.arrowType?.meta?.timezone
+  const timezone: string | undefined = props.arrowType?.field?.type?.timezone
   const hasTimezone: boolean =
     notNullOrUndefined(timezone) ||
     // Timezone can also be configure by the user:

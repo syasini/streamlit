@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Dictionary, Struct, StructRow, Vector } from "apache-arrow"
+import { Dictionary, Field, Struct, StructRow, Vector } from "apache-arrow"
 
 /** Data types used by ArrowJS. */
 export type DataType =
@@ -47,13 +47,15 @@ export enum IndexTypeName {
 
 /** Type information for single-index columns, and data columns. */
 export interface Type {
+  field: Field | undefined
+
   /** The type label returned by pandas.api.types.infer_dtype */
   // NOTE: `DataTypeName` should be used here, but as it's hard (maybe impossible)
   // to define such recursive types in TS, `string` will suffice for now.
-  pandas_type: IndexTypeName | string
+  pandas_type: IndexTypeName | string | undefined
 
   /** The numpy dtype that corresponds to the types returned in df.dtypes */
-  numpy_type: string
+  numpy_type: string | undefined
 
   /** Type metadata. */
   meta?: Record<string, any> | null
@@ -77,6 +79,9 @@ export function isRangeIndex(
 
 /** Returns type for a single-index column or data column. */
 export function getTypeName(type: Type): IndexTypeName | string {
+  if (type.pandas_type === undefined || type.numpy_type === undefined) {
+    return String(type.field?.type)
+  }
   // For `PeriodType` and `IntervalType` types are kept in `numpy_type`,
   // for the rest of the indexes in `pandas_type`.
   return type.pandas_type === "object" ? type.numpy_type : type.pandas_type

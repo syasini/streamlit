@@ -106,9 +106,9 @@ function generateTableCell(
   const formattedContent =
     displayContent || formatArrowCell(content, contentType, field)
 
-  const { headerColumns } = table.dimensions
+  const { indexColumns } = table.dimensions
   const cellDataType =
-    table.types.data[columnIndex - headerColumns]?.pandas_type
+    table.types.data[columnIndex - indexColumns]?.pandas_type
   const isNumeric = cellDataType === "int64" || cellDataType === "float64"
 
   const style: React.CSSProperties = {

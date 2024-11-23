@@ -32,7 +32,10 @@ import unzip from "lodash/unzip"
 import zip from "lodash/zip"
 
 import { IArrow, Styler as StylerProto } from "@streamlit/lib/src/proto"
-import { isNullOrUndefined } from "@streamlit/lib/src/util/utils"
+import {
+  isNullOrUndefined,
+  notNullOrUndefined,
+} from "@streamlit/lib/src/util/utils"
 
 import {
   DataType,
@@ -98,7 +101,7 @@ interface Types {
  * and we parse it into this typed object - so these member names come from
  * Arrow.)
  */
-interface Schema {
+interface PandasSchema {
   /**
    * The DataFrame's index names (either provided by user or generated,
    * guaranteed unique). It is used to fetch the index data. Each DataFrame has
@@ -179,11 +182,17 @@ interface Styler {
 
 /** Dimensions of the DataFrame. */
 interface DataFrameDimensions {
+  // The number of header rows (> 1 for multi-level headers)
   headerRows: number
-  headerColumns: number
+  // The number of index columns
+  indexColumns: number
+  // The number of data rows (excluding header rows)
   dataRows: number
+  // The number of data columns (excluding index columns)
   dataColumns: number
+  // The total number of rows (header rows + data rows)
   rows: number
+  // The total number of columns (index + data columns)
   columns: number
 }
 
@@ -231,6 +240,21 @@ export interface DataFrameCell {
 }
 
 /**
+ * Converts an Arrow vector to a list of strings.
+ *
+ * @param vector The Arrow vector to convert.
+ * @returns The list of strings.
+ */
+function convertVectorToList(vector: Vector<any>): string[] {
+  const values = []
+
+  for (let i = 0; i < vector.length; i++) {
+    values.push(vector.get(i))
+  }
+  return values
+}
+
+/**
  * Parses data from an Arrow table, and stores it in a row-major format
  * (which is more useful for our frontend display code than Arrow's columnar format).
  */
@@ -265,16 +289,47 @@ export class Quiver {
   private readonly _styler?: Styler
 
   constructor(element: IArrow) {
+    // Load arrow table object from IPC data
     const table = tableFromIPC(element.data)
-    const schema = Quiver.parseSchema(table)
-    const rawColumns = Quiver.getRawColumns(schema)
-    const fields = Quiver.parseFields(table.schema)
+    console.log("table", table)
 
-    const index = Quiver.parseIndex(table, schema)
-    const columns = Quiver.parseColumns(schema)
-    const indexNames = Quiver.parseIndexNames(schema)
+    // Load field information for all columns:
+    const fields = Quiver.parseFields(table.schema)
+    console.log("fields", fields)
+
+    // Load pandas schema from metadata (if it exists):
+    const pandasSchema = Quiver.parsePandasSchema(table)
+    console.log("pandasSchema", pandasSchema)
+
+    //
+    const rawColumns = Quiver.getRawColumns(table.schema, pandasSchema)
+    console.log("rawColumns", rawColumns)
+
+    // Load the full type information for all columns:
+    const types = Quiver.parseTypes(table.schema, pandasSchema)
+    console.log("types", types)
+
+    // Load all column names from table schema:
+    const columns = Quiver.parseColumns(table.schema, pandasSchema)
+    console.log("columns", columns)
+
+    // Load all non-index data cells:
     const data = Quiver.parseData(table, columns, rawColumns)
-    const types = Quiver.parseTypes(table, schema)
+    console.log("data", data)
+
+    // Load the display names of the index columns:
+    const indexNames: string[] = pandasSchema
+      ? Quiver.parseIndexNames(pandasSchema)
+      : []
+    console.log("indexNames", indexNames)
+
+    // Load all index data cells:
+    const index: Index = pandasSchema
+      ? Quiver.parseIndex(table, pandasSchema)
+      : []
+    console.log("index", index)
+
+    // Load styler data (if provided):
     const styler = element.styler
       ? Quiver.parseStyler(element.styler as StylerProto)
       : undefined
@@ -290,29 +345,41 @@ export class Quiver {
     this._indexNames = indexNames
   }
 
-  /** Parse Arrow table's schema from a JSON string to an object. */
-  private static parseSchema(table: Table): Schema {
+  /** Parse Arrow table's Pandas schema from a JSON string to an object. */
+  private static parsePandasSchema(table: Table): PandasSchema | undefined {
     const schema = table.schema.metadata.get("pandas")
     if (isNullOrUndefined(schema)) {
-      // This should never happen!
-      throw new Error("Table schema is missing.")
+      // No Pandas schema found. This happens if the dataset
+      // did not touched Pandas during serialization.
+      return undefined
     }
     return JSON.parse(schema)
   }
 
   /** Get unprocessed column names for data columns. Needed for selecting
    * data columns when there are multi-columns. */
-  private static getRawColumns(schema: Schema): string[] {
-    return (
-      schema.columns
-        .map(columnSchema => columnSchema.field_name)
-        // Filter out all index columns
-        .filter(columnName => !schema.index_columns.includes(columnName))
-    )
+  private static getRawColumns(
+    arrowSchema: ArrowSchema,
+    pandasSchema: PandasSchema | undefined
+  ): string[] {
+    console.log(arrowSchema)
+    console.log(pandasSchema)
+    if (pandasSchema) {
+      return (
+        pandasSchema.columns
+          .map(columnSchema => columnSchema.field_name)
+          // Filter out all index columns
+          .filter(
+            columnName => !pandasSchema.index_columns.includes(columnName)
+          )
+      )
+    }
+
+    return (arrowSchema.fields || []).map(field => field.name)
   }
 
   /** Parse DataFrame's index header values. */
-  private static parseIndex(table: Table, schema: Schema): Index {
+  private static parseIndex(table: Table, schema: PandasSchema): Index {
     return schema.index_columns
       .map(indexName => {
         // Generate a range using the "range" index metadata.
@@ -334,7 +401,7 @@ export class Quiver {
   }
 
   /** Parse DataFrame's index header names. */
-  private static parseIndexNames(schema: Schema): string[] {
+  private static parseIndexNames(schema: PandasSchema): string[] {
     return schema.index_columns.map(indexName => {
       // Range indices are treated differently since they
       // contain additional metadata (e.g. start, stop, step).
@@ -352,29 +419,36 @@ export class Quiver {
   }
 
   /** Parse DataFrame's column header values. */
-  private static parseColumns(schema: Schema): Columns {
-    // If DataFrame `columns` has multi-level indexing, the length of
-    // `column_indexes` will show how many levels there are.
-    const isMultiIndex = schema.column_indexes.length > 1
+  private static parseColumns(
+    arrowSchema: ArrowSchema,
+    pandasSchema: PandasSchema | undefined
+  ): Columns {
+    if (pandasSchema) {
+      // If DataFrame `columns` has multi-level indexing, the length of
+      // `column_indexes` will show how many levels there are.
+      const isMultiIndex = pandasSchema.column_indexes.length > 1
 
-    // Perform the following transformation:
-    // ["('1','foo')", "('2','bar')", "('3','baz')"] -> ... -> [["1", "2", "3"], ["foo", "bar", "baz"]]
-    return unzip(
-      schema.columns
-        .map(columnSchema => columnSchema.field_name)
-        // Filter out all index columns
-        .filter(fieldName => !schema.index_columns.includes(fieldName))
-        .map(fieldName =>
-          isMultiIndex
-            ? JSON.parse(
-                fieldName
-                  .replace(/\(/g, "[")
-                  .replace(/\)/g, "]")
-                  .replace(/'/g, '"')
-              )
-            : [fieldName]
-        )
-    )
+      // Perform the following transformation:
+      // ["('1','foo')", "('2','bar')", "('3','baz')"] -> ... -> [["1", "2", "3"], ["foo", "bar", "baz"]]
+      return unzip(
+        pandasSchema.columns
+          .map(columnSchema => columnSchema.field_name)
+          // Filter out all index columns
+          .filter(fieldName => !pandasSchema.index_columns.includes(fieldName))
+          .map(fieldName =>
+            isMultiIndex
+              ? JSON.parse(
+                  fieldName
+                    .replace(/\(/g, "[")
+                    .replace(/\)/g, "]")
+                    .replace(/'/g, '"')
+                )
+              : [fieldName]
+          )
+      )
+    }
+
+    return [(arrowSchema.fields || []).map(field => field.name)]
   }
 
   /** Parse DataFrame's data. */
@@ -393,17 +467,21 @@ export class Quiver {
   }
 
   /** Parse DataFrame's index and data types. */
-  private static parseTypes(table: Table, schema: Schema): Types {
-    const index = Quiver.parseIndexType(schema)
-    const data = Quiver.parseDataType(table, schema)
+  private static parseTypes(
+    arrowSchema: ArrowSchema,
+    pandasSchema: PandasSchema | undefined
+  ): Types {
+    const index = pandasSchema ? Quiver.parseIndexType(pandasSchema) : []
+    const data = Quiver.parseDataType(arrowSchema, pandasSchema)
     return { index, data }
   }
 
   /** Parse types for each index column. */
-  private static parseIndexType(schema: Schema): Type[] {
+  private static parseIndexType(schema: PandasSchema): Type[] {
     return schema.index_columns.map(indexName => {
       if (isRangeIndex(indexName)) {
         return {
+          field: undefined,
           pandas_type: IndexTypeName.RangeIndex,
           numpy_type: IndexTypeName.RangeIndex,
           meta: indexName as RangeIndex,
@@ -421,6 +499,7 @@ export class Quiver {
       }
 
       return {
+        field: undefined,
         pandas_type: indexColumn.pandas_type,
         numpy_type: indexColumn.numpy_type,
         meta: indexColumn.metadata,
@@ -449,33 +528,39 @@ export class Quiver {
 
     const categoricalDict =
       this._data.getChildAt(dataColumnIndex)?.data[0]?.dictionary
-    if (categoricalDict) {
-      // get all values into a list
-      const values = []
-
-      for (let i = 0; i < categoricalDict.length; i++) {
-        values.push(categoricalDict.get(i))
-      }
-      return values
-    }
-    return undefined
+    return notNullOrUndefined(categoricalDict)
+      ? convertVectorToList(categoricalDict)
+      : undefined
   }
 
   /** Parse types for each non-index column. */
-  private static parseDataType(table: Table, schema: Schema): Type[] {
-    return (
-      schema.columns
-        // Filter out all index columns
-        .filter(
-          columnSchema =>
-            !schema.index_columns.includes(columnSchema.field_name)
-        )
-        .map(columnSchema => ({
-          pandas_type: columnSchema.pandas_type,
-          numpy_type: columnSchema.numpy_type,
-          meta: columnSchema.metadata,
-        }))
-    )
+  private static parseDataType(
+    arrowSchema: ArrowSchema,
+    pandasSchema: PandasSchema | undefined
+  ): Type[] {
+    if (pandasSchema) {
+      return (
+        pandasSchema.columns
+          // Filter out all index columns
+          .filter(
+            columnSchema =>
+              !pandasSchema.index_columns.includes(columnSchema.field_name)
+          )
+          .map((columnSchema, index) => ({
+            field: arrowSchema.fields[index],
+            pandas_type: columnSchema.pandas_type,
+            numpy_type: columnSchema.numpy_type,
+            meta: columnSchema.metadata,
+          }))
+      )
+    }
+    {
+      return (arrowSchema.fields || []).map(field => ({
+        field,
+        pandas_type: undefined,
+        numpy_type: undefined,
+      }))
+    }
   }
 
   /** Parse styler information from proto. */
@@ -709,17 +794,17 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
 
   /** The DataFrame's dimensions. */
   public get dimensions(): DataFrameDimensions {
-    const headerColumns = this._index.length || this.types.index.length || 1
+    const indexColumns = this._index.length || this.types.index.length || 0
     const headerRows = this._columns.length || 1
     const dataRows = this._data.numRows || 0
     const dataColumns = this._data.numCols || this._columns?.[0]?.length || 0
 
     const rows = headerRows + dataRows
-    const columns = headerColumns + dataColumns
+    const columns = indexColumns + dataColumns
 
     return {
       headerRows,
-      headerColumns,
+      indexColumns,
       dataRows,
       dataColumns,
       rows,
@@ -739,7 +824,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
 
   /** Return a single cell in the table. */
   public getCell(rowIndex: number, columnIndex: number): DataFrameCell {
-    const { headerRows, headerColumns, rows, columns } = this.dimensions
+    const { headerRows, indexColumns, rows, columns } = this.dimensions
 
     if (rowIndex < 0 || rowIndex >= rows) {
       throw new Error(`Row index is out of range: ${rowIndex}`)
@@ -748,9 +833,9 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
       throw new Error(`Column index is out of range: ${columnIndex}`)
     }
 
-    const isBlankCell = rowIndex < headerRows && columnIndex < headerColumns
-    const isIndexCell = rowIndex >= headerRows && columnIndex < headerColumns
-    const isColumnsCell = rowIndex < headerRows && columnIndex >= headerColumns
+    const isBlankCell = rowIndex < headerRows && columnIndex < indexColumns
+    const isIndexCell = rowIndex >= headerRows && columnIndex < indexColumns
+    const isColumnsCell = rowIndex < headerRows && columnIndex >= indexColumns
 
     if (isBlankCell) {
       // Blank cells include `blank`.
@@ -788,7 +873,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
       let field = this._fields[`__index_level_${String(columnIndex)}__`]
       if (field === undefined) {
         // If the index column has a name, we need to get it differently:
-        field = this._fields[String(columns - headerColumns)]
+        field = this._fields[String(columns - indexColumns)]
       }
       return {
         type: DataFrameCellType.INDEX,
@@ -801,7 +886,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
     }
 
     if (isColumnsCell) {
-      const dataColumnIndex = columnIndex - headerColumns
+      const dataColumnIndex = columnIndex - indexColumns
 
       // Column label cells include:
       // - col_heading
@@ -820,6 +905,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
         // ArrowJS automatically converts "columns" cells to strings.
         // Keep ArrowJS structure for consistency.
         contentType: {
+          field: undefined,
           pandas_type: IndexTypeName.UnicodeIndex,
           numpy_type: "object",
         },
@@ -827,7 +913,7 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
     }
 
     const dataRowIndex = rowIndex - headerRows
-    const dataColumnIndex = columnIndex - headerColumns
+    const dataColumnIndex = columnIndex - indexColumns
 
     const cssId = this._styler?.uuid
       ? `${this.cssId}row${dataRowIndex}_col${dataColumnIndex}`
@@ -859,13 +945,13 @@ but was expecting \`${JSON.stringify(expectedIndexTypes)}\`.
     }
   }
 
+  /** Get the value of an index cell. */
   public getIndexValue(rowIndex: number, columnIndex: number): any {
     const index = this._index[columnIndex]
-    const value =
-      index instanceof Vector ? index.get(rowIndex) : index[rowIndex]
-    return value
+    return index instanceof Vector ? index.get(rowIndex) : index[rowIndex]
   }
 
+  /** Get the value of a data cell. */
   public getDataValue(rowIndex: number, columnIndex: number): any {
     return this._data.getChildAt(columnIndex)?.get(rowIndex)
   }

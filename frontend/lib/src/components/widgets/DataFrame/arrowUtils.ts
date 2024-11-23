@@ -27,7 +27,7 @@ import moment from "moment"
 
 import { DataFrameCell, Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
-  convertToSeconds,
+  convertTimestampToSeconds,
   format as formatArrowCell,
 } from "@streamlit/lib/src/dataframes/arrowFormatUtils"
 import {
@@ -275,7 +275,6 @@ export function getColumnFromArrow(
   if (isNullOrUndefined(arrowType)) {
     // Use empty column type as fallback
     arrowType = {
-      meta: null,
       numpy_type: "object",
       pandas_type: "object",
     } as ArrowType
@@ -330,7 +329,7 @@ export function getAllColumnsFromArrow(data: Quiver): BaseColumnProps[] {
   const columns: BaseColumnProps[] = []
 
   const { dimensions } = data
-  const numIndices = dimensions.headerColumns
+  const numIndices = dimensions.indexColumns
   const numColumns = dimensions.dataColumns
 
   if (numIndices === 0 && numColumns === 0) {
@@ -365,7 +364,7 @@ export function getAllColumnsFromArrow(data: Quiver): BaseColumnProps[] {
  * cell data from the Quiver (Arrow) object. Different types of data will
  * result in different cell types.
  *
- * @param column - The colum of the cell.
+ * @param column - The column of the cell.
  * @param arrowCell - The dataframe cell object from Arrow.
  * @param cssStyles - Optional css styles to apply on the cell.
  *
@@ -411,7 +410,10 @@ export function getCellFromArrow(
       // Time values needs to be adjusted to seconds based on the unit
       parsedDate = moment
         .unix(
-          convertToSeconds(arrowCell.content, arrowCell.field?.type?.unit ?? 0)
+          convertTimestampToSeconds(
+            arrowCell.content,
+            arrowCell.field?.type?.unit ?? 0
+          )
         )
         .utc()
         .toDate()
