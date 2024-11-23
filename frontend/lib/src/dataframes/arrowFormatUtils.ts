@@ -143,43 +143,6 @@ interface Interval {
   right: number
 }
 
-type IntervalData = "int64" | "uint64" | "float64" | "datetime64[ns]"
-type IntervalClosed = "left" | "right" | "both" | "neither"
-type IntervalType = `interval[${IntervalData}, ${IntervalClosed}]`
-
-/** Formats an interval index. */
-function formatIntervalType(data: StructRow, typeName: IntervalType): string {
-  const match = typeName.match(/interval\[(.+), (both|left|right|neither)\]/)
-  if (match === null) {
-    throw new Error(`Invalid interval type: ${typeName}`)
-  }
-  const [, subtype, closed] = match
-  return formatInterval(data, subtype, closed as IntervalClosed)
-}
-
-function formatInterval(
-  data: StructRow,
-  subtype: string,
-  closed: IntervalClosed
-): string {
-  const interval = data.toJSON() as Interval
-
-  const leftBracket = closed === "both" || closed === "left" ? "[" : "("
-  const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
-  const leftInterval = format(interval.left, {
-    field: undefined,
-    pandas_type: subtype,
-    numpy_type: subtype,
-  })
-  const rightInterval = format(interval.right, {
-    field: undefined,
-    pandas_type: subtype,
-    numpy_type: subtype,
-  })
-
-  return `${leftBracket + leftInterval}, ${rightInterval + rightBracket}`
-}
-
 /**
  * Adjusts a time value to seconds based on the unit information in the field.
  *
@@ -444,22 +407,36 @@ function formatFloat(num: number): string {
   return numbro(num).format("0,0.0000")
 }
 
-function formatCategoricalType(
-  x: number | bigint | StructRow,
-  field?: Field
-): string {
-  // Serialization for pandas.Interval and pandas.Period is provided by Arrow extensions
+/**
+ * Formats an interval value from arrow to string.
+ */
+function formatInterval(x: StructRow, field?: Field): string {
+  // Serialization for pandas.Interval is provided by Arrow extensions
   // https://github.com/pandas-dev/pandas/blob/235d9009b571c21b353ab215e1e675b1924ae55c/
   // pandas/core/arrays/arrow/extension_types.py#L17
   const extensionName = field && field.metadata.get("ARROW:extension:name")
-  if (extensionName) {
+  if (extensionName && extensionName === "pandas.interval") {
     const extensionMetadata = JSON.parse(
       field.metadata.get("ARROW:extension:metadata") as string
     )
-    if (extensionName === "pandas.interval") {
-      const { subtype, closed } = extensionMetadata
-      return formatInterval(x as StructRow, subtype, closed)
-    }
+    const { subtype, closed } = extensionMetadata
+
+    const interval = (x as StructRow).toJSON() as Interval
+
+    const leftBracket = closed === "both" || closed === "left" ? "[" : "("
+    const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
+    const leftInterval = format(interval.left, {
+      field: undefined,
+      pandas_type: subtype,
+      numpy_type: subtype,
+    })
+    const rightInterval = format(interval.right, {
+      field: undefined,
+      pandas_type: subtype,
+      numpy_type: subtype,
+    })
+
+    return `${leftBracket + leftInterval}, ${rightInterval + rightBracket}`
   }
   return String(x)
 }
@@ -489,16 +466,12 @@ export function format(x: DataType, type?: Type, field?: Field): string {
     formatDatetime(x as Date | number, field)
   }
 
-  if (typeName?.startsWith("interval")) {
-    return formatIntervalType(x as StructRow, typeName as IntervalType)
-  }
-
   if (typeName?.startsWith("period") || extensionName === "pandas.period") {
     return formatPeriodField(x as bigint, field)
   }
 
-  if (typeName === "categorical") {
-    return formatCategoricalType(x as number | bigint | StructRow, field)
+  if (typeName === "categorical" || typeName?.startsWith("interval")) {
+    return formatInterval(x as StructRow, field)
   }
 
   if (typeName?.startsWith("timedelta")) {
