@@ -33,6 +33,7 @@ jobs:
           # Exclude all files in custom_components folder as they require external dependencies
           files: |
             **/*_test.py
+            **/e2e_playwright/shared/*.py
             !custom_components/**
       - name: Check changed files
         id: check_changed_files
