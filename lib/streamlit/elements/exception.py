@@ -135,7 +135,7 @@ Traceback:
         if not uae.show_message:
             exception_proto.message = _GENERIC_UNCAUGHT_EXCEPTION_TEXT
         if not uae.show_type:
-            exception_proto.type = ""
+            exception_proto.ClearField("type")
         else:
             type_str = str(type(uae.exc))
             exception_proto.type = type_str.replace("<class '", "").replace("'>", "")

@@ -103,11 +103,11 @@ def handle_uncaught_app_exception(ex: BaseException) -> None:
     STACKTRACE = "stacktrace"
     TYPE = "type"
     TRUE = "true"
+    FALSE = "false"
 
-    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE]
-    show_type = show_error_details in [FULL, STACKTRACE, TYPE, True, TRUE]
+    show_type = show_error_details in [FULL, STACKTRACE, TYPE, True, TRUE, FALSE, False]
+    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE, FALSE, False]
     show_message = show_error_details in [FULL, True, TRUE]
-    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE]
 
     if not error_logged:
         _LOGGER.warning("Uncaught app execution", exc_info=ex)
