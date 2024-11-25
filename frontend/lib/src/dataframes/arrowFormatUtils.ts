@@ -225,6 +225,9 @@ function formatDate(date: number | Date, field?: Field): string {
   return String(date)
 }
 
+/**
+ * Format datetime value from Arrow to string.
+ */
 function formatDatetime(date: number | Date, field?: Field): string {
   let datetime
   if (date instanceof Date) {
@@ -316,7 +319,7 @@ function formatDecimal(value: Uint32Array, field?: Field): string {
   return `${sign}${wholePart}` + (decimalPart ? `.${decimalPart}` : "")
 }
 
-export function formatPeriod(
+export function formatPeriodFromFreq(
   duration: number | bigint,
   freq: PeriodFrequency
 ): string {
@@ -337,7 +340,7 @@ export function formatPeriod(
   return momentConverter(durationNumber, freqParam)
 }
 
-function formatPeriodField(duration: number | bigint, field?: Field): string {
+function formatPeriod(duration: number | bigint, field?: Field): string {
   // Serialization for pandas.Period is provided by Arrow extensions
   // https://github.com/pandas-dev/pandas/blob/70bb855cbbc75b52adcb127c84e0a35d2cd796a9/pandas/core/arrays/arrow/extension_types.py#L26
   if (isNullOrUndefined(field)) {
@@ -363,13 +366,13 @@ function formatPeriodField(duration: number | bigint, field?: Field): string {
 
   const parsedExtensionMetadata = JSON.parse(extensionMetadata as string)
   const { freq } = parsedExtensionMetadata
-  return formatPeriod(duration, freq)
+  return formatPeriodFromFreq(duration, freq)
 }
 
 /**
  * Formats nested arrays and other objects to JSON.
  */
-function formatObjects(object: any, field?: Field): string {
+function formatObject(object: any, field?: Field): string {
   if (field?.type instanceof Struct) {
     // This type is used by python dictionary values
 
@@ -467,10 +470,10 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   }
 
   if (typeName?.startsWith("period") || extensionName === "pandas.period") {
-    return formatPeriodField(x as bigint, field)
+    return formatPeriod(x as bigint, field)
   }
 
-  if (typeName === "categorical" || typeName?.startsWith("interval")) {
+  if (typeName?.startsWith("interval")) {
     return formatInterval(x as StructRow, field)
   }
 
@@ -483,7 +486,7 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   }
 
   if (typeName === "object" || typeName?.startsWith("list")) {
-    return formatObjects(x, field)
+    return formatObject(x, field)
   }
 
   if (typeName === "float64" && Number.isFinite(x)) {

@@ -33,7 +33,7 @@ import {
   UNICODE,
 } from "@streamlit/lib/src/mocks/arrow"
 
-import { getTypeName, IndexTypeName } from "./arrowTypeUtils"
+import { getTypeName, IndexTypeName, isInteger, Type } from "./arrowTypeUtils"
 
 describe("getTypeName", () => {
   describe("uses numpy_type", () => {
@@ -159,4 +159,86 @@ describe("getTypeName", () => {
       expect(getTypeName(indexType)).toEqual(IndexTypeName.UnicodeIndex)
     })
   })
+})
+
+describe("isInteger", () => {
+  it.each([
+    [
+      {
+        field: undefined,
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      true,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "object",
+        numpy_type: "int16",
+      },
+      true,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "range",
+        numpy_type: "range",
+      },
+      true,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "uint64",
+        numpy_type: "uint64",
+      },
+      true,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "unicode",
+        numpy_type: "object",
+      },
+      false,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "categorical",
+        numpy_type: "int8",
+      },
+      false,
+    ],
+    [
+      {
+        field: undefined,
+        pandas_type: "object",
+        numpy_type: "interval[int64, both]",
+      },
+      false,
+    ],
+  ])(
+    "interprets %p as integer type: %p",
+    (arrowType: Type, expected: boolean) => {
+      expect(isInteger(arrowType)).toEqual(expected)
+    }
+  )
 })
