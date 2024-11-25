@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { vectorFromArray } from "apache-arrow"
+import { Field, Timestamp, TimeUnit, vectorFromArray } from "apache-arrow"
 
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
@@ -101,30 +101,45 @@ describe("format", () => {
 
   test("datetime", () => {
     expect(
-      format(0, {
-        pandas_type: "datetime",
-        numpy_type: "datetime64[ns]",
-      })
+      format(
+        0,
+        {
+          pandas_type: "datetime",
+          numpy_type: "datetime64[ns]",
+        },
+        new Field("test", new Timestamp(TimeUnit.SECOND), true, null)
+      )
     ).toEqual("1970-01-01 00:00:00")
   })
 
   test("datetimetz", () => {
     expect(
-      format(0, {
-        pandas_type: "datetimetz",
-        numpy_type: "datetime64[ns]",
-        meta: { timezone: "Europe/Moscow" },
-      })
+      format(
+        0,
+        {
+          pandas_type: "datetimetz",
+          numpy_type: "datetime64[ns]",
+        },
+        new Field(
+          "test",
+          new Timestamp(TimeUnit.SECOND, "Europe/Moscow"),
+          true,
+          null
+        )
+      )
     ).toEqual("1970-01-01 03:00:00+03:00")
   })
 
   test("datetimetz with offset", () => {
     expect(
-      format(0, {
-        pandas_type: "datetimetz",
-        numpy_type: "datetime64[ns]",
-        meta: { timezone: "+01:00" },
-      })
+      format(
+        0,
+        {
+          pandas_type: "datetimetz",
+          numpy_type: "datetime64[ns]",
+        },
+        new Field("test", new Timestamp(TimeUnit.SECOND, "+01:00"), true, null)
+      )
     ).toEqual("1970-01-01 01:00:00+01:00")
   })
 
