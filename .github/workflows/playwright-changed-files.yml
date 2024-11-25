@@ -34,6 +34,7 @@ jobs:
           files: |
             **/*_test.py
             **/*.py
+            **/*.toml
             !custom_components/**
       - name: Check changed files
         id: check_changed_files
