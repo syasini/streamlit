@@ -466,7 +466,7 @@ export function format(x: DataType, type?: Type, field?: Field): string {
 
   // datetimetz, datetime, datetime64, datetime64[ns], etc.
   if (isDate && typeName?.startsWith("datetime")) {
-    formatDatetime(x as Date | number, field)
+    return formatDatetime(x as Date | number, field)
   }
 
   if (typeName?.startsWith("period") || extensionName === "pandas.period") {
