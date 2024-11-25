@@ -27,7 +27,7 @@ import moment from "moment"
 
 import { DataFrameCell, Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
-  convertToSeconds,
+  convertTimestampToSeconds,
   format as formatArrowCell,
 } from "@streamlit/lib/src/dataframes/arrowFormatUtils"
 import {
@@ -411,7 +411,10 @@ export function getCellFromArrow(
       // Time values needs to be adjusted to seconds based on the unit
       parsedDate = moment
         .unix(
-          convertToSeconds(arrowCell.content, arrowCell.field?.type?.unit ?? 0)
+          convertTimestampToSeconds(
+            arrowCell.content,
+            arrowCell.field?.type?.unit ?? 0
+          )
         )
         .utc()
         .toDate()

@@ -60,7 +60,6 @@ type SupportedPandasOffsetType =
 type PeriodFrequency =
   | SupportedPandasOffsetType
   | `${SupportedPandasOffsetType}-${string}`
-type PeriodType = `period[${PeriodFrequency}]`
 
 const WEEKDAY_SHORT = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 const formatMs = (duration: number): string =>
@@ -144,49 +143,18 @@ interface Interval {
   right: number
 }
 
-type IntervalData = "int64" | "uint64" | "float64" | "datetime64[ns]"
-type IntervalClosed = "left" | "right" | "both" | "neither"
-type IntervalType = `interval[${IntervalData}, ${IntervalClosed}]`
-
-/** Formats an interval index. */
-function formatIntervalType(data: StructRow, typeName: IntervalType): string {
-  const match = typeName.match(/interval\[(.+), (both|left|right|neither)\]/)
-  if (match === null) {
-    throw new Error(`Invalid interval type: ${typeName}`)
-  }
-  const [, subtype, closed] = match
-  return formatInterval(data, subtype, closed as IntervalClosed)
-}
-
-function formatInterval(
-  data: StructRow,
-  subtype: string,
-  closed: IntervalClosed
-): string {
-  const interval = data.toJSON() as Interval
-
-  const leftBracket = closed === "both" || closed === "left" ? "[" : "("
-  const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
-  const leftInterval = format(interval.left, {
-    pandas_type: subtype,
-    numpy_type: subtype,
-  })
-  const rightInterval = format(interval.right, {
-    pandas_type: subtype,
-    numpy_type: subtype,
-  })
-
-  return `${leftBracket + leftInterval}, ${rightInterval + rightBracket}`
-}
-
 /**
  * Adjusts a time value to seconds based on the unit information in the field.
  *
  * The unit numbers are specified here:
  * https://github.com/apache/arrow/blob/3ab246f374c17a216d86edcfff7ff416b3cff803/js/src/enum.ts#L95
+ *
+ * @param timestamp The timestamp to convert.
+ * @param unit The unit of the timestamp. 0 is seconds, 1 is milliseconds, 2 is microseconds, 3 is nanoseconds.
+ * @returns The timestamp in seconds.
  */
-export function convertToSeconds(
-  value: number | bigint,
+export function convertTimestampToSeconds(
+  timestamp: number | bigint,
   unit: number
 ): number {
   let unitAdjustment
@@ -202,31 +170,107 @@ export function convertToSeconds(
     unitAdjustment = 1000 * 1000 * 1000
   } else {
     // Interpret it as seconds as a fallback
-    return Number(value)
+    return Number(timestamp)
   }
 
   // Do the calculation based on bigints, if the value
   // is a bigint and not safe for usage as number.
   // This might lose some precision since it doesn't keep
   // fractional parts.
-  if (typeof value === "bigint" && !Number.isSafeInteger(Number(value))) {
-    return Number(value / BigInt(unitAdjustment))
+  if (
+    typeof timestamp === "bigint" &&
+    !Number.isSafeInteger(Number(timestamp))
+  ) {
+    return Number(timestamp / BigInt(unitAdjustment))
   }
 
-  return Number(value) / unitAdjustment
+  return Number(timestamp) / unitAdjustment
 }
 
-function formatTime(data: number, field?: Field): string {
-  const timeInSeconds = convertToSeconds(data, field?.type?.unit ?? 0)
+/**
+ * Formats a time value based on the unit information in the field.
+ *
+ * @param timestamp The time value to format.
+ * @param field The field containing the unit information.
+ * @returns The formatted time value.
+ */
+function formatTime(timestamp: number | bigint, field?: Field): string {
+  const timeInSeconds = convertTimestampToSeconds(
+    timestamp,
+    field?.type?.unit ?? 0
+  )
   return moment
     .unix(timeInSeconds)
     .utc()
     .format(timeInSeconds % 1 === 0 ? "HH:mm:ss" : "HH:mm:ss.SSS")
 }
 
-function formatDuration(data: number | bigint, field?: Field): string {
+function formatDate(date: number | Date, field?: Field): string {
+  const formatPattern = "YYYY-MM-DD"
+
+  if (date instanceof Date) {
+    return moment.utc(date).format(formatPattern)
+  } else if (typeof date === "number" && Number.isFinite(date)) {
+    // TODO: what is the best default?
+    const unit = field?.type?.unit ?? 1
+    // 0 is DAY, 1 is MILLISECOND
+    // https://github.com/apache/arrow/blob/3ab246f374c17a216d86edcfff7ff416b3cff803/js/src/enum.ts#L87
+    // When unit === 0, convert days to milliseconds:
+
+    const timestamp = unit === 0 ? date * 86400000 : date
+    return moment.utc(timestamp).format(formatPattern)
+  }
+
+  logWarning(`Unsupported date type: ${date}`)
+  return String(date)
+}
+
+/**
+ * Format datetime value from Arrow to string.
+ */
+function formatDatetime(date: number | Date, field?: Field): string {
+  let datetime
+  if (date instanceof Date) {
+    datetime = moment.utc(date)
+  } else {
+    // Handle numeric timestamps with unit conversion
+    const timeInSeconds = convertTimestampToSeconds(
+      date,
+      field?.type?.unit ?? 0
+    )
+    datetime = moment.unix(timeInSeconds)
+  }
+
+  const timezone = field?.type?.timezone
+  if (timezone) {
+    if (moment.tz.zone(timezone)) {
+      // If timezone is a valid timezone name (e.g., "America/New_York")
+      datetime = datetime.tz(timezone)
+    } else {
+      // If timezone is a UTC offset (e.g., "+0500")
+      datetime = datetime.utcOffset(timezone)
+    }
+
+    return datetime.format("YYYY-MM-DD HH:mm:ssZ")
+  }
+  // Return the timestamp without timezone information
+  return datetime.format("YYYY-MM-DD HH:mm:ss")
+}
+
+/**
+ * Formats a duration value based on the unit information in the field.
+ *
+ * @param duration The duration value to format.
+ * @param field The field containing the unit information.
+ * @returns The formatted duration value.
+ */
+function formatDuration(duration: number | bigint, field?: Field): string {
+  // unit: 0 is seconds, 1 is milliseconds, 2 is microseconds, 3 is nanoseconds.
   return moment
-    .duration(convertToSeconds(data, field?.type?.unit ?? 3), "seconds")
+    .duration(
+      convertTimestampToSeconds(duration, field?.type?.unit ?? 3),
+      "seconds"
+    )
     .humanize()
 }
 
@@ -241,7 +285,9 @@ function formatDuration(data: number | bigint, field?: Field): string {
  * https://github.com/apache/arrow/issues/28804
  * https://github.com/apache/arrow/issues/35745
  */
-function formatDecimal(value: Uint32Array, scale: number): string {
+function formatDecimal(value: Uint32Array, field?: Field): string {
+  const scale = field?.type?.scale || 0
+
   // Format Uint32Array to a numerical string and pad it with zeros
   // So that it is exactly the length of the scale.
   let numString = util.bigNumToString(new util.BN(value)).padStart(scale, "0")
@@ -273,20 +319,10 @@ function formatDecimal(value: Uint32Array, scale: number): string {
   return `${sign}${wholePart}` + (decimalPart ? `.${decimalPart}` : "")
 }
 
-export function formatPeriodType(
-  duration: bigint,
-  typeName: PeriodType
+export function formatPeriodFromFreq(
+  duration: number | bigint,
+  freq: PeriodFrequency
 ): string {
-  const match = typeName.match(/period\[(.*)]/)
-  if (match === null) {
-    logWarning(`Invalid period type: ${typeName}`)
-    return String(duration)
-  }
-  const [, freq] = match
-  return formatPeriod(duration, freq as PeriodFrequency)
-}
-
-function formatPeriod(duration: bigint, freq: PeriodFrequency): string {
   const [freqName, freqParam] = freq.split("-", 2)
   const momentConverter =
     PERIOD_TYPE_FORMATTERS[freqName as SupportedPandasOffsetType]
@@ -304,33 +340,112 @@ function formatPeriod(duration: bigint, freq: PeriodFrequency): string {
   return momentConverter(durationNumber, freqParam)
 }
 
-function formatCategoricalType(
-  x: number | bigint | StructRow,
-  field: Field
-): string {
-  // Serialization for pandas.Interval and pandas.Period is provided by Arrow extensions
+function formatPeriod(duration: number | bigint, field?: Field): string {
+  // Serialization for pandas.Period is provided by Arrow extensions
+  // https://github.com/pandas-dev/pandas/blob/70bb855cbbc75b52adcb127c84e0a35d2cd796a9/pandas/core/arrays/arrow/extension_types.py#L26
+  if (isNullOrUndefined(field)) {
+    logWarning("Field information is missing")
+    return String(duration)
+  }
+
+  const extensionName = field.metadata.get("ARROW:extension:name")
+  const extensionMetadata = field.metadata.get("ARROW:extension:metadata")
+
+  if (
+    isNullOrUndefined(extensionName) ||
+    isNullOrUndefined(extensionMetadata)
+  ) {
+    logWarning("Arrow extension metadata is missing")
+    return String(duration)
+  }
+
+  if (extensionName !== "pandas.period") {
+    logWarning(`Unsupported extension name for period type: ${extensionName}`)
+    return String(duration)
+  }
+
+  const parsedExtensionMetadata = JSON.parse(extensionMetadata as string)
+  const { freq } = parsedExtensionMetadata
+  return formatPeriodFromFreq(duration, freq)
+}
+
+/**
+ * Formats nested arrays and other objects to JSON.
+ */
+function formatObject(object: any, field?: Field): string {
+  if (field?.type instanceof Struct) {
+    // This type is used by python dictionary values
+
+    // Workaround: Arrow JS adds all properties from all cells
+    // as fields. When you convert to string, it will contain lots of fields with
+    // null values. To mitigate this, we filter out null values.
+
+    return JSON.stringify(object, (_key, value) => {
+      if (!notNullOrUndefined(value)) {
+        // Ignore null and undefined values ->
+        return undefined
+      }
+      if (typeof value === "bigint") {
+        return Number(value)
+      }
+      return value
+    })
+  }
+  return JSON.stringify(object, (_key, value) =>
+    typeof value === "bigint" ? Number(value) : value
+  )
+}
+
+/**
+ * Formats a float value to a string.
+ *
+ * @param num The float value to format.
+ * @returns The formatted float value.
+ */
+function formatFloat(num: number): string {
+  if (!Number.isFinite(num)) {
+    return String(num)
+  }
+
+  return numbro(num).format("0,0.0000")
+}
+
+/**
+ * Formats an interval value from arrow to string.
+ */
+function formatInterval(x: StructRow, field?: Field): string {
+  // Serialization for pandas.Interval is provided by Arrow extensions
   // https://github.com/pandas-dev/pandas/blob/235d9009b571c21b353ab215e1e675b1924ae55c/
   // pandas/core/arrays/arrow/extension_types.py#L17
-  const extensionName = field.metadata.get("ARROW:extension:name")
-  if (extensionName) {
+  const extensionName = field && field.metadata.get("ARROW:extension:name")
+  if (extensionName && extensionName === "pandas.interval") {
     const extensionMetadata = JSON.parse(
       field.metadata.get("ARROW:extension:metadata") as string
     )
-    if (extensionName === "pandas.interval") {
-      const { subtype, closed } = extensionMetadata
-      return formatInterval(x as StructRow, subtype, closed)
-    }
-    if (extensionName === "pandas.Period") {
-      const { freq } = extensionMetadata
-      return formatPeriod(x as bigint, freq)
-    }
+    const { subtype, closed } = extensionMetadata
+
+    const interval = (x as StructRow).toJSON() as Interval
+
+    const leftBracket = closed === "both" || closed === "left" ? "[" : "("
+    const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
+    const leftInterval = format(interval.left, {
+      pandas_type: subtype,
+      numpy_type: subtype,
+    })
+    const rightInterval = format(interval.right, {
+      pandas_type: subtype,
+      numpy_type: subtype,
+    })
+
+    return `${leftBracket + leftInterval}, ${rightInterval + rightBracket}`
   }
   return String(x)
 }
 
-/** Takes the data and it's type and nicely formats it. */
+/** Takes the cell data and type metadata from arrow and nicely formats it. */
 export function format(x: DataType, type?: Type, field?: Field): string {
   const typeName = type && getTypeName(type)
+  const extensionName = field && field.metadata.get("ARROW:extension:name")
 
   if (isNullOrUndefined(x)) {
     return "<NA>"
@@ -339,48 +454,25 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   // date
   const isDate = x instanceof Date || Number.isFinite(x)
   if (isDate && typeName === "date") {
-    return moment.utc(x as Date | number).format("YYYY-MM-DD")
+    return formatDate(x as Date | number, field)
   }
+
   // time
   if (typeof x === "bigint" && typeName === "time") {
     return formatTime(Number(x), field)
   }
 
-  // datetimetz
-  if (isDate && typeName === "datetimetz") {
-    const meta = type?.meta
-    let datetime = moment(x as Date | number)
-
-    if (meta?.timezone) {
-      if (moment.tz.zone(meta?.timezone)) {
-        // uses timezone notation
-        datetime = datetime.tz(meta?.timezone)
-      } else {
-        // uses UTC offset notation
-        datetime = datetime.utcOffset(meta?.timezone)
-      }
-    }
-
-    return datetime.format("YYYY-MM-DD HH:mm:ssZ")
-  }
-  // datetime, datetime64, datetime64[ns], etc.
+  // datetimetz, datetime, datetime64, datetime64[ns], etc.
   if (isDate && typeName?.startsWith("datetime")) {
-    return moment.utc(x as Date | number).format("YYYY-MM-DD HH:mm:ss")
+    formatDatetime(x as Date | number, field)
+  }
+
+  if (typeName?.startsWith("period") || extensionName === "pandas.period") {
+    return formatPeriod(x as bigint, field)
   }
 
   if (typeName?.startsWith("interval")) {
-    return formatIntervalType(x as StructRow, typeName as IntervalType)
-  }
-
-  if (typeName?.startsWith("period")) {
-    return formatPeriodType(x as bigint, typeName as PeriodType)
-  }
-
-  if (typeName === "categorical") {
-    return formatCategoricalType(
-      x as number | bigint | StructRow,
-      field as Field
-    )
+    return formatInterval(x as StructRow, field)
   }
 
   if (typeName?.startsWith("timedelta")) {
@@ -388,36 +480,15 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   }
 
   if (typeName === "decimal") {
-    return formatDecimal(x as Uint32Array, field?.type?.scale || 0)
+    return formatDecimal(x as Uint32Array, field)
   }
 
-  // Nested arrays and objects.
   if (typeName === "object" || typeName?.startsWith("list")) {
-    if (field?.type instanceof Struct) {
-      // This type is used by python dictionary values
-
-      // Workaround: Arrow JS adds all properties from all cells
-      // as fields. When you convert to string, it will contain lots of fields with
-      // null values. To mitigate this, we filter out null values.
-
-      return JSON.stringify(x, (_key, value) => {
-        if (!notNullOrUndefined(value)) {
-          // Ignore null and undefined values ->
-          return undefined
-        }
-        if (typeof value === "bigint") {
-          return Number(value)
-        }
-        return value
-      })
-    }
-    return JSON.stringify(x, (_key, value) =>
-      typeof value === "bigint" ? Number(value) : value
-    )
+    return formatObject(x, field)
   }
 
   if (typeName === "float64" && Number.isFinite(x)) {
-    return numbro(x).format("0,0.0000")
+    return formatFloat(x as number)
   }
 
   return String(x)
