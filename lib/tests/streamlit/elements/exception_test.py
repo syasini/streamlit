@@ -150,12 +150,18 @@ SyntaxError: invalid syntax
             f"Stack does not have length {original_stack_len}: {proto.stack_trace}",
         )
 
-    def test_uncaught_app_exception(self):
+    def test_uncaught_app_exception_default_setting_community_cloud(self):
+        """
+        In community cloud, we show a generic error message, the trace and the type.
+        This corresponds to a config of false/False or "stacktrace".
+        """
         err = None
         try:
             st.format("http://not_an_image.png", width=-1)
         except Exception as e:
-            err = UncaughtAppException(e)
+            err = UncaughtAppException(
+                e, show_message=False, show_trace=True, show_type=True
+            )
         self.assertIsNotNone(err)
 
         # Marshall it.
@@ -168,6 +174,30 @@ SyntaxError: invalid syntax
 
         assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
         assert proto.type == "AttributeError"
+
+    def test_uncaught_app_exception_none_config_setting(self):
+        """
+        Corresponds to the "none" config option.
+        """
+        err = None
+        try:
+            st.format("http://not_an_image.png", width=-1)
+        except Exception as e:
+            err = UncaughtAppException(
+                e, show_message=False, show_trace=False, show_type=False
+            )
+        self.assertIsNotNone(err)
+
+        # Marshall it.
+        proto = ExceptionProto()
+        exception.marshall(proto, err)
+
+        for line in proto.stack_trace:
+            # assert message that could contain secret information in the stack trace
+            assert "module 'streamlit' has no attribute 'format'" not in line
+
+        assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+        assert proto.type == ""
 
 
 class StExceptionAPITest(DeltaGeneratorTestCase):
