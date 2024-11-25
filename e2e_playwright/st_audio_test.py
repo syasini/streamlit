@@ -78,10 +78,11 @@ def test_audio_remount_no_autoplay(app: Page):
     expect(audio_element).to_have_js_property("paused", True)
     expect(audio_element).to_have_js_property("autoplay", False)
 
-    click_checkbox(app, "Autoplay")
-
     # To prevent flakiness, we wait for the audio to load and start playing
     wait_until(app, lambda: audio_element.evaluate("el => el.readyState") == 4)
+
+    click_checkbox(app, "Autoplay")
+
     expect(audio_element).to_have_js_property("autoplay", True)
     expect(audio_element).to_have_js_property("paused", False)
 
