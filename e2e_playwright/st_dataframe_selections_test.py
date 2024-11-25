@@ -157,6 +157,7 @@ def test_single_column_select(app: Page):
 def test_multi_row_select(app: Page):
     canvas = _get_multi_row_select_df(app)
     expect_canvas_to_be_visible(canvas)
+    canvas.scroll_into_view_if_needed()
 
     select_row(canvas, 1)
     select_row(canvas, 3)

@@ -64,10 +64,13 @@ def test_audio_autoplay(app: Page):
     expect(audio_element).to_have_js_property("paused", True)
     expect(audio_element).to_have_js_property("autoplay", False)
 
+    # To prevent flakiness, we wait for the audio to load and start playing
+    wait_until(
+        app, lambda: audio_element.evaluate("el => el.readyState") == 4, timeout=15000
+    )
+
     click_checkbox(app, "Autoplay")
 
-    # To prevent flakiness, we wait for the audio to load and start playing
-    wait_until(app, lambda: audio_element.evaluate("el => el.readyState") == 4)
     expect(audio_element).to_have_js_property("autoplay", True)
     expect(audio_element).to_have_js_property("paused", False)
 
