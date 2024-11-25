@@ -103,10 +103,38 @@ SyntaxError: invalid syntax
         err = None
 
         try:
-            user_func()
-        except Exception as e:
+            st.image(
+                "http://not_an_image.png",
+                width=-1,
+                use_column_width=True,
+                use_container_width=True,
+            )
+        except StreamlitAPIException as e:
             err = e
+        self.assertIsNotNone(err)
 
+        # Marshall it.
+        proto = ExceptionProto()
+        exception.marshall(proto, err)
+
+        # The streamlit package should not appear in any stack entry.
+        streamlit_dir = os.path.dirname(st.__file__)
+        streamlit_dir = os.path.join(os.path.realpath(streamlit_dir), "")
+        for line in proto.stack_trace:
+            self.assertNotIn(streamlit_dir, line, "Streamlit stack entry not stripped")
+
+    def test_uncaught_app_exception_default_setting_community_cloud(self):
+        """
+        In community cloud, we show a generic error message, the trace and the type.
+        This corresponds to a config of false/False or "stacktrace".
+        """
+        err = None
+        try:
+            st.format("http://not_an_image.png", width=-1)
+        except Exception as e:
+            err = UncaughtAppException(
+                e, show_message=False, show_trace=True, show_type=True
+            )
         self.assertIsNotNone(err)
 
         # Marshall it.
@@ -248,6 +276,30 @@ SyntaxError: invalid syntax
             assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
             assert len(proto.stack_trace)
             assert proto.type == "AttributeError"
+
+    def test_uncaught_app_exception_none_config_setting(self):
+        """
+        Corresponds to the "none" config option.
+        """
+        err = None
+        try:
+            st.format("http://not_an_image.png", width=-1)
+        except Exception as e:
+            err = UncaughtAppException(
+                e, show_message=False, show_trace=False, show_type=False
+            )
+        self.assertIsNotNone(err)
+
+        # Marshall it.
+        proto = ExceptionProto()
+        exception.marshall(proto, err)
+
+        for line in proto.stack_trace:
+            # assert message that could contain secret information in the stack trace
+            assert "module 'streamlit' has no attribute 'format'" not in line
+
+        assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+        assert proto.type == ""
 
 
 class StExceptionAPITest(DeltaGeneratorTestCase):
