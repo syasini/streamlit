@@ -98,12 +98,14 @@ def handle_uncaught_app_exception(ex: BaseException) -> None:
 
     show_error_details = config.get_option("client.showErrorDetails")
 
-    # options for show error details config
+    # options for show error details config.
     FULL = "full"
     STACKTRACE = "stacktrace"
     TYPE = "type"
+    # When true/false are passed in the command line they will be strings.
     TRUE = "true"
     FALSE = "false"
+    # "none" is also a valid config setting. We show only a default error message.
 
     show_type = show_error_details in [FULL, STACKTRACE, TYPE, True, TRUE, FALSE, False]
     show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE, FALSE, False]
