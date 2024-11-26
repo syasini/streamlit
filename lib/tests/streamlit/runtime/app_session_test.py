@@ -80,28 +80,14 @@ def _create_test_session(
         "streamlit.runtime.app_session.LocalSourcesWatcher",
         MagicMock(spec=LocalSourcesWatcher),
     ):
-        session = AppSession(
+        return AppSession(
             script_data=ScriptData("/fake/script_path.py", is_hello=False),
-            uploaded_file_manager=MagicMock(),
+            uploaded_file_manager=MagicMock(spec=UploadedFileManager),
             script_cache=MagicMock(),
             message_enqueued_callback=None,
             user_info={"email": "test@example.com"},
             session_id_override=session_id_override,
         )
-        import sys
-
-        # in Python 3.13, the "test_shutdown" test is failing because shutdown is called
-        # twice and not None. I was able to figure that this is because the
-        # AppSession.__del__ method is called which calls shutdown() and disconnect
-        # again. I am not sure what changed in 3.13 - perhaps a session object of
-        # another test is garbage collected quicker which calls the __del__ method.
-        # Another alternative is to move the test_shutdown test to its own class
-        # to avoid this side-effect. There is no test to rely on the __del__ method
-        # call, so for now this side-effect is disabled completely.
-        if sys.version_info >= (3, 13):
-            with patch.object(AppSession, "__del__", MagicMock()):
-                return session
-        return session
 
 
 class AppSessionTest(unittest.TestCase):
