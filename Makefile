@@ -217,6 +217,7 @@ clean:
 	rm -f lib/Pipfile.lock
 	rm -rf frontend/app/build
 	rm -rf frontend/node_modules
+	rm -rf frontend/app/performance/lighthouse/reports
 	rm -rf frontend/app/node_modules
 	rm -rf frontend/lib/node_modules
 	rm -rf frontend/test_results
@@ -262,7 +263,7 @@ protobuf: check-protoc
 		echo ; \
 		yarn --silent pbjs \
 			../proto/streamlit/proto/*.proto \
-			--path=proto -t static-module --wrap es6 \
+			--path ../proto -t static-module --wrap es6 \
 	) > ./lib/src/proto.js
 
 	@# Typescript type declarations for our generated protobufs
@@ -302,20 +303,20 @@ frontend-app:
 	cd frontend/ ; yarn run buildApp
 
 .PHONY: jslint
-# Lint the JS code.
+# Verify that our JS/TS code is formatted and that there are no lint errors.
 jslint:
-	cd frontend; \
-		yarn lint;
+	cd frontend/ ; yarn run formatCheck
+	cd frontend/ ; yarn run lint
 
 .PHONY: tstypecheck
 # Typecheck the JS/TS code.
 tstypecheck:
-	pre-commit run typecheck-lib --all-files --hook-stage manual && pre-commit run typecheck-app --all-files --hook-stage manual
+	cd frontend/ ; yarn run typecheck
 
 .PHONY: jsformat
 # Fix formatting issues in our JavaScript & TypeScript files.
 jsformat:
-	pre-commit run prettier --all-files --hook-stage manual
+	cd frontend/ ; yarn run format
 
 .PHONY: jstest
 # Run JS unit tests.
@@ -412,6 +413,12 @@ pre-commit-install:
 # Ensure relative imports exist within the lib/dist folder when doing yarn buildLibProd.
 ensure-relative-imports:
 	./scripts/ensure_relative_imports.sh
+
+.PHONY: performance-lighthouse
+# Run Lighthouse performance tests
+performance-lighthouse:
+	cd frontend/app; \
+	yarn run lighthouse:run
 
 .PHONY frontend-lib-prod:
 # Build the production version for @streamlit/lib.
