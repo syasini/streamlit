@@ -67,6 +67,9 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
         max_age_days: float = 31,
         min_version: int | None = None,
     ) -> bytes | None:
+        """Get a signed cookie from the request. Added for compatibility with
+        Tornado < 6.3.0.
+        """
         try:
             return super().get_signed_cookie(name, value, max_age_days, min_version)
         except AttributeError:
@@ -77,6 +80,9 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
         return super().check_origin(origin) or is_url_from_allowed_origins(origin)
 
     def _validate_xsrf_token(self, supplied_token: str) -> bool:
+        """Inspired by tornado.web.RequestHandler.check_xsrf_cookie method,
+        to check the XSRF token passed in Websocket connection header.
+        """
         _, token, _ = self._decode_xsrf_token(supplied_token)
         _, expected_token, _ = self._get_raw_xsrf_token()
 
@@ -87,7 +93,10 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
             return False
         return hmac.compare_digest(decoded_token, decoded_expected_token)
 
-    def _parse_user_cookie(self, raw_cookie_value: bytes, email) -> dict[str, Any]:
+    def _parse_user_cookie(self, raw_cookie_value: bytes, email: str) -> dict[str, Any]:
+        """Process the user cookie and extract the user info after
+        validating the origin. Origin is validated for security reasons.
+        """
         cookie_value = json.loads(raw_cookie_value)
         user_info = {}
 

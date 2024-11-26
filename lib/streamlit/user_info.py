@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Iterator, Mapping, NoReturn, Union
+from typing import TYPE_CHECKING, Iterator, Mapping, NoReturn, TypedDict, Union, cast
 
 from streamlit import config, runtime
 from streamlit.errors import StreamlitAPIException
@@ -27,6 +27,10 @@ from streamlit.runtime.secrets import secrets_singleton
 
 if TYPE_CHECKING:
     from streamlit.runtime.scriptrunner_utils.script_run_context import UserInfo
+
+    class ProviderTokenPayload(TypedDict):
+        provider: str
+        exp: int
 
 
 def get_signing_secret() -> str:
@@ -54,10 +58,11 @@ def encode_provider_token(provider: str) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=2),
     }
     provider_token: bytes = jwt.encode(header, payload, get_signing_secret())
+    # JWT token is a byte string, so we need to decode it to a URL compatible string
     return provider_token.decode("latin-1")
 
 
-def decode_provider_token(provider_token: str):
+def decode_provider_token(provider_token: str) -> ProviderTokenPayload:
     """Decode the JWT token and validate the claims."""
     try:
         from authlib.jose import JoseError, JWTClaims, jwt
@@ -75,7 +80,7 @@ def decode_provider_token(provider_token: str):
     except JoseError as e:
         raise StreamlitAPIException(f"Error decoding provider token: {e}") from None
 
-    return payload
+    return cast("ProviderTokenPayload", payload)
 
 
 def validate_auth_credentials(provider: str) -> None:
@@ -111,15 +116,15 @@ def validate_auth_credentials(provider: str) -> None:
     missing_keys = [key for key in required_keys if key not in provider_section]
     if missing_keys:
         raise StreamlitAPIException(
-            f"Auth credentials for '{provider}' are missing the following keys: {missing_keys}. Please check your configuration."
+            f"Auth credentials for '{provider}' are missing the following keys: "
+            f"{missing_keys}. Please check your configuration."
         )
 
 
 def generate_login_redirect_url(provider: str) -> str:
     """Generate the login redirect URL for the given provider."""
-    base_url = "/auth/login"
     provider_token = encode_provider_token(provider)
-    return f"{base_url}?provider={provider_token}"
+    return f"/auth/login?provider={provider_token}"
 
 
 def _get_user_info() -> UserInfo:
@@ -159,10 +164,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
 
     """
 
-    def login(
-        self,
-        provider: str,
-    ) -> None:
+    def login(self, provider: str) -> None:
         """Initiate the login for the given provider."""
         context = _get_script_run_ctx()
         if context is not None:
@@ -190,10 +192,8 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
 
     def is_logged_in(self) -> bool:
         """Check if the user is logged in."""
-        if (
-            _get_user_info().get("email") is not None
-            and _get_user_info().get("email") != "test@example.com"
-        ):
+        user_email = _get_user_info().get("email")
+        if user_email is not None and user_email != "test@example.com":
             return True
         return False
 

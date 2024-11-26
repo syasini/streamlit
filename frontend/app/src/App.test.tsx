@@ -136,6 +136,7 @@ vi.mock("@streamlit/lib/src/hostComm/HostCommunicationManager", async () => {
   const MockedClass = vi.fn().mockImplementation((...props) => {
     const hostCommunicationMgr = new actualModule.default(...props)
     vi.spyOn(hostCommunicationMgr, "sendMessageToHost")
+    vi.spyOn(hostCommunicationMgr, "sendMessageToSameOriginHost")
     return hostCommunicationMgr
   })
 
@@ -1938,6 +1939,19 @@ describe("App", () => {
   })
 
   describe("authRedirect handling", () => {
+    let prevWindowLocation: Location
+    let prevWindowParent: Window
+
+    beforeEach(() => {
+      prevWindowLocation = window.location
+      prevWindowParent = window.parent
+    })
+
+    afterEach(() => {
+      window.location = prevWindowLocation
+      window.parent = prevWindowParent
+    })
+
     it("redirects to the auth URL", () => {
       renderApp(getProps())
 
@@ -1951,6 +1965,27 @@ describe("App", () => {
       sendForwardMessage("authRedirect", { url: "https://example.com" })
 
       expect(window.location.href).toBe("https://example.com")
+    })
+    it("sends a message to the host when in child frame", () => {
+      renderApp(getProps())
+      // A HACK to mock a condition in `isInChildFrame` util function.
+      // @ts-expect-error
+      delete window.parent
+      // @ts-expect-error
+      window.parent = undefined
+
+      const hostCommunicationMgr = getStoredValue<HostCommunicationManager>(
+        HostCommunicationManager
+      )
+
+      sendForwardMessage("authRedirect", { url: "https://example.com" })
+
+      expect(
+        hostCommunicationMgr.sendMessageToSameOriginHost
+      ).toHaveBeenCalledWith({
+        type: "REDIRECT_TO_URL",
+        url: "https://example.com",
+      })
     })
   })
 

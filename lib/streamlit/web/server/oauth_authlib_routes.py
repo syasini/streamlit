@@ -51,6 +51,7 @@ auth_cache = AuthCache()
 
 
 def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
+    """Create an OAuth client for the given provider based on secrets.toml configuration."""
     if secrets_singleton.load_if_toml_exists():
         auth_section = secrets_singleton.get("auth")
         if auth_section:
@@ -77,22 +78,33 @@ def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
 
 class AuthLoginHandler(tornado.web.RequestHandler):
     async def get(self):
+        """Redirect to the OAuth provider login page."""
+        provider = self._parse_provider_token()
+        if provider is None:
+            self.redirect("/")
+            return
+
+        client, redirect_uri = create_oauth_client(provider)
+        try:
+            client.authorize_redirect(self, redirect_uri)
+        except Exception as e:
+            self.send_error(400, reason=str(e))
+
+    def _parse_provider_token(self) -> str | None:
         provider_token = self.get_argument("provider", None)
         try:
             if provider_token is None:
                 raise StreamlitAPIException("Missing provider token")
             payload = decode_provider_token(provider_token)
         except StreamlitAPIException:
-            self.redirect("/")
-            return
-        client, redirect_uri = create_oauth_client(payload["provider"])
-        try:
-            client.authorize_redirect(self, redirect_uri)
-        except Exception as e:
-            self.send_error(400, reason=str(e))
+            return None
+
+        return payload["provider"]
 
 
 class AuthHandlerMixin(tornado.web.RequestHandler):
+    """Mixin for handling auth cookies. Added for compatibility with Tornado < 6.3.0."""
+
     def set_auth_cookie(self, user_info: dict[str, Any]) -> None:
         try:
             self.set_signed_cookie(
@@ -115,50 +127,22 @@ class AuthLogoutHandler(AuthHandlerMixin, tornado.web.RequestHandler):
 
 class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
     async def get(self):
-        state_code_from_url = self.get_argument("state")
-        current_cache_keys = list(auth_cache.get_dict().keys())
-        state_provider_mapping = {}
-        for key in current_cache_keys:
-            _, _, provider, code = key.split("_")
-            state_provider_mapping[code] = provider
-        provider = state_provider_mapping.get(state_code_from_url, None)
-
-        redirect_uri = None
-        if secrets_singleton.load_if_toml_exists():
-            auth_section = secrets_singleton.get("auth")
-            if auth_section:
-                redirect_uri = auth_section.get("redirect_uri", None)
-
-        if not redirect_uri:
+        provider = self._get_provider_by_state()
+        origin = self._get_origin_from_secrets()
+        if origin is None:
             self.redirect("/")
             return
 
-        redirect_uri_parsed = urlparse(redirect_uri)
-        origin_from_redirect_uri = (
-            redirect_uri_parsed.scheme + "://" + redirect_uri_parsed.netloc
-        )
-
         error = self.get_argument("error", None)
-
         if error:
-            dict_for_cookie = {
-                "provider": provider,
-                "error": error,
-                "email": None,
-                "origin": origin_from_redirect_uri,
-            }
-            self.set_auth_cookie(dict_for_cookie)
+            cookie_value = self._prepare_error_cookie_value(error, origin, provider)
+            self.set_auth_cookie(cookie_value)
             self.redirect("/")
             return
 
         if provider is None:
-            dict_for_cookie = {
-                "provider": None,
-                "error": "Missing provider",
-                "email": None,
-                "origin": origin_from_redirect_uri,
-            }
-            self.set_auth_cookie(dict_for_cookie)
+            cookie_value = self._prepare_missing_provider_cookie_value(origin)
+            self.set_auth_cookie(cookie_value)
             self.redirect("/")
             return
 
@@ -166,9 +150,52 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         token = client.authorize_access_token(self)
         user = token.get("userinfo")
 
-        cookie_dict = dict(user)
-        cookie_dict["origin"] = origin_from_redirect_uri
-
+        cookie_value = dict(user, origin=origin)
         if user:
-            self.set_auth_cookie(cookie_dict)
+            self.set_auth_cookie(cookie_value)
         self.redirect("/")
+
+    def _get_provider_by_state(self) -> str | None:
+        state_code_from_url = self.get_argument("state")
+        current_cache_keys = list(auth_cache.get_dict().keys())
+        state_provider_mapping = {}
+        for key in current_cache_keys:
+            _, _, recorded_provider, code = key.split("_")
+            state_provider_mapping[code] = recorded_provider
+
+        provider: str | None = state_provider_mapping.get(state_code_from_url, None)
+        return provider
+
+    def _get_origin_from_secrets(self) -> str | None:
+        redirect_uri = None
+        if secrets_singleton.load_if_toml_exists():
+            auth_section = secrets_singleton.get("auth")
+            if auth_section:
+                redirect_uri = auth_section.get("redirect_uri", None)
+
+        if not redirect_uri:
+            return None
+
+        redirect_uri_parsed = urlparse(redirect_uri)
+        origin_from_redirect_uri: str = (
+            redirect_uri_parsed.scheme + "://" + redirect_uri_parsed.netloc
+        )
+        return origin_from_redirect_uri
+
+    def _prepare_error_cookie_value(
+        self, error: str, origin: str, provider: str | None
+    ) -> dict[str, Any]:
+        return {
+            "provider": provider,
+            "error": error,
+            "email": None,
+            "origin": origin,
+        }
+
+    def _prepare_missing_provider_cookie_value(self, origin: str) -> dict[str, Any]:
+        return {
+            "provider": None,
+            "error": "Missing provider",
+            "email": None,
+            "origin": origin,
+        }
