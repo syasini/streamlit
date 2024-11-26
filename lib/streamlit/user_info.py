@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 
 
 def get_signing_secret() -> str:
+    """Get the cookie signing secret from the configuration or secrets.toml."""
     signing_secret: str = config.get_option("server.cookieSecret")
     if secrets_singleton.load_if_toml_exists():
         auth_section = secrets_singleton.get("auth")
@@ -39,6 +40,7 @@ def get_signing_secret() -> str:
 
 
 def encode_provider_token(provider: str) -> str:
+    """Returns a signed JWT token with the provider and expiration time."""
     try:
         from authlib.jose import jwt  # type: ignore[import-untyped]
     except ImportError:
@@ -56,6 +58,7 @@ def encode_provider_token(provider: str) -> str:
 
 
 def decode_provider_token(provider_token: str):
+    """Decode the JWT token and validate the claims."""
     try:
         from authlib.jose import JoseError, JWTClaims, jwt
     except ImportError:
@@ -76,6 +79,7 @@ def decode_provider_token(provider_token: str):
 
 
 def validate_auth_credentials(provider: str) -> None:
+    """Validate the general auth credentials and auth credentials for the given provider."""
     if not secrets_singleton.load_if_toml_exists():
         raise StreamlitAPIException(
             "To use Auth you need to configure auth credentials in secrets.toml."
@@ -112,6 +116,7 @@ def validate_auth_credentials(provider: str) -> None:
 
 
 def generate_login_redirect_url(provider: str) -> str:
+    """Generate the login redirect URL for the given provider."""
     base_url = "/auth/login"
     provider_token = encode_provider_token(provider)
     return f"{base_url}?provider={provider_token}"
@@ -158,6 +163,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
         self,
         provider: str,
     ) -> None:
+        """Initiate the login for the given provider."""
         context = _get_script_run_ctx()
         if context is not None:
             validate_auth_credentials(provider)
@@ -166,6 +172,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
             context.enqueue(fwd_msg)
 
     def logout(self) -> None:
+        """Logout the current user."""
         context = _get_script_run_ctx()
         if context is not None:
             context.user_info.clear()
@@ -182,6 +189,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
             context.enqueue(fwd_msg)
 
     def is_logged_in(self) -> bool:
+        """Check if the user is logged in."""
         if (
             _get_user_info().get("email") is not None
             and _get_user_info().get("email") != "test@example.com"
