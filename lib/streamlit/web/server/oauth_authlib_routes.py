@@ -27,12 +27,16 @@ from streamlit.web.server.server_util import AUTH_COOKIE_NAME
 
 
 class AuthCache:
+    """Simple cache implementation for storing info required for Authlib."""
+
     def __init__(self):
         self.cache = {}
 
     def get(self, key):
         return self.cache.get(key)
 
+    # for set method, we are follow the same signature used in Authlib
+    # the expires_in is not used in our case
     def set(self, key, value, expires_in):
         self.cache[key] = value
 
