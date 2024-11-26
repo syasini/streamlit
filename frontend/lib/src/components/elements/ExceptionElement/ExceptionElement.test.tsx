@@ -61,6 +61,10 @@ describe("ExceptionElement Element", () => {
 
     expect(screen.queryByText("RuntimeError")).not.toBeInTheDocument()
     expect(screen.queryByText("Traceback:")).not.toBeInTheDocument()
+
+    expect(
+      screen.getByText("This is an exception of type RuntimeError")
+    ).toBeInTheDocument()
   })
 
   it("should render markdown when it has messageIsMarkdown", () => {
