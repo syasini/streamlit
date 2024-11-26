@@ -84,6 +84,7 @@ message ForwardMsg {
     // App logo message
     Logo logo = 22;
 
+    // Auth redirect message
     AuthRedirect auth_redirect = 24;
 
     // Platform - message to host
