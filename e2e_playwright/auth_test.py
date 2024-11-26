@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import time
+from tempfile import NamedTemporaryFile
 from typing import Generator
 
 import pytest
@@ -26,6 +27,17 @@ from e2e_playwright.conftest import (
     wait_for_app_run,
 )
 from e2e_playwright.shared.app_utils import get_button, get_markdown
+
+AUTH_SECRETS_TEMPLATE = """
+[auth]
+redirect_uri = "http://localhost:{app_port}/oauth2callback"
+cookie_secret = "your_cookie_secret_here"
+
+[auth.testprovider]
+client_id = "test-client-id"
+client_secret = "test-client-secret"
+server_metadata_url = "http://localhost:{oidc_server_port}/.well-known/openid-configuration"
+"""
 
 
 @pytest.fixture(scope="module")
@@ -55,35 +67,25 @@ def fake_oidc_server(oidc_server_port: int) -> Generator[AsyncSubprocess, None, 
 
 
 @pytest.fixture(scope="module")
-@pytest.mark.early
 def prepare_secrets_file(app_port: int, oidc_server_port: int) -> None:
     """Fixture that inject the correct port to auth_secrets.toml file redirect_uri."""
     # Read in the file
-    with open("./test_assets/auth_secrets.toml") as file:
-        filedata = file.read()
-
-    original_filedata = filedata
-
-    # Replace the target string
-    filedata = filedata.replace(
-        "http://localhost:8501/oauth2callback",
-        f"http://localhost:{app_port}/oauth2callback",
+    rendered_secrets = AUTH_SECRETS_TEMPLATE.format(
+        app_port=app_port, oidc_server_port=oidc_server_port
     )
+    with NamedTemporaryFile(suffix=".toml", delete=False) as tmp_secrets_file:
+        tmp_secrets_file.write(rendered_secrets.encode())
+        tmp_secrets_file.flush()
+        yield tmp_secrets_file.name
 
-    filedata = filedata.replace(
-        "http://localhost:9999/",
-        f"http://localhost:{oidc_server_port}/",
-    )
 
-    # Write the file out again
-    with open("./test_assets/auth_secrets.toml", "w") as file:
-        file.write(filedata)
-
-    yield
-
-    # Write the file out again
-    with open("./test_assets/auth_secrets.toml", "w") as file:
-        file.write(original_filedata)
+@pytest.fixture(scope="module")
+def app_server_extra_args(prepare_secrets_file) -> list[str]:
+    """Fixture that returns extra arguments to pass to the Streamlit app server."""
+    return [
+        "--secrets.files",
+        prepare_secrets_file,
+    ]
 
 
 def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):

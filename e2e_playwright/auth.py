@@ -14,21 +14,7 @@
 
 from __future__ import annotations
 
-import os
-from typing import Final
-
 import streamlit as st
-from streamlit import config, runtime
-
-if runtime.exists():
-    # We are hacking here, but we are setting the secrets file to a different file to determine if it works
-    TEST_ASSETS_DIR: Final[str] = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "test_assets"
-    )
-    auth_secrets_file = os.path.join(TEST_ASSETS_DIR, "auth_secrets.toml")
-    config.set_option("secrets.files", [auth_secrets_file])
-    st.secrets._secrets = None
-
 
 x = st.button("TEST LOGIN")
 
