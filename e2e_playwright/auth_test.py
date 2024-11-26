@@ -36,7 +36,7 @@ def oidc_server_port() -> int:
 
 @pytest.fixture(scope="module")
 def fake_oidc_server(oidc_server_port: int) -> Generator[AsyncSubprocess, None, None]:
-    """Fixture that starts and stops the Streamlit app server."""
+    """Fixture that starts and stops the OIDC app server."""
     oidc_server_proc = AsyncSubprocess(
         [
             "python",
