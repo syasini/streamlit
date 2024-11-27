@@ -87,7 +87,7 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.9.4
 rpds-py==0.21.0
-ruff==0.5.7
+ruff==0.8.0
 seaborn==0.13.2
 SecretStorage==3.3.3
 semver==3.0.2
