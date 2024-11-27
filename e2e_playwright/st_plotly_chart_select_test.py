@@ -217,7 +217,7 @@ def test_selection_state_remains_after_unmounting(
     wait_for_app_run(app)
 
     click_button(app, "Create some elements to unmount component")
-    # wait for the "Another elements" texts to appear on the screen before
+    # wait for the "Another element" texts to appear on the screen before
     # getting the chart element to make sure that the chart is the new one
     # and not the old one which is going to be replaced and can lead to a
     # "Element not in DOM" error when trying to take the snapshot.
