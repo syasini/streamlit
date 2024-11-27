@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
 
@@ -87,9 +87,26 @@ def test_maintains_selection_when_same_name_exists(
     wait_for_app_run(app)
     # Add Tab 3
     control_buttons.nth(0).click()
+    wait_for_app_run(app)
     # Select Tab 2
     tab_buttons = app.get_by_test_id("stTabs").locator("button[role=tab]")
     tab_buttons.nth(1).click()
+
+    # Ensure that the click worked and the highlight animation finished
+    # to avoid issues with the snapshot later
+    expect(tab_buttons.nth(1)).to_have_attribute("aria-selected", "true")
+    tab_highlight_element = app.query_selector(
+        "[data-baseweb='tab-highlight']", strict=True
+    )
+    assert tab_highlight_element is not None
+    tab_highlight_element.evaluate(
+        """
+        element => Promise.all(
+                element.getAnimations().map((animation) => animation.finished)
+            )
+        """
+    )
+
     # Change Tab 1 & 3 Names
     control_buttons.nth(3).click()
     # Wait for tabs to properly load
