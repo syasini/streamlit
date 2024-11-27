@@ -78,7 +78,7 @@ function ExceptionMessage({
   return (
     <>
       <StyledMessageType>{type}</StyledMessageType>
-      {type.length !== 0 && `: `}
+      {type.length !== 0 && ": "}
       {isNonEmptyString(message) ? message : null}
     </>
   )
