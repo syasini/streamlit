@@ -711,12 +711,12 @@ _create_option(
 _create_option(
     "server.enableCORS",
     description="""
-        Enables support for Cross-Origin Resource Sharing (CORS) protection, for
-        added security.
+        Enables support for Cross-Origin Resource Sharing (CORS) protection,
+        for added security.
 
-        Due to conflicts between CORS and XSRF, if `server.enableXsrfProtection` is
-        on and `server.enableCORS` is off at the same time, we will prioritize
-        `server.enableXsrfProtection`.
+        XSRF protection requires CORS protection. If XSRF protection is
+        enabled and CORS protection is disabled at the same time, Streamlit
+        will prioritize XSRF protection and use `server.enableCORS=True`.
     """,
     default_val=True,
     type_=bool,
@@ -729,9 +729,9 @@ _create_option(
         Enables support for Cross-Site Request Forgery (XSRF) protection, for
         added security.
 
-        Due to conflicts between CORS and XSRF, if `server.enableXsrfProtection` is
-        on and `server.enableCORS` is off at the same time, we will prioritize
-        `server.enableXsrfProtection`.
+        XSRF protection requires CORS protection. If XSRF protection is
+        enabled and CORS protection is disabled at the same time, Streamlit
+        will prioritize XSRF protection and use `server.enableCORS=True`.
     """,
     default_val=True,
     type_=bool,
