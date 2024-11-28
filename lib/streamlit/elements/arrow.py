@@ -404,8 +404,8 @@ class ArrowMixin:
 
         selection_mode : "single-row", "multi-row", "single-column", \
             "multi-column", or Iterable of these
-            The types of selections Streamlit should allow. This can be one of
-            the following:
+            The types of selections Streamlit should allow when selections are
+            enabled with ``on_select``. This can be one of the following:
 
             - "multi-row" (default): Multiple rows can be selected at a time.
             - "single-row": Only one row can be selected at a time.
