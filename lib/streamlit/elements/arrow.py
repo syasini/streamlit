@@ -233,7 +233,7 @@ class ArrowMixin:
         column_order: Iterable[str] | None = None,
         column_config: ColumnConfigMappingInput | None = None,
         key: Key | None = None,
-        on_select: Literal["ignore"],  # No default value here to make it work with mypy
+        on_select: Literal["ignore"] = "ignore",
         selection_mode: SelectionMode | Iterable[SelectionMode] = "multi-row",
     ) -> DeltaGenerator: ...
 
@@ -249,7 +249,7 @@ class ArrowMixin:
         column_order: Iterable[str] | None = None,
         column_config: ColumnConfigMappingInput | None = None,
         key: Key | None = None,
-        on_select: Literal["rerun"] | WidgetCallback = "rerun",
+        on_select: Literal["rerun"] | WidgetCallback,
         selection_mode: SelectionMode | Iterable[SelectionMode] = "multi-row",
     ) -> DataframeState: ...
 
@@ -360,12 +360,12 @@ class ArrowMixin:
             dictionary where each key is a column name and the associated value
             is one of the following:
 
-            * ``None``: Streamlit hides the column.
+            - ``None``: Streamlit hides the column.
 
-            * A string: Streamlit changes the display label of the column to
+            - A string: Streamlit changes the display label of the column to
               the given string.
 
-            * A column type within ``st.column_config``: Streamlit applies the
+            - A column type within ``st.column_config``: Streamlit applies the
               defined configuration to the column. For example, use
               ``st.column_config.NumberColumn("Dollar values”, format=”$ %d")``
               to change the displayed name of the column to "Dollar values"
