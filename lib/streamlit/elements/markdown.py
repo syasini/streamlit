@@ -76,8 +76,9 @@ class MarkdownMixin:
               supported colors: blue, green, orange, red, violet, gray/grey,
               rainbow, or primary. For example, you can use
               ``:orange[your text here]`` or ``:blue-background[your text here]``.
-              If you use "primary" for color, you must set the
-              ``theme.primaryColor`` configuration option to specify the color.
+              If you use "primary" for color, Streamlit will use the default
+              primary accent color unless you set the ``theme.primaryColor``
+              configuration option.
 
         unsafe_allow_html : bool
             Whether to render HTML within ``body``. If this is ``False``
