@@ -28,7 +28,12 @@ export const sizes = {
   // Used for checkboxes, radio, and toggles:
   checkbox: "1rem",
   borderWidth: "1px",
+  // Used for checkboxes/toggle
+  smallElementHeight: "1.5rem",
+  // min height used for most input widgets
   minElementHeight: "2.5rem",
+  // min height for larger input widgets like text area and audio input
+  largestElementHeight: "4.25rem",
   smallLogoHeight: "1.25rem",
   defaultLogoHeight: "1.5rem",
   largeLogoHeight: "2rem",
@@ -37,7 +42,6 @@ export const sizes = {
   headerDecorationHeight: "0.125rem",
   appRunningMen: "1.6rem",
   appStatusMaxWidth: "20rem",
-  largestElementHeight: "4.25rem",
   spinnerSize: "1.375rem",
   spinnerThickness: "0.2rem",
   tabHeight: "2.5rem",
