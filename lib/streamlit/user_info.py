@@ -193,9 +193,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
     def is_logged_in(self) -> bool:
         """Check if the user is logged in."""
         user_email = _get_user_info().get("email")
-        if user_email is not None and user_email != "test@example.com":
-            return True
-        return False
+        return user_email is not None and user_email != "test@example.com"
 
     def __getitem__(self, key: str) -> str | None:
         return _get_user_info()[key]

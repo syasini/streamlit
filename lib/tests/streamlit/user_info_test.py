@@ -170,13 +170,14 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
         assert parsed_payload["provider"] == provider
 
     def test_user_login_with_invalid_provider(self):
-        """Test that st.experimental_user.login sends correct proto message."""
+        """Test that st.experimental_user.login raise exception for invalid provider."""
         with self.assertRaises(StreamlitAPIException) as ex:
             st.experimental_user.login("invalid_provider")
 
         assert "Auth credentials are missing *'invalid_provider'*" in str(ex.exception)
 
     def test_user_login_redirect_uri_missing(self):
+        """Tests that an error is raised if the redirect uri is missing"""
         with patch(
             "streamlit.user_info.secrets_singleton",
             MagicMock(
@@ -193,6 +194,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
             )
 
     def test_user_login_required_fields_missing(self):
+        """Tests that an error is raised if the required fields are missing"""
         with patch(
             "streamlit.user_info.secrets_singleton",
             MagicMock(
@@ -214,7 +216,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
             )
 
     def test_user_logout(self):
-        """Test that st.experimental_user.login sends correct proto message."""
+        """Test that st.experimental_user.logout sends correct proto message."""
         st.experimental_user.logout()
 
         c = self.get_message_from_queue().auth_redirect

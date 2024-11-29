@@ -222,7 +222,7 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
     def test_auth_callback_failure_missing_provider_in_cache(
         self, mock_set_auth_cookie
     ):
-        """Test auth callback success."""
+        """Test auth callback missing provider failure."""
         response = self.fetch("/oauth2callback?state=456", follow_redirects=False)
         mock_set_auth_cookie.assert_called_with(
             {
