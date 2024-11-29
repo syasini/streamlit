@@ -274,8 +274,9 @@ class WriteMixin:
             - write(list)           : Displays list-like in an interactive viewer.
             - write(error)          : Prints an exception specially.
             - write(func)           : Displays information about a function.
-            - write(module)         : Displays information about the module.
+            - write(module)         : Displays information about a module.
             - write(class)          : Displays information about a class.
+            - write(DeltaGenerator) : Displays information about a DeltaGenerator.
             - write(mpl_fig)        : Displays a Matplotlib figure.
             - write(generator)      : Streams the output of a generator.
             - write(openai.Stream)  : Streams the output of an OpenAI stream.
