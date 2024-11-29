@@ -24,7 +24,7 @@ import * as Utils from "@streamlit/lib/src/theme/utils"
 import { mockTheme } from "@streamlit/lib/src/mocks/mockTheme"
 import { mockConvertRemToPx } from "@streamlit/lib/src/mocks/mocks"
 
-import { fuzzyFilterSelectOptions, Props, Selectbox } from "./Selectbox"
+import Selectbox, { fuzzyFilterSelectOptions, Props } from "./Selectbox"
 
 vi.mock("@streamlit/lib/src/WidgetStateManager")
 
@@ -35,7 +35,6 @@ const getProps = (props: Partial<Props> = {}): Props => ({
   width: 0,
   disabled: false,
   onChange: vi.fn(),
-  theme: mockTheme.emotion,
   placeholder: "Select...",
   ...props,
 })
