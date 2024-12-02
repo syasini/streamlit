@@ -15,7 +15,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Iterator, Mapping, NoReturn, TypedDict, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Final,
+    Iterator,
+    Mapping,
+    NoReturn,
+    TypedDict,
+    Union,
+    cast,
+)
 
 from streamlit import config, runtime
 from streamlit.errors import StreamlitAPIException
@@ -24,6 +33,7 @@ from streamlit.runtime.scriptrunner_utils.script_run_context import (
     get_script_run_ctx as _get_script_run_ctx,
 )
 from streamlit.runtime.secrets import secrets_singleton
+from streamlit.url_util import make_url_path
 
 if TYPE_CHECKING:
     from streamlit.runtime.scriptrunner_utils.script_run_context import UserInfo
@@ -31,6 +41,10 @@ if TYPE_CHECKING:
     class ProviderTokenPayload(TypedDict):
         provider: str
         exp: int
+
+
+AUTH_LOGIN_ENDPOINT: Final = "/auth/login"
+AUTH_LOGOUT_ENDPOINT: Final = "/auth/logout"
 
 
 def get_signing_secret() -> str:
@@ -124,7 +138,9 @@ def validate_auth_credentials(provider: str) -> None:
 def generate_login_redirect_url(provider: str) -> str:
     """Generate the login redirect URL for the given provider."""
     provider_token = encode_provider_token(provider)
-    return f"/auth/login?provider={provider_token}"
+    base_path = config.get_option("server.baseUrlPath")
+    login_path = make_url_path(base_path, AUTH_LOGIN_ENDPOINT)
+    return f"{login_path}?provider={provider_token}"
 
 
 def _get_user_info() -> UserInfo:
@@ -184,8 +200,10 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
                 instance = runtime.get_instance()
                 instance.clear_user_info_for_session(session_id)
 
+            base_path = config.get_option("server.baseUrlPath")
+
             fwd_msg = ForwardMsg()
-            fwd_msg.auth_redirect.url = "/auth/logout"
+            fwd_msg.auth_redirect.url = make_url_path(base_path, AUTH_LOGOUT_ENDPOINT)
             context.enqueue(fwd_msg)
 
     def is_logged_in(self) -> bool:

@@ -306,14 +306,17 @@ class Server:
             (
                 make_url_path_regex(base, OAUTH2_CALLBACK_ENDPOINT),
                 AuthCallbackHandler,
+                {"base_url": base},
             ),
             (
                 make_url_path_regex(base, AUTH_LOGIN_ENDPOINT),
                 AuthLoginHandler,
+                {"base_url": base},
             ),
             (
                 make_url_path_regex(base, AUTH_LOGOUT_ENDPOINT),
                 AuthLogoutHandler,
+                {"base_url": base},
             ),
             (
                 make_url_path_regex(base, STREAM_ENDPOINT),

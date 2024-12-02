@@ -21,6 +21,7 @@ import tornado.web
 
 from streamlit.errors import StreamlitAPIException
 from streamlit.runtime.secrets import secrets_singleton
+from streamlit.url_util import make_url_path
 from streamlit.user_info import decode_provider_token
 from streamlit.web.server.oidc_mixin import TornadoOAuth, TornadoOAuth2App
 from streamlit.web.server.server_util import AUTH_COOKIE_NAME
@@ -76,12 +77,40 @@ def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
     return oauth.create_client(provider), redirect_uri
 
 
-class AuthLoginHandler(tornado.web.RequestHandler):
+class AuthHandlerMixin(tornado.web.RequestHandler):
+    """Mixin for handling auth cookies. Added for compatibility with Tornado < 6.3.0."""
+
+    def initialize(self, base_url: str) -> None:
+        self.base_url = base_url
+
+    def redirect_to_base(self) -> None:
+        self.redirect(make_url_path(self.base_url, "/"))
+
+    def set_auth_cookie(self, user_info: dict[str, Any]) -> None:
+        serialized_cookie_value = json.dumps(user_info)
+        try:
+            self.set_signed_cookie(
+                AUTH_COOKIE_NAME,
+                serialized_cookie_value,
+                httpOnly=True,
+            )
+        except AttributeError:
+            self.set_secure_cookie(
+                AUTH_COOKIE_NAME,
+                serialized_cookie_value,
+                httponly=True,
+            )
+
+    def clear_auth_cookie(self) -> None:
+        self.clear_cookie(AUTH_COOKIE_NAME)
+
+
+class AuthLoginHandler(AuthHandlerMixin, tornado.web.RequestHandler):
     async def get(self):
         """Redirect to the OAuth provider login page."""
         provider = self._parse_provider_token()
         if provider is None:
-            self.redirect("/")
+            self.redirect_to_base()
             return
 
         client, redirect_uri = create_oauth_client(provider)
@@ -102,27 +131,10 @@ class AuthLoginHandler(tornado.web.RequestHandler):
         return payload["provider"]
 
 
-class AuthHandlerMixin(tornado.web.RequestHandler):
-    """Mixin for handling auth cookies. Added for compatibility with Tornado < 6.3.0."""
-
-    def set_auth_cookie(self, user_info: dict[str, Any]) -> None:
-        try:
-            self.set_signed_cookie(
-                AUTH_COOKIE_NAME, json.dumps(user_info), httpOnly=True
-            )
-        except AttributeError:
-            self.set_secure_cookie(
-                AUTH_COOKIE_NAME, json.dumps(user_info), httponly=True
-            )
-
-    def clear_auth_cookie(self) -> None:
-        self.clear_cookie(AUTH_COOKIE_NAME)
-
-
 class AuthLogoutHandler(AuthHandlerMixin, tornado.web.RequestHandler):
     def get(self):
         self.clear_auth_cookie()
-        self.redirect("/")
+        self.redirect_to_base()
 
 
 class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
@@ -130,20 +142,20 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         provider = self._get_provider_by_state()
         origin = self._get_origin_from_secrets()
         if origin is None:
-            self.redirect("/")
+            self.redirect_to_base()
             return
 
         error = self.get_argument("error", None)
         if error:
             cookie_value = self._prepare_error_cookie_value(error, origin, provider)
             self.set_auth_cookie(cookie_value)
-            self.redirect("/")
+            self.redirect_to_base()
             return
 
         if provider is None:
             cookie_value = self._prepare_missing_provider_cookie_value(origin)
             self.set_auth_cookie(cookie_value)
-            self.redirect("/")
+            self.redirect_to_base()
             return
 
         client, _ = create_oauth_client(provider)
@@ -153,7 +165,7 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         cookie_value = dict(user, origin=origin)
         if user:
             self.set_auth_cookie(cookie_value)
-        self.redirect("/")
+        self.redirect_to_base()
 
     def _get_provider_by_state(self) -> str | None:
         state_code_from_url = self.get_argument("state")
