@@ -18,7 +18,8 @@ from typing import Final
 
 import streamlit
 from streamlit import config
-from streamlit.errors import UncaughtAppException
+from streamlit.delta_generator_singletons import get_dg_singleton_instance
+from streamlit.elements.exception import send_proto
 from streamlit.logger import get_logger
 
 _LOGGER: Final = get_logger(__name__)
@@ -70,7 +71,8 @@ def _print_rich_exception(e: BaseException) -> None:
 
 def _show_exception(ex: BaseException) -> None:
     """Show the exception on the frontend."""
-    streamlit.exception(ex)
+    main_delta_generator = get_dg_singleton_instance().main_dg
+    send_proto(main_delta_generator, ex, is_uncaught_app_exception=True)
 
 
 def handle_uncaught_app_exception(ex: BaseException) -> None:
@@ -81,41 +83,16 @@ def handle_uncaught_app_exception(ex: BaseException) -> None:
     warning in the frontend instead.
     """
 
-    error_logged = False
-
     if config.get_option("logger.enableRich"):
         try:
             # Print exception via rich
             # Rich is only a soft dependency
             # -> if not installed, we will use the default traceback formatting
             _print_rich_exception(ex)
-            error_logged = True
         except Exception:
             # Rich is not installed or not compatible to our config
             # -> Use normal traceback formatting as fallback
             # Catching all exceptions because we don't want to leave any possibility of breaking here.
-            error_logged = False
+            _LOGGER.warning("Uncaught app execution", exc_info=ex)
 
-    show_error_details = config.get_option("client.showErrorDetails")
-
-    # options for show error details config.
-    FULL = "full"
-    STACKTRACE = "stacktrace"
-    TYPE = "type"
-    # When true/false are passed in the command line they will be strings.
-    TRUE = "true"
-    FALSE = "false"
-    # "none" is also a valid config setting. We show only a default error message.
-
-    show_type = show_error_details in [FULL, STACKTRACE, TYPE, True, TRUE, FALSE, False]
-    show_trace = show_error_details in [FULL, STACKTRACE, True, TRUE, FALSE, False]
-    show_message = show_error_details in [FULL, True, TRUE]
-
-    if not error_logged:
-        _LOGGER.warning("Uncaught app execution", exc_info=ex)
-
-    _show_exception(
-        UncaughtAppException(
-            ex, show_message=show_message, show_trace=show_trace, show_type=show_type
-        )
-    )
+    _show_exception(ex)

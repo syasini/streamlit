@@ -74,16 +74,6 @@ class MarkdownFormattedException(Error):
     pass
 
 
-class UncaughtAppException(Error):
-    """Catchall exception type for uncaught exceptions that occur during script execution."""
-
-    def __init__(self, exc, show_message, show_type, show_trace):
-        self.exc = exc
-        self.show_message = show_message
-        self.show_type = show_type
-        self.show_trace = show_trace
-
-
 class StreamlitAPIException(MarkdownFormattedException):
     """Base class for Streamlit API exceptions.
 

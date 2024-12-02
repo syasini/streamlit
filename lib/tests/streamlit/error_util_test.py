@@ -17,98 +17,12 @@ from __future__ import annotations
 import contextlib
 import io
 import unittest
-from unittest.mock import patch
 
 from streamlit.error_util import _print_rich_exception, handle_uncaught_app_exception
-from streamlit.errors import UncaughtAppException
 from tests import testutil
 
 
 class ErrorUtilTest(unittest.TestCase):
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_show_details_legacy(self, mock_show_exception):
-        """If client.showErrorDetails is true, uncaught app errors print
-        to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": True}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is True
-            assert ex.show_trace is True
-            assert ex.show_type is True
-
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_hide_message_legacy(self, mock_show_exception):
-        """If client.showErrorDetails is false, uncaught app errors are logged,
-        and a generic error message is printed to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": False}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is False
-            assert ex.show_trace is True
-            assert ex.show_type is True
-
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_full_config(self, mock_show_exception):
-        """If client.showErrorDetails is false, uncaught app errors are logged,
-        and a generic error message is printed to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": "full"}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is True
-            assert ex.show_trace is True
-            assert ex.show_type is True
-
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_stacktrace_config(self, mock_show_exception):
-        """If client.showErrorDetails is false, uncaught app errors are logged,
-        and a generic error message is printed to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": "stacktrace"}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is False
-            assert ex.show_trace is True
-            assert ex.show_type is True
-
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_type_config(self, mock_show_exception):
-        """If client.showErrorDetails is false, uncaught app errors are logged,
-        and a generic error message is printed to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": "type"}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is False
-            assert ex.show_trace is False
-            assert ex.show_type is True
-
-    @patch("streamlit.error_util._show_exception")
-    def test_uncaught_exception_none_config(self, mock_show_exception):
-        """If client.showErrorDetails is false, uncaught app errors are logged,
-        and a generic error message is printed to the frontend."""
-        with testutil.patch_config_options({"client.showErrorDetails": "none"}):
-            exc = RuntimeError("boom!")
-            handle_uncaught_app_exception(exc)
-            ex = mock_show_exception.call_args[0][0]
-            mock_show_exception.assert_called_once()
-            assert isinstance(ex, UncaughtAppException)
-            assert ex.show_message is False
-            assert ex.show_trace is False
-            assert ex.show_type is False
-
     def test_handle_print_rich_exception(self):
         """Test if the print rich exception method is working fine."""
 
