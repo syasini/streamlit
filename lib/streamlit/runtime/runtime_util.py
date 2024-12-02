@@ -82,7 +82,11 @@ def serialize_forward_msg(msg: ForwardMsg) -> bytes:
 
         # Overwrite the offending ForwardMsg.delta with an error to display.
         # This assumes that the size limit wasn't exceeded due to metadata.
-        exception.marshall(msg.delta.new_element.exception, MessageSizeError(msg_str))
+        exception.marshall(
+            msg.delta.new_element.exception,
+            MessageSizeError(msg_str),
+            is_uncaught_app_exception=False,
+        )
         msg_str = msg.SerializeToString()
 
     return msg_str
