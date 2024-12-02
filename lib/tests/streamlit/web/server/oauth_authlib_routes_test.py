@@ -62,6 +62,7 @@ class LoginHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 (
                     r"/auth/login",
                     AuthLoginHandler,
+                    {"base_url": ""},
                 )
             ]
         )
@@ -149,6 +150,7 @@ class LogoutHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 (
                     r"/auth/logout",
                     AuthLogoutHandler,
+                    {"base_url": ""},
                 )
             ]
         )
@@ -175,6 +177,7 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 (
                     r"/oauth2callback",
                     AuthCallbackHandler,
+                    {"base_url": ""},
                 )
             ],
             cookie_secret="AAAA",
