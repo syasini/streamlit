@@ -182,9 +182,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
 
             if runtime.exists():
                 instance = runtime.get_instance()
-                session_info = instance._session_mgr.get_session_info(session_id)
-                if session_info is not None:
-                    session_info.session._user_info = {}
+                instance.clear_user_info_for_session(session_id)
 
             fwd_msg = ForwardMsg()
             fwd_msg.auth_redirect.url = "/auth/logout"

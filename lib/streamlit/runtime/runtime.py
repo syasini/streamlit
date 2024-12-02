@@ -273,6 +273,17 @@ class Runtime:
             return None
         return session_info.client
 
+    def clear_user_info_for_session(self, session_id: str) -> None:
+        """Clear the user_info for the given session_id.
+
+        Notes
+        -----
+        Threading: SAFE. May be called on any thread.
+        """
+        session_info = self._session_mgr.get_session_info(session_id)
+        if session_info is not None:
+            session_info.session.clear_user_info()
+
     async def start(self) -> None:
         """Start the runtime. This must be called only once, before
         any other functions are called.
