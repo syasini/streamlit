@@ -477,9 +477,9 @@ _create_option(
                          messages, associated tracebacks, and exception types
                          will only print to the console.
         - True         : This is deprecated. Streamlit displays "full"
-                         exceptions.
+                         error details.
         - False        : This is deprecated. Streamlit displays "stacktrace"
-                         exceptions.
+                         error details.
     """,
     default_val="full",
     type_=str,
