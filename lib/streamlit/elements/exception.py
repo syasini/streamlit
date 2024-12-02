@@ -66,7 +66,7 @@ class ExceptionMixin:
 
 def send_proto(
     dg: DeltaGenerator, exception: BaseException, is_uncaught_app_exception: bool
-):
+) -> DeltaGenerator:
     exception_proto = ExceptionProto()
     marshall(exception_proto, exception, is_uncaught_app_exception)
     return dg._enqueue("exception", exception_proto)
