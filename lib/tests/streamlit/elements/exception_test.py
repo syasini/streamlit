@@ -31,7 +31,7 @@ from streamlit.elements.exception import (
     _format_syntax_error_message,
     _split_list,
 )
-from streamlit.errors import StreamlitAPIException, UncaughtAppException
+from streamlit.errors import StreamlitAPIException
 from streamlit.proto.Exception_pb2 import Exception as ExceptionProto
 from tests import testutil
 from tests.delta_generator_test_case import DeltaGeneratorTestCase
@@ -58,15 +58,27 @@ SyntaxError: invalid syntax
         subclasses) have the "message_is_markdown" flag set.
         """
         proto = ExceptionProto()
-        exception.marshall(proto, RuntimeError("oh no!"))
+        exception.marshall(
+            proto, RuntimeError("oh no!"), is_uncaught_app_exception=False
+        )
         self.assertFalse(proto.message_is_markdown)
 
         proto = ExceptionProto()
-        exception.marshall(proto, StreamlitAPIException("oh no!"))
+        exception.marshall(
+            proto, RuntimeError("oh no!"), is_uncaught_app_exception=True
+        )
+        self.assertFalse(proto.message_is_markdown)
+
+        proto = ExceptionProto()
+        exception.marshall(
+            proto, StreamlitAPIException("oh no!"), is_uncaught_app_exception=True
+        )
         self.assertTrue(proto.message_is_markdown)
 
         proto = ExceptionProto()
-        exception.marshall(proto, errors.DuplicateWidgetID("oh no!"))
+        exception.marshall(
+            proto, errors.DuplicateWidgetID("oh no!"), is_uncaught_app_exception=True
+        )
         self.assertTrue(proto.message_is_markdown)
 
     @parameterized.expand(
@@ -101,7 +113,7 @@ SyntaxError: invalid syntax
 
         # Marshall it.
         proto = ExceptionProto()
-        exception.marshall(proto, cast(Exception, err))
+        exception.marshall(proto, cast(Exception, err), is_uncaught_app_exception=True)
 
         user_module_path = os.path.join(os.path.realpath(user_module_path), "")
         self.assertIn(user_module_path, proto.stack_trace[0], "Stack not stripped")
@@ -140,7 +152,7 @@ SyntaxError: invalid syntax
 
         # Marshall it.
         proto = ExceptionProto()
-        exception.marshall(proto, cast(Exception, err))
+        exception.marshall(proto, cast(Exception, err), is_uncaught_app_exception=False)
 
         user_module_path = os.path.join(os.path.realpath(user_module_path), "")
         self.assertFalse(any(user_module_path in t for t in proto.stack_trace))
@@ -153,51 +165,91 @@ SyntaxError: invalid syntax
     def test_uncaught_app_exception_default_setting_community_cloud(self):
         """
         In community cloud, we show a generic error message, the trace and the type.
-        This corresponds to a config of false/False or "stacktrace".
+        Community cloud uses False. This is the same results as "stacktrace".
         """
-        err = None
-        try:
-            st.format("http://not_an_image.png", width=-1)
-        except Exception as e:
-            err = UncaughtAppException(
-                e, show_message=False, show_trace=True, show_type=True
-            )
-        self.assertIsNotNone(err)
+        with testutil.patch_config_options({"client.showErrorDetails": False}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
 
-        # Marshall it.
-        proto = ExceptionProto()
-        exception.marshall(proto, err)
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
 
-        for line in proto.stack_trace:
-            # assert message that could contain secret information in the stack trace
-            assert "module 'streamlit' has no attribute 'format'" not in line
+            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+            assert len(proto.stack_trace)
+            assert proto.type == "AttributeError"
 
-        assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-        assert proto.type == "AttributeError"
+    def test_uncaught_app_exception_full_config_setting(self):
+        with testutil.patch_config_options({"client.showErrorDetails": "full"}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
+
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
+
+            assert proto.message == "module 'streamlit' has no attribute 'format'"
+            assert len(proto.stack_trace)
+            assert proto.type == "AttributeError"
 
     def test_uncaught_app_exception_none_config_setting(self):
-        """
-        Corresponds to the "none" config option.
-        """
-        err = None
-        try:
-            st.format("http://not_an_image.png", width=-1)
-        except Exception as e:
-            err = UncaughtAppException(
-                e, show_message=False, show_trace=False, show_type=False
-            )
-        self.assertIsNotNone(err)
+        with testutil.patch_config_options({"client.showErrorDetails": "none"}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
 
-        # Marshall it.
-        proto = ExceptionProto()
-        exception.marshall(proto, err)
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
 
-        for line in proto.stack_trace:
-            # assert message that could contain secret information in the stack trace
-            assert "module 'streamlit' has no attribute 'format'" not in line
+            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+            assert len(proto.stack_trace) == 0
+            assert proto.type == ""
 
-        assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-        assert proto.type == ""
+    def test_uncaught_app_exception_type_config_setting(self):
+        with testutil.patch_config_options({"client.showErrorDetails": "type"}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
+
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
+
+            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+            assert len(proto.stack_trace) == 0
+            assert proto.type == "AttributeError"
+
+    def test_uncaught_app_exception__config_setting(self):
+        with testutil.patch_config_options({"client.showErrorDetails": "stacktrace"}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
+
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
+
+            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+            assert len(proto.stack_trace)
+            assert proto.type == "AttributeError"
 
 
 class StExceptionAPITest(DeltaGeneratorTestCase):
