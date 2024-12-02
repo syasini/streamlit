@@ -152,14 +152,20 @@ Traceback:
         # Config options can be set from several places including the command-line and
         # the user's script. Legacy config options (true/false) will have type string when set via
         # command-line and bool when set via user script (e.g. st.set_option("client.showErrorDetails", False)).
-        TRUE = "true"
-        FALSE = "false"
+        TRUE_VARIATIONS = ["true", "True", True]
+        FALSE_VARIATIONS = ["false", "False", False]
         # "none" is also a valid config setting. We show only a default error message.
 
-        show_message = show_error_details in [FULL, True, TRUE]
+        show_message = (
+            show_error_details == FULL or show_error_details in TRUE_VARIATIONS
+        )
         # False is a legacy config option still in-use in community cloud. It is equivalent
         # to "stacktrace".
-        show_trace = show_message or show_error_details in [STACKTRACE, FALSE, False]
+        show_trace = (
+            show_message
+            or show_error_details == STACKTRACE
+            or show_error_details in FALSE_VARIATIONS
+        )
         show_type = show_trace or show_error_details == TYPE
 
         if not show_message:
