@@ -64,6 +64,7 @@ class ExceptionMixin:
         return cast("DeltaGenerator", self)
 
 
+# TODO(lawilby): confirm whether we want to track metrics here with lukasmasuch.
 @gather_metrics("exception")
 def _send_proto(
     dg: DeltaGenerator,
