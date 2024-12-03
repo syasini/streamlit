@@ -64,6 +64,7 @@ class ExceptionMixin:
         return cast("DeltaGenerator", self)
 
 
+@gather_metrics("exception")
 def _send_proto(
     dg: DeltaGenerator,
     exception: BaseException,
