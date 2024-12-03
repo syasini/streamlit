@@ -58,9 +58,7 @@ SyntaxError: invalid syntax
         subclasses) have the "message_is_markdown" flag set.
         """
         proto = ExceptionProto()
-        exception.marshall(
-            proto, RuntimeError("oh no!"), is_uncaught_app_exception=False
-        )
+        exception.marshall(proto, RuntimeError("oh no!"))
         self.assertFalse(proto.message_is_markdown)
 
         proto = ExceptionProto()

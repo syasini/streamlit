@@ -45,7 +45,7 @@ class CacheErrorsTest(DeltaGeneratorTestCase):
             unhashable_type_func(threading.Lock())
 
         ep = ExceptionProto()
-        exception.marshall(ep, cm.exception, is_uncaught_app_exception=True)
+        exception.marshall(ep, cm.exception)
 
         self.assertEqual(ep.type, "UnhashableParamError")
 
@@ -79,7 +79,7 @@ def unhashable_type_func(_lock, ...):
             unserializable_return_value_func()
 
         ep = ExceptionProto()
-        exception.marshall(ep, cm.exception, is_uncaught_app_exception=True)
+        exception.marshall(ep, cm.exception)
 
         self.assertEqual(ep.type, "UnserializableReturnValueError")
 
