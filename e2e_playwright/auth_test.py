@@ -47,14 +47,20 @@ def oidc_server_port() -> int:
 
 
 @pytest.fixture(scope="module")
-def fake_oidc_server(oidc_server_port: int) -> Generator[AsyncSubprocess, None, None]:
+def fake_oidc_server(
+    request, oidc_server_port: int
+) -> Generator[AsyncSubprocess, None, None]:
     """Fixture that starts and stops the OIDC app server."""
+
+    is_success = getattr(request, "param", "success")
+
     oidc_server_proc = AsyncSubprocess(
         [
             "python",
             "shared/oidc_mock_server.py",
             "--port",
             str(oidc_server_port),
+            "--success" if is_success == "success" else "--failure",
         ],
         cwd=".",
     )
@@ -88,6 +94,7 @@ def app_server_extra_args(prepare_secrets_file) -> list[str]:
     ]
 
 
+@pytest.mark.parametrize("fake_oidc_server", ["success"], indirect=True)
 def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):
     """Test authentication flow with test provider."""
     button_element = get_button(app, "TEST LOGIN")
@@ -99,4 +106,16 @@ def test_login_successful(app: Page, fake_oidc_server, prepare_secrets_file):
     wait_for_app_run(app)
 
     text = get_markdown(app, "John Doe")
+    expect(text).to_be_visible()
+
+
+@pytest.mark.parametrize("fake_oidc_server", ["failure"], indirect=True)
+def test_login_failure(app: Page, fake_oidc_server, prepare_secrets_file):
+    """Test authentication flow with error response from oidc server."""
+    button_element = get_button(app, "TEST LOGIN")
+    button_element.click()
+    app.wait_for_timeout(2_000)
+    wait_for_app_run(app)
+
+    text = get_markdown(app, "ERROR: access_denied")
     expect(text).to_be_visible()

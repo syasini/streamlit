@@ -16,6 +16,7 @@ import base64
 import json
 import time
 import uuid
+from functools import partial
 from urllib.parse import parse_qs
 from wsgiref.simple_server import make_server
 
@@ -68,7 +69,7 @@ def generate_token(payload):
     return b".".join([header_b64, payload_b64, signature_b64]).decode()
 
 
-def oidc_app(environ, start_response):
+def oidc_app(environ, start_response, success=True):
     path = environ["PATH_INFO"]
     current_port = environ["SERVER_PORT"]
 
@@ -93,7 +94,11 @@ def oidc_app(environ, start_response):
 
         code = str(uuid.uuid4())
         NONCE_REGISTRY[code] = nonce
-        location = f"{redirect_uri}?code={code}&state={state}&nonce={nonce}"
+
+        if success:
+            location = f"{redirect_uri}?code={code}&state={state}&nonce={nonce}"
+        else:
+            location = f"{redirect_uri}?error=access_denied&state={state}"
 
         status = "302 Found"
         headers = [("Location", location)]
@@ -157,10 +162,12 @@ if __name__ == "__main__":
     # read script arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9999)
+    parser.add_argument("--success", action="store_true", dest="success")
+    parser.add_argument("--failure", action="store_false", dest="success")
 
     args = parser.parse_args()
     port = args.port
 
-    httpd = make_server("", port, oidc_app)
+    httpd = make_server("", port, partial(oidc_app, success=args.success))
     print(f"Serving on port {port}...")
     httpd.serve_forever()
