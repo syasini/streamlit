@@ -56,7 +56,7 @@ class ExceptionMixin:
         >>> st.exception(e)
 
         """
-        return send_proto(self.dg, exception, is_uncaught_app_exception=False)
+        return _send_proto(self.dg, exception)
 
     @property
     def dg(self) -> DeltaGenerator:
@@ -64,8 +64,10 @@ class ExceptionMixin:
         return cast("DeltaGenerator", self)
 
 
-def send_proto(
-    dg: DeltaGenerator, exception: BaseException, is_uncaught_app_exception: bool
+def _send_proto(
+    dg: DeltaGenerator,
+    exception: BaseException,
+    is_uncaught_app_exception: bool = False,
 ) -> DeltaGenerator:
     exception_proto = ExceptionProto()
     marshall(exception_proto, exception, is_uncaught_app_exception)
@@ -75,7 +77,7 @@ def send_proto(
 def marshall(
     exception_proto: ExceptionProto,
     exception: BaseException,
-    is_uncaught_app_exception: bool,
+    is_uncaught_app_exception: bool = False,
 ) -> None:
     """Marshalls an Exception.proto message.
 

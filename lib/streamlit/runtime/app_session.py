@@ -628,9 +628,7 @@ class AppSession:
                 ), "exception must be set for the SCRIPT_STOPPED_WITH_COMPILE_ERROR event"
                 msg = ForwardMsg()
                 exception_utils.marshall(
-                    msg.session_event.script_compilation_exception,
-                    exception,
-                    is_uncaught_app_exception=False,
+                    msg.session_event.script_compilation_exception, exception
                 )
                 self._enqueue_forward_msg(msg)
 
@@ -740,9 +738,7 @@ class AppSession:
     def _create_exception_message(self, e: BaseException) -> ForwardMsg:
         """Create and return an Exception ForwardMsg."""
         msg = ForwardMsg()
-        exception_utils.marshall(
-            msg.delta.new_element.exception, e, is_uncaught_app_exception=False
-        )
+        exception_utils.marshall(msg.delta.new_element.exception, e)
         return msg
 
     def _handle_git_information_request(self) -> None:
