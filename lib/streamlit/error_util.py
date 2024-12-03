@@ -17,9 +17,9 @@ from __future__ import annotations
 from typing import Final
 
 import streamlit
+import streamlit.elements.exception as exception
 from streamlit import config
 from streamlit.delta_generator_singletons import get_dg_singleton_instance
-from streamlit.elements.exception import _send_proto
 from streamlit.logger import get_logger
 
 _LOGGER: Final = get_logger(__name__)
@@ -72,8 +72,7 @@ def _print_rich_exception(e: BaseException) -> None:
 def _show_exception(ex: BaseException) -> None:
     """Show the exception on the frontend."""
     main_delta_generator = get_dg_singleton_instance().main_dg
-    _send_proto(main_delta_generator, ex, is_uncaught_app_exception=True)
-    # streamlit.exception(ex)
+    exception._send_proto(main_delta_generator, ex, is_uncaught_app_exception=True)
 
 
 def handle_uncaught_app_exception(ex: BaseException) -> None:
@@ -94,6 +93,7 @@ def handle_uncaught_app_exception(ex: BaseException) -> None:
             # Rich is not installed or not compatible to our config
             # -> Use normal traceback formatting as fallback
             # Catching all exceptions because we don't want to leave any possibility of breaking here.
-            _LOGGER.warning("Uncaught app execution", exc_info=ex)
+            pass
 
+    _LOGGER.warning("Uncaught app execution", exc_info=ex)
     _show_exception(ex)
