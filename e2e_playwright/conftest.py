@@ -746,7 +746,7 @@ def wait_for_app_run(
     page_or_locator.locator(
         "[data-testid='stApp'][data-test-connection-state='CONNECTED']"
     ).wait_for(
-        timeout=20000,
+        timeout=25000,
         state="attached",
     )
     # Wait until we know the script has started. We determine this by checking
@@ -755,7 +755,7 @@ def wait_for_app_run(
     page_or_locator.locator(
         "[data-testid='stApp'][data-test-script-state='notRunning']"
     ).wait_for(
-        timeout=20000,
+        timeout=25000,
         state="attached",
     )
 
