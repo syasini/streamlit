@@ -19,10 +19,10 @@ from urllib.parse import urlparse
 
 import tornado.web
 
+from streamlit.auth_util import decode_provider_token
 from streamlit.errors import AuthError
 from streamlit.runtime.secrets import secrets_singleton
 from streamlit.url_util import make_url_path
-from streamlit.user_info import decode_provider_token
 from streamlit.web.server.oidc_mixin import TornadoOAuth, TornadoOAuth2App
 from streamlit.web.server.server_util import AUTH_COOKIE_NAME
 

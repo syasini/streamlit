@@ -21,7 +21,7 @@ import tornado.testing
 import tornado.web
 import tornado.websocket
 
-from streamlit.user_info import encode_provider_token
+from streamlit.auth_util import encode_provider_token
 from streamlit.web.server import oauth_authlib_routes
 from streamlit.web.server.oauth_authlib_routes import (
     AuthCache,

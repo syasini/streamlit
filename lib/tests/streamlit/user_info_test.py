@@ -145,7 +145,7 @@ class UserInfoProxyTest(DeltaGeneratorTestCase):
 
 
 @patch(
-    "streamlit.user_info.secrets_singleton",
+    "streamlit.auth_util.secrets_singleton",
     MagicMock(
         load_if_toml_exists=MagicMock(return_value=True),
         get=MagicMock(return_value=SECRETS_MOCK),
@@ -179,7 +179,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
     def test_user_login_redirect_uri_missing(self):
         """Tests that an error is raised if the redirect uri is missing"""
         with patch(
-            "streamlit.user_info.secrets_singleton",
+            "streamlit.auth_util.secrets_singleton",
             MagicMock(
                 load_if_toml_exists=MagicMock(return_value=True),
                 get=MagicMock(return_value={"google": {}}),
@@ -196,7 +196,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
     def test_user_login_required_fields_missing(self):
         """Tests that an error is raised if the required fields are missing"""
         with patch(
-            "streamlit.user_info.secrets_singleton",
+            "streamlit.auth_util.secrets_singleton",
             MagicMock(
                 load_if_toml_exists=MagicMock(return_value=True),
                 get=MagicMock(

@@ -14,125 +14,30 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
 from typing import (
     TYPE_CHECKING,
     Final,
     Iterator,
     Mapping,
     NoReturn,
-    TypedDict,
     Union,
-    cast,
 )
 
 from streamlit import config, runtime
-from streamlit.errors import AuthError, StreamlitAPIException
+from streamlit.auth_util import encode_provider_token, validate_auth_credentials
+from streamlit.errors import StreamlitAPIException
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
 from streamlit.runtime.scriptrunner_utils.script_run_context import (
     get_script_run_ctx as _get_script_run_ctx,
 )
-from streamlit.runtime.secrets import secrets_singleton
 from streamlit.url_util import make_url_path
 
 if TYPE_CHECKING:
     from streamlit.runtime.scriptrunner_utils.script_run_context import UserInfo
 
-    class ProviderTokenPayload(TypedDict):
-        provider: str
-        exp: int
-
 
 AUTH_LOGIN_ENDPOINT: Final = "/auth/login"
 AUTH_LOGOUT_ENDPOINT: Final = "/auth/logout"
-
-
-def get_signing_secret() -> str:
-    """Get the cookie signing secret from the configuration or secrets.toml."""
-    signing_secret: str = config.get_option("server.cookieSecret")
-    if secrets_singleton.load_if_toml_exists():
-        auth_section = secrets_singleton.get("auth")
-        if auth_section:
-            signing_secret = auth_section.get("cookie_secret", signing_secret)
-    return signing_secret
-
-
-def encode_provider_token(provider: str) -> str:
-    """Returns a signed JWT token with the provider and expiration time."""
-    try:
-        from authlib.jose import jwt  # type: ignore[import-untyped]
-    except ImportError:
-        raise AuthError(
-            "To use Auth you need to install the 'Authlib' package."
-        ) from None
-
-    header = {"alg": "HS256"}
-    payload = {
-        "provider": provider,
-        "exp": datetime.now(timezone.utc) + timedelta(minutes=2),
-    }
-    provider_token: bytes = jwt.encode(header, payload, get_signing_secret())
-    # JWT token is a byte string, so we need to decode it to a URL compatible string
-    return provider_token.decode("latin-1")
-
-
-def decode_provider_token(provider_token: str) -> ProviderTokenPayload:
-    """Decode the JWT token and validate the claims."""
-    try:
-        from authlib.jose import JoseError, JWTClaims, jwt
-    except ImportError:
-        raise AuthError(
-            "To use Auth you need to install the 'Authlib' package."
-        ) from None
-
-    claim_options = {"exp": {"essential": True}, "provider": {"essential": True}}
-    try:
-        payload: JWTClaims = jwt.decode(
-            provider_token, get_signing_secret(), claims_options=claim_options
-        )
-        payload.validate()
-    except JoseError as e:
-        raise AuthError(f"Error decoding provider token: {e}") from None
-
-    return cast("ProviderTokenPayload", payload)
-
-
-def validate_auth_credentials(provider: str) -> None:
-    """Validate the general auth credentials and auth credentials for the given provider."""
-    if not secrets_singleton.load_if_toml_exists():
-        raise AuthError(
-            "To use Auth you need to configure auth credentials in secrets.toml."
-        )
-
-    auth_section = secrets_singleton.get("auth")
-    if auth_section is None:
-        raise AuthError(
-            "Auth credentials are missing. Please check your configuration."
-        )
-    if "redirect_uri" not in auth_section:
-        raise AuthError(
-            "Auth credentials are missing 'redirect_uri'. Please check your configuration."
-        )
-
-    provider_section = auth_section.get(provider)
-    if provider_section is None:
-        raise AuthError(
-            f"Auth credentials are missing *'{provider}'*. Please check your configuration."
-        )
-
-    if not isinstance(provider_section, Mapping):
-        raise AuthError(
-            f"Auth credentials for '{provider}' must be a toml section."
-            f" Please check your configuration."
-        )
-
-    required_keys = ["client_id", "client_secret", "server_metadata_url"]
-    missing_keys = [key for key in required_keys if key not in provider_section]
-    if missing_keys:
-        raise AuthError(
-            f"Auth credentials for '{provider}' are missing the following keys: "
-            f"{missing_keys}. Please check your configuration."
-        )
 
 
 def generate_login_redirect_url(provider: str) -> str:
