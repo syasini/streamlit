@@ -252,7 +252,7 @@ class CachedFunc:
         # on behalf of the user.
         is_nested_cache_function = in_cached_function.get()
         spinner_or_no_context = (
-            spinner(spinner_message, _cache=False)
+            spinner(spinner_message, _cache=True)
             if spinner_message is not None and not is_nested_cache_function
             else contextlib.nullcontext()
         )
