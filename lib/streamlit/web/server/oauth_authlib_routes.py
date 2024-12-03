@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 
 import tornado.web
 
-from streamlit.errors import StreamlitAPIException
+from streamlit.errors import AuthError
 from streamlit.runtime.secrets import secrets_singleton
 from streamlit.url_util import make_url_path
 from streamlit.user_info import decode_provider_token
@@ -123,9 +123,9 @@ class AuthLoginHandler(AuthHandlerMixin, tornado.web.RequestHandler):
         provider_token = self.get_argument("provider", None)
         try:
             if provider_token is None:
-                raise StreamlitAPIException("Missing provider token")
+                raise AuthError("Missing provider token")
             payload = decode_provider_token(provider_token)
-        except StreamlitAPIException:
+        except AuthError:
             return None
 
         return payload["provider"]

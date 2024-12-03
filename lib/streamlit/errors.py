@@ -103,6 +103,10 @@ class DuplicateWidgetID(StreamlitAPIException):
     pass
 
 
+class AuthError(StreamlitAPIException):
+    pass
+
+
 class StreamlitDuplicateElementId(DuplicateWidgetID):
     """An exception raised when the auto-generated ID of an element is not unique."""
 

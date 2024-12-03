@@ -22,7 +22,7 @@ from unittest.mock import MagicMock, patch
 from parameterized import parameterized
 
 import streamlit as st
-from streamlit.errors import StreamlitAPIException
+from streamlit.errors import AuthError, StreamlitAPIException
 from streamlit.runtime.forward_msg_queue import ForwardMsgQueue
 from streamlit.runtime.fragment import MemoryFragmentStorage
 from streamlit.runtime.pages_manager import PagesManager
@@ -171,7 +171,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
 
     def test_user_login_with_invalid_provider(self):
         """Test that st.experimental_user.login raise exception for invalid provider."""
-        with self.assertRaises(StreamlitAPIException) as ex:
+        with self.assertRaises(AuthError) as ex:
             st.experimental_user.login("invalid_provider")
 
         assert "Auth credentials are missing *'invalid_provider'*" in str(ex.exception)
@@ -185,7 +185,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 get=MagicMock(return_value={"google": {}}),
             ),
         ):
-            with self.assertRaises(StreamlitAPIException) as ex:
+            with self.assertRaises(AuthError) as ex:
                 st.experimental_user.login("google")
 
             assert (
@@ -207,7 +207,7 @@ class UserInfoAuthTest(DeltaGeneratorTestCase):
                 ),
             ),
         ):
-            with self.assertRaises(StreamlitAPIException) as ex:
+            with self.assertRaises(AuthError) as ex:
                 st.experimental_user.login("google")
 
             assert (
