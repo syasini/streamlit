@@ -156,8 +156,12 @@ class ColumnConfig(TypedDict, total=False):
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -169,11 +173,12 @@ class ColumnConfig(TypedDict, total=False):
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: str, bool, int, float, or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     hidden: bool or None
         Whether to hide the column. This defaults to ``False``.
@@ -251,8 +256,12 @@ def Column(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -264,7 +273,8 @@ def Column(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     Examples
     --------
@@ -348,8 +358,12 @@ def NumberColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -361,17 +375,19 @@ def NumberColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: int, float, or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     format: str or None
         A printf-style format string controlling how numbers are displayed.
         This does not impact the return value. The following formatters are
         valid: ``%d``, ``%e``, ``%f``, ``%g``, ``%i``, ``%u``. You can also add
-        prefixes and suffixes, e.g. ``"$ %.2f"`` to show a dollar prefix.
+        prefixes and suffixes, e.g. ``"$ %.2f"`` to show a dollar prefix. If
+        this is ``None`` (default), the numbers are not formatted.
 
         Number formatting from ``column_config`` always takes precedence over
         number formatting from ``pandas.Styler``.
@@ -481,8 +497,12 @@ def TextColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -494,11 +514,12 @@ def TextColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: str or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     max_chars: int or None
         The maximum number of characters that can be entered. If this is
@@ -596,8 +617,12 @@ def LinkColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -609,11 +634,12 @@ def LinkColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: str or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     max_chars: int or None
         The maximum number of characters that can be entered. If None (default),
@@ -744,8 +770,12 @@ def CheckboxColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -757,11 +787,12 @@ def CheckboxColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: bool or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     Examples
     --------
@@ -845,8 +876,12 @@ def SelectboxColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -858,11 +893,12 @@ def SelectboxColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: str, int, float, bool, or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     options: Iterable of str or None
         The options that can be selected during editing. If this is ``None``
@@ -963,7 +999,8 @@ def BarChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1056,7 +1093,8 @@ def LineChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1150,7 +1188,8 @@ def AreaChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1250,7 +1289,8 @@ def ImageColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     Examples
     --------
@@ -1329,7 +1369,8 @@ def ListColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     Examples
     --------
@@ -1417,8 +1458,12 @@ def DatetimeColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -1430,11 +1475,12 @@ def DatetimeColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: datetime.datetime or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     format: str or None
         A momentJS format string controlling how datetimes are displayed. See
@@ -1559,8 +1605,12 @@ def TimeColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -1572,11 +1622,12 @@ def TimeColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: datetime.time or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     format: str or None
         A momentJS format string controlling how times are displayed. See
@@ -1696,8 +1747,12 @@ def DateColumn(
         label. If this is ``None`` (default), no tooltip is displayed.
 
     disabled: bool or None
-        Whether editing should be disabled for this column. This defaults to
-        ``False``.
+        Whether editing should be disabled for this column. If this is ``None``
+        (default), Streamlit will decide: indices are disabled and data columns
+        are not.
+
+        If a column has mixed types, it may become uneditable regardless of
+        ``disabled``.
 
     required: bool or None
         Whether edited cells in the column need to have a value. If this is
@@ -1709,11 +1764,12 @@ def DateColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     default: datetime.date or None
         Specifies the default value in this column when a new row is added by
-        the user.
+        the user. This defaults to ``None``.
 
     format: str or None
         A momentJS format string controlling how times are displayed. See
@@ -1831,12 +1887,14 @@ def ProgressColumn(
         A printf-style format string controlling how numbers are displayed.
         This does not impact the return value. The following formatters are
         valid: ``%d``, ``%e``, ``%f``, ``%g``, ``%i``, ``%u``. You can also add
-        prefixes and suffixes, e.g. ``"$ %.2f"`` to show a dollar prefix.
+        prefixes and suffixes, e.g. ``"$ %.2f"`` to show a dollar prefix. If
+        this is ``None`` (default), the numbers are not formatted.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), indices are pinned and data columns are not.
+        (default), Streamlit will decide: indices are pinned and data columns
+        are not.
 
     min_value: int, float, or None
         The minimum value of the progress bar. If this is ``None`` (default),
