@@ -163,26 +163,6 @@ SyntaxError: invalid syntax
             f"Stack does not have length {original_stack_len}: {proto.stack_trace}",
         )
 
-    @parameterized.expand([(False,), ("false",), ("False",), ("stacktrace",)])
-    def test_uncaught_app_exception_hide_message(self, show_error_details_config_value):
-        with testutil.patch_config_options(
-            {"client.showErrorDetails": show_error_details_config_value}
-        ):
-            err = None
-            try:
-                st.format("http://not_an_image.png", width=-1)
-            except Exception as e:
-                err = e
-            self.assertIsNotNone(err)
-
-            # Marshall it.
-            proto = ExceptionProto()
-            exception.marshall(proto, err, is_uncaught_app_exception=True)
-
-            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-            assert len(proto.stack_trace)
-            assert proto.type == "AttributeError"
-
     @parameterized.expand([(True,), ("true",), ("True",), ("full",)])
     def test_uncaught_app_exception_show_everything(
         self, show_error_details_config_value
@@ -202,11 +182,14 @@ SyntaxError: invalid syntax
             exception.marshall(proto, err, is_uncaught_app_exception=True)
 
             assert proto.message == "module 'streamlit' has no attribute 'format'"
-            assert len(proto.stack_trace)
+            assert len(proto.stack_trace) > 0
             assert proto.type == "AttributeError"
 
-    def test_uncaught_app_exception_hide_everythin(self):
-        with testutil.patch_config_options({"client.showErrorDetails": "none"}):
+    @parameterized.expand([(False,), ("false",), ("False",), ("stacktrace",)])
+    def test_uncaught_app_exception_hide_message(self, show_error_details_config_value):
+        with testutil.patch_config_options(
+            {"client.showErrorDetails": show_error_details_config_value}
+        ):
             err = None
             try:
                 st.format("http://not_an_image.png", width=-1)
@@ -219,8 +202,25 @@ SyntaxError: invalid syntax
             exception.marshall(proto, err, is_uncaught_app_exception=True)
 
             assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-            assert len(proto.stack_trace) == 0
-            assert proto.type == ""
+            assert len(proto.stack_trace) > 0
+            assert proto.type == "AttributeError"
+
+    def test_uncaught_app_exception_show_type_and_stacktrace_only(self):
+        with testutil.patch_config_options({"client.showErrorDetails": "stacktrace"}):
+            err = None
+            try:
+                st.format("http://not_an_image.png", width=-1)
+            except Exception as e:
+                err = e
+            self.assertIsNotNone(err)
+
+            # Marshall it.
+            proto = ExceptionProto()
+            exception.marshall(proto, err, is_uncaught_app_exception=True)
+
+            assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
+            assert len(proto.stack_trace) > 0
+            assert proto.type == "AttributeError"
 
     def test_uncaught_app_exception_show_only_type(self):
         with testutil.patch_config_options({"client.showErrorDetails": "type"}):
@@ -239,8 +239,8 @@ SyntaxError: invalid syntax
             assert len(proto.stack_trace) == 0
             assert proto.type == "AttributeError"
 
-    def test_uncaught_app_exception_show_type_and_stacktrace_only(self):
-        with testutil.patch_config_options({"client.showErrorDetails": "stacktrace"}):
+    def test_uncaught_app_exception_hide_everything(self):
+        with testutil.patch_config_options({"client.showErrorDetails": "none"}):
             err = None
             try:
                 st.format("http://not_an_image.png", width=-1)
@@ -253,8 +253,8 @@ SyntaxError: invalid syntax
             exception.marshall(proto, err, is_uncaught_app_exception=True)
 
             assert proto.message == _GENERIC_UNCAUGHT_EXCEPTION_TEXT
-            assert len(proto.stack_trace)
-            assert proto.type == "AttributeError"
+            assert len(proto.stack_trace) == 0
+            assert proto.type == ""
 
 
 class StExceptionAPITest(DeltaGeneratorTestCase):
