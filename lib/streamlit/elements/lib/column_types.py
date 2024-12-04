@@ -147,9 +147,9 @@ class ColumnConfig(TypedDict, total=False):
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -242,9 +242,9 @@ def Column(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -339,9 +339,9 @@ def NumberColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -472,9 +472,9 @@ def TextColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -587,9 +587,9 @@ def LinkColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -735,9 +735,9 @@ def CheckboxColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -836,9 +836,9 @@ def SelectboxColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -952,9 +952,9 @@ def BarChartColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1045,9 +1045,9 @@ def LineChartColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1139,9 +1139,9 @@ def AreaChartColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1239,9 +1239,9 @@ def ImageColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1318,9 +1318,9 @@ def ListColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1408,9 +1408,9 @@ def DatetimeColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1550,9 +1550,9 @@ def TimeColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1687,9 +1687,9 @@ def DateColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
@@ -1819,9 +1819,9 @@ def ProgressColumn(
         column will be sized to fit the cell contents. Otherwise, this can be
         one of the following:
 
-        -``"small"``: 75px wide
-        -``"medium"``: 200px wide
-        -``"large"``: 400px wide
+        - ``"small"``: 75px wide
+        - ``"medium"``: 200px wide
+        - ``"large"``: 400px wide
 
     help: str or None
         An optional tooltip that gets displayed when hovering over the column
