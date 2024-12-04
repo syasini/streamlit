@@ -53,29 +53,32 @@ SyntaxError: invalid syntax
 """
         self.assertEqual(expected.strip(), _format_syntax_error_message(err))
 
-    def test_markdown_flag(self):
+    @parameterized.expand([(True,), (False,)])
+    def test_markdown_flag(self, is_uncaught_app_exception):
         """Test that ExceptionProtos for StreamlitAPIExceptions (and
         subclasses) have the "message_is_markdown" flag set.
         """
         proto = ExceptionProto()
-        exception.marshall(proto, RuntimeError("oh no!"))
-        self.assertFalse(proto.message_is_markdown)
-
-        proto = ExceptionProto()
         exception.marshall(
-            proto, RuntimeError("oh no!"), is_uncaught_app_exception=True
+            proto,
+            RuntimeError("oh no!"),
+            is_uncaught_app_exception=is_uncaught_app_exception,
         )
         self.assertFalse(proto.message_is_markdown)
 
         proto = ExceptionProto()
         exception.marshall(
-            proto, StreamlitAPIException("oh no!"), is_uncaught_app_exception=True
+            proto,
+            StreamlitAPIException("oh no!"),
+            is_uncaught_app_exception=is_uncaught_app_exception,
         )
         self.assertTrue(proto.message_is_markdown)
 
         proto = ExceptionProto()
         exception.marshall(
-            proto, errors.DuplicateWidgetID("oh no!"), is_uncaught_app_exception=True
+            proto,
+            errors.DuplicateWidgetID("oh no!"),
+            is_uncaught_app_exception=is_uncaught_app_exception,
         )
         self.assertTrue(proto.message_is_markdown)
 
@@ -160,12 +163,11 @@ SyntaxError: invalid syntax
             f"Stack does not have length {original_stack_len}: {proto.stack_trace}",
         )
 
-    def test_uncaught_app_exception_default_setting_community_cloud(self):
-        """
-        In community cloud, we show a generic error message, the trace and the type.
-        Community cloud uses False. This is the same results as "stacktrace".
-        """
-        with testutil.patch_config_options({"client.showErrorDetails": False}):
+    @parameterized.expand([(False,), ("false",), ("False",), ("stacktrace",)])
+    def test_uncaught_app_exception_hide_message(self, show_error_details_config_value):
+        with testutil.patch_config_options(
+            {"client.showErrorDetails": show_error_details_config_value}
+        ):
             err = None
             try:
                 st.format("http://not_an_image.png", width=-1)
@@ -181,8 +183,13 @@ SyntaxError: invalid syntax
             assert len(proto.stack_trace)
             assert proto.type == "AttributeError"
 
-    def test_uncaught_app_exception_full_config_setting(self):
-        with testutil.patch_config_options({"client.showErrorDetails": "full"}):
+    @parameterized.expand([(True,), ("true",), ("True",), ("full",)])
+    def test_uncaught_app_exception_show_everything(
+        self, show_error_details_config_value
+    ):
+        with testutil.patch_config_options(
+            {"client.showErrorDetails": show_error_details_config_value}
+        ):
             err = None
             try:
                 st.format("http://not_an_image.png", width=-1)
@@ -198,7 +205,7 @@ SyntaxError: invalid syntax
             assert len(proto.stack_trace)
             assert proto.type == "AttributeError"
 
-    def test_uncaught_app_exception_none_config_setting(self):
+    def test_uncaught_app_exception_hide_everythin(self):
         with testutil.patch_config_options({"client.showErrorDetails": "none"}):
             err = None
             try:
@@ -215,7 +222,7 @@ SyntaxError: invalid syntax
             assert len(proto.stack_trace) == 0
             assert proto.type == ""
 
-    def test_uncaught_app_exception_type_config_setting(self):
+    def test_uncaught_app_exception_show_only_type(self):
         with testutil.patch_config_options({"client.showErrorDetails": "type"}):
             err = None
             try:
@@ -232,7 +239,7 @@ SyntaxError: invalid syntax
             assert len(proto.stack_trace) == 0
             assert proto.type == "AttributeError"
 
-    def test_uncaught_app_exception__config_setting(self):
+    def test_uncaught_app_exception_show_type_and_stacktrace_only(self):
         with testutil.patch_config_options({"client.showErrorDetails": "stacktrace"}):
             err = None
             try:
