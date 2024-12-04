@@ -56,7 +56,7 @@ class ExceptionMixin:
         >>> st.exception(e)
 
         """
-        return _send_proto(self.dg, exception)
+        return _exception(self.dg, exception)
 
     @property
     def dg(self) -> DeltaGenerator:
@@ -66,7 +66,7 @@ class ExceptionMixin:
 
 # TODO(lawilby): confirm whether we want to track metrics here with lukasmasuch.
 @gather_metrics("exception")
-def _send_proto(
+def _exception(
     dg: DeltaGenerator,
     exception: BaseException,
     is_uncaught_app_exception: bool = False,
