@@ -167,14 +167,14 @@ class ColumnConfig(TypedDict, total=False):
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: str, bool, int, float, or None
         Specifies the default value in this column when a new row is added by
@@ -267,14 +267,14 @@ def Column(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     Examples
     --------
@@ -369,14 +369,14 @@ def NumberColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: int, float, or None
         Specifies the default value in this column when a new row is added by
@@ -508,14 +508,14 @@ def TextColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: str or None
         Specifies the default value in this column when a new row is added by
@@ -628,22 +628,22 @@ def LinkColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: str or None
         Specifies the default value in this column when a new row is added by
         the user. This defaults to ``None``.
 
     max_chars: int or None
-        The maximum number of characters that can be entered. If None (default),
-        there will be no maximum.
+        The maximum number of characters that can be entered. If this is
+        ``None`` (default), there will be no maximum.
 
     validate: str or None
         A JS-flavored regular expression (e.g. ``"^https://.+$"``) that edited
@@ -781,14 +781,14 @@ def CheckboxColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: bool or None
         Specifies the default value in this column when a new row is added by
@@ -887,14 +887,14 @@ def SelectboxColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: str, int, float, bool, or None
         Specifies the default value in this column when a new row is added by
@@ -999,8 +999,8 @@ def BarChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1093,8 +1093,8 @@ def LineChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1188,8 +1188,8 @@ def AreaChartColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     y_min: int, float, or None
         The minimum value on the y-axis for all cells in the column. If this is
@@ -1289,8 +1289,8 @@ def ImageColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     Examples
     --------
@@ -1369,8 +1369,8 @@ def ListColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     Examples
     --------
@@ -1469,14 +1469,14 @@ def DatetimeColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: datetime.datetime or None
         Specifies the default value in this column when a new row is added by
@@ -1616,14 +1616,14 @@ def TimeColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: datetime.time or None
         Specifies the default value in this column when a new row is added by
@@ -1758,14 +1758,14 @@ def DateColumn(
         Whether edited cells in the column need to have a value. If this is
         ``False`` (default), the user can submit empty values for this column.
         If this is ``True``, an edited cell in this column can only be
-        submitted if its value is not ``None`` and a new row will only be
+        submitted if its value is not ``None``, and a new row will only be
         submitted after the user fills in this column.
 
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     default: datetime.date or None
         Specifies the default value in this column when a new row is added by
@@ -1893,8 +1893,8 @@ def ProgressColumn(
     pinned: bool or None
         Whether the column is pinned. A pinned column will stay visible on the
         left side no matter where the user scrolls. If this is ``None``
-        (default), Streamlit will decide: indices are pinned and data columns
-        are not.
+        (default), Streamlit will decide: index columns are pinned, and data
+        columns are not pinned.
 
     min_value: int, float, or None
         The minimum value of the progress bar. If this is ``None`` (default),
@@ -1902,7 +1902,7 @@ def ProgressColumn(
 
     max_value: int, float, or None
         The maximum value of the progress bar. If this is ``None`` (default),
-        the maximum will be 100 for integer values and 1 for float values.
+        the maximum will be 100 for integer values and 1.0 for float values.
 
     Examples
     --------
