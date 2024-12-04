@@ -187,6 +187,9 @@ class ButtonMixin:
 
         Examples
         --------
+
+        **Example 1: Customize your button type**
+
         >>> import streamlit as st
         >>>
         >>> st.button("Reset", type="primary")
@@ -194,10 +197,15 @@ class ButtonMixin:
         ...     st.write("Why hello there")
         ... else:
         ...     st.write("Goodbye")
+        >>>
+        >>> if st.button("Aloha", type="tertiary"):
+        ...     st.write("Ciao")
 
         .. output::
            https://doc-buton.streamlit.app/
-           height: 220px
+           height: 300px
+
+        **Example 2: Add icons to your button**
 
         Although you can add icons to your buttons through Markdown, the
         ``icon`` parameter is a convenient and consistent alternative.
