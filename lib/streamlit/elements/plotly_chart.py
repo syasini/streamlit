@@ -329,7 +329,8 @@ class PlotlyMixin:
         you would call Plotly's ``py.plot`` or ``py.iplot``.
 
         .. Important::
-            You must install ``plotly`` to use this command.
+            You must install ``plotly`` to use this command. Additionally, your
+            performance may be enhanced by installing ``orjson`` as well.
 
         Parameters
         ----------
