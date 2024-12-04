@@ -1839,12 +1839,12 @@ def ProgressColumn(
         (default), indices are pinned and data columns are not.
 
     min_value: int, float, or None
-        The minimum value of the progress bar.
-        If None (default), will be 0.
+        The minimum value of the progress bar. If this is ``None`` (default),
+        the minimum will be 0.
 
     max_value: int, float, or None
-        The minimum value of the progress bar. If None (default), will be 100 for
-        integer values and 1 for float values.
+        The maximum value of the progress bar. If this is ``None`` (default),
+        the maximum will be 100 for integer values and 1 for float values.
 
     Examples
     --------
