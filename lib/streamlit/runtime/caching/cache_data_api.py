@@ -400,7 +400,8 @@ class CacheDataAPI:
         unhashable argument (like a database connection) or an argument you
         want to exclude from caching, use an underscore prefix in the argument
         name. In this case, Streamlit will return a cached value when all other
-        arguments match a previous function call.
+        arguments match a previous function call. Alternatively, you can
+        declare custom hashing functions with ``hash_funcs``.
 
         To cache global resources, use ``st.cache_resource`` instead. Learn more
         about caching at https://docs.streamlit.io/develop/concepts/architecture/caching.
