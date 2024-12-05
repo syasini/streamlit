@@ -85,11 +85,15 @@ def test_first_graph_after_exit_fullscreen(
     # Hover over the parent div
     app.get_by_test_id("stGraphVizChart").nth(0).hover()
 
+    first_graph_svg = get_first_graph_svg(app)
+    expect(first_graph_svg).to_have_attribute("width", "79pt")
     # Enter and exit fullscreen
     click_fullscreen(app)
+    # in fullscreen mode, the width attribute is removed. Wait for this to
+    # avoid flakiness.
+    expect(first_graph_svg).not_to_have_attribute("width", "79pt")
     click_fullscreen(app)
 
-    first_graph_svg = get_first_graph_svg(app)
     expect(first_graph_svg).to_have_attribute("width", "79pt")
     expect(first_graph_svg).to_have_attribute("height", "116pt")
     assert_snapshot(first_graph_svg, name="st_graphviz-after_exit_fullscreen")

@@ -115,9 +115,11 @@ def test_dataframe_demo_page(app: Page, assert_snapshot: ImageCompareFunction) -
 
 
 # TEST PRINTING:
-# The print tests are in this suite to avoid having full-app screenshots being spread around in different suites.
-# Even the smallest design change in one part of the app can make these full-screenshots fail and require renewal, which is why we want them to be
-# bundled in one place. The "Dataframe Demo" page was arbitrarily chosen as a good printing candidate.
+# The print tests are in this suite to avoid having full-app screenshots being spread
+# around in different suites. Even the smallest design change in one part of the app can
+# make these full-screenshots fail and require renewal, which is why we want them to be
+# bundled in one place. The "Dataframe Demo" page was arbitrarily chosen as a good
+# printing candidate.
 
 
 def _evaluate_match_media_print(app: Page):
@@ -141,7 +143,8 @@ def _set_landscape_dimensions(app: Page):
 def test_app_print_mode_portrait_with_sidebar_open(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    """Test that the dataframe demo page looks correctly in print-mode with sidebar open."""
+    """Test that the dataframe demo page looks correctly in print-mode with
+    sidebar open."""
     app = themed_app
     _load_dataframe_demo_page(app)
     app.emulate_media(media="print", forced_colors="active")
@@ -157,10 +160,12 @@ def test_app_print_mode_portrait_with_sidebar_open(
 def test_app_print_mode_portrait_with_sidebar_closed(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    """Test that the dataframe demo page looks correctly in print-mode with sidebar closed."""
+    """Test that the dataframe demo page looks correctly in print-mode with
+    sidebar closed."""
     app = themed_app
     _load_dataframe_demo_page(app)
-    # close sidebar. Must be done before print-mode, because we hide the close button when printing
+    # close sidebar. Must be done before print-mode, because we hide the close button
+    # when printing
     app.get_by_test_id("stSidebar").hover()
     sidebar_element = app.get_by_test_id("stSidebarContent")
     sidebar_element.get_by_test_id("stBaseButton-headerNoPadding").click()
@@ -176,7 +181,8 @@ def test_app_print_mode_portrait_with_sidebar_closed(
 def test_app_print_mode_landscape_with_sidebar_open(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    """Test that the dataframe demo page looks correctly in print-mode (orientation: landscape) with sidebar open."""
+    """Test that the dataframe demo page looks correctly in print-mode
+    (orientation: landscape) with sidebar open."""
     app = themed_app
     _load_dataframe_demo_page(app)
     app.emulate_media(media="print", forced_colors="active")
@@ -192,10 +198,12 @@ def test_app_print_mode_landscape_with_sidebar_open(
 def test_app_print_mode_landscape_with_sidebar_closed(
     themed_app: Page, assert_snapshot: ImageCompareFunction
 ):
-    """Test that the dataframe demo page looks correctly in print-mode (orientation: landscape) with sidebar closed."""
+    """Test that the dataframe demo page looks correctly in print-mode
+    (orientation: landscape) with sidebar closed."""
     app = themed_app
     _load_dataframe_demo_page(app)
-    # close sidebar. Must be done before print-mode, because we hide the close button when printing
+    # close sidebar. Must be done before print-mode, because we hide the close button
+    # when printing
     app.get_by_test_id("stSidebar").hover()
     sidebar_element = app.get_by_test_id("stSidebarContent")
     sidebar_element.get_by_test_id("stBaseButton-headerNoPadding").click()
