@@ -14,7 +14,11 @@
 
 from playwright.sync_api import Page, expect
 
-from e2e_playwright.conftest import ImageCompareFunction, wait_for_app_run
+from e2e_playwright.conftest import (
+    ImageCompareFunction,
+    wait_for_app_run,
+)
+from e2e_playwright.shared.app_utils import register_dom_observer
 
 
 def navigate_to_page(app: Page, index: int):
@@ -146,6 +150,9 @@ def test_app_print_mode_portrait_with_sidebar_open(
     """Test that the dataframe demo page looks correctly in print-mode with
     sidebar open."""
     app = themed_app
+
+    wait_until_no_changes_were_observed = register_dom_observer(app, timeout_ms=2500)
+
     _load_dataframe_demo_page(app)
     app.emulate_media(media="print", forced_colors="active")
     _set_portrait_dimensions(app)
@@ -153,6 +160,8 @@ def test_app_print_mode_portrait_with_sidebar_open(
 
     # ensure that the sidebar is visible
     expect(app.get_by_test_id("stSidebarContent")).to_be_visible()
+
+    wait_until_no_changes_were_observed()
 
     assert_snapshot(app, name="hello_app-print_media-portrait-sidebar_open")
 
@@ -163,6 +172,9 @@ def test_app_print_mode_portrait_with_sidebar_closed(
     """Test that the dataframe demo page looks correctly in print-mode with
     sidebar closed."""
     app = themed_app
+
+    wait_until_no_changes_were_observed = register_dom_observer(app, timeout_ms=2500)
+
     _load_dataframe_demo_page(app)
     # close sidebar. Must be done before print-mode, because we hide the close button
     # when printing
@@ -175,6 +187,8 @@ def test_app_print_mode_portrait_with_sidebar_closed(
     _set_portrait_dimensions(app)
     _evaluate_match_media_print(app)
 
+    wait_until_no_changes_were_observed()
+
     assert_snapshot(app, name="hello_app-print_media-portrait-sidebar_closed")
 
 
@@ -184,13 +198,18 @@ def test_app_print_mode_landscape_with_sidebar_open(
     """Test that the dataframe demo page looks correctly in print-mode
     (orientation: landscape) with sidebar open."""
     app = themed_app
+
+    wait_until_no_changes_were_observed = register_dom_observer(app, timeout_ms=2500)
+
     _load_dataframe_demo_page(app)
     app.emulate_media(media="print", forced_colors="active")
     _set_landscape_dimensions(app)
     _evaluate_match_media_print(app)
-
     # ensure that the sidebar is visible
     expect(app.get_by_test_id("stSidebarContent")).to_be_visible()
+
+    # make sure no DOM changes are observed for some time before taking the snapshot
+    wait_until_no_changes_were_observed()
 
     assert_snapshot(app, name="hello_app-print_media-landscape-sidebar_open")
 
@@ -201,6 +220,9 @@ def test_app_print_mode_landscape_with_sidebar_closed(
     """Test that the dataframe demo page looks correctly in print-mode
     (orientation: landscape) with sidebar closed."""
     app = themed_app
+
+    wait_until_no_changes_were_observed = register_dom_observer(app, timeout_ms=2500)
+
     _load_dataframe_demo_page(app)
     # close sidebar. Must be done before print-mode, because we hide the close button
     # when printing
@@ -212,5 +234,8 @@ def test_app_print_mode_landscape_with_sidebar_closed(
     app.emulate_media(media="print", forced_colors="active")
     _set_landscape_dimensions(app)
     _evaluate_match_media_print(app)
+
+    # make sure no DOM changes are observed for some time before taking the snapshot
+    wait_until_no_changes_were_observed()
 
     assert_snapshot(app, name="hello_app-print_media-landscape-sidebar_closed")

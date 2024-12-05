@@ -16,11 +16,11 @@ from __future__ import annotations
 
 import platform
 import re
-from typing import Literal, Pattern
+from typing import Callable, Literal, Pattern
 
 from playwright.sync_api import Frame, Locator, Page, expect
 
-from e2e_playwright.conftest import wait_for_app_run
+from e2e_playwright.conftest import wait_for_app_run, wait_until
 
 # Meta = Apple's Command Key; for complete list see https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values#special_values
 COMMAND_KEY = "Meta" if platform.system() == "Darwin" else "Control"
@@ -568,6 +568,91 @@ def get_observed_connection_statuses(page_or_frame: Page | Frame | None) -> list
 
     return page_or_frame.evaluate(
         "() => window.streamlitPlaywrightDebugConnectionStatuses"
+    )
+
+
+def register_dom_observer(
+    page: Page | None, timeout_ms: int = 1000
+) -> Callable[[], None]:
+    """Register a DOM observer that will set
+    'window.streamlitChangesObservedInTheLastXSeconds' to true when changes are observed
+    and false if no changes were observed for `timeout_ms` milliseconds.
+
+    Returns a function that can be called to wait until no changes were observed for the
+    specified timeout.
+
+    Parameters
+    ----------
+    page : Page
+        The page to register the observer on.
+    timeout_ms : int
+        The timeout in milliseconds for which no changes should be observed on the DOM.
+
+
+    Returns
+    -------
+    Callable[[], None]
+        A function that can be called to wait until no changes were observed for the
+        specified time.
+
+    Example
+    -------
+
+    ```python
+    wait_until_no_changes_were_observed = register_dom_observer(app, timeout=2000)
+
+    # Make changes to the app
+
+    # Now wait until no changes were observed for 2000 milliseconds
+    wait_until_no_changes_were_observed()
+
+    assert_snapshot()
+    ```
+
+    """
+
+    if page is None:
+        return lambda: None
+
+    page.evaluate(f"""async () => {{
+        window.streamlitChangesObservedInTheLastXSeconds = false;
+        let timeoutId = null;
+        const callback = (mutations, observer) => {{
+            if (!mutations || mutations.length === 0) {{
+                return
+            }}
+            const target = mutations[0].target
+            if (!target) {{
+                return
+            }}
+            clearTimeout(timeoutId);
+            window.streamlitChangesObservedInTheLastXSeconds = true;
+            timeoutId = setTimeout(() => {{
+                window.streamlitChangesObservedInTheLastXSeconds = false;
+                console.log("No changes observed for {timeout_ms} milliseconds");
+            }}, {timeout_ms})
+        }}
+        const observer = new MutationObserver(callback);
+        // Observe app status for changes
+        const targetNode = document.querySelector('[data-testid=stApp]')
+        if (!targetNode) {{
+            console.log("stApp not found")
+            return
+        }}
+
+        const config = {{
+            childList: true,
+            subtree: true,
+        }};
+        observer.observe(targetNode, config);
+    }}""")
+
+    return lambda: wait_until(  # type: ignore # see https://github.com/python/mypy/issues/12557
+        page,
+        lambda: page.evaluate("() => window.streamlitChangesObservedInTheLastXSeconds")
+        is False,
+        # wait a little bit longer than the passed timeout before raising an exception
+        timeout=timeout_ms + 5000,
     )
 
 
