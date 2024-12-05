@@ -129,6 +129,7 @@ def test_video_end_time(app: Page, nth_element: int):
 
     video_element = video_elements.nth(nth_element)
     video_element.scroll_into_view_if_needed()
+    _wait_until_video_has_data(app, video_element)
     video_element.evaluate("el => el.play()")
     # Wait until video will reach end_time
     app.wait_for_timeout(3000)
@@ -152,6 +153,7 @@ def test_video_end_time_loop(app: Page, nth_element: int):
 
     video_element = video_elements.nth(nth_element)
     video_element.scroll_into_view_if_needed()
+    _wait_until_video_has_data(app, video_element)
     video_element.evaluate("el => el.play()")
     # According to the element definition looks like this:
     # start_time=35, end_time=39, loop=True
