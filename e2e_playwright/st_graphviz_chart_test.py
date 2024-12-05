@@ -23,7 +23,9 @@ def get_first_graph_svg(app: Page):
 
 
 def click_fullscreen(app: Page):
-    app.get_by_role("button", name="Fullscreen").nth(0).click()
+    fullscreen_button = app.get_by_role("button", name="Fullscreen").nth(0)
+    expect(fullscreen_button).to_be_visible()
+    fullscreen_button.click(force=True)
     # Wait for the animation to finish
     app.wait_for_timeout(1000)
 
@@ -82,11 +84,12 @@ def test_first_graph_after_exit_fullscreen(
 ):
     """Test if the first graph has correct size after exiting fullscreen."""
 
+    first_graph_svg = get_first_graph_svg(app)
+    expect(first_graph_svg).to_have_attribute("width", "79pt")
+
     # Hover over the parent div
     app.get_by_test_id("stGraphVizChart").nth(0).hover()
 
-    first_graph_svg = get_first_graph_svg(app)
-    expect(first_graph_svg).to_have_attribute("width", "79pt")
     # Enter and exit fullscreen
     click_fullscreen(app)
     # in fullscreen mode, the width attribute is removed. Wait for this to
