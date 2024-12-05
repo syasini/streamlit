@@ -19,48 +19,25 @@ from urllib.parse import urlparse
 
 import tornado.web
 
-from streamlit.auth_util import decode_provider_token
+from streamlit.auth_util import (
+    AuthCache,
+    decode_provider_token,
+    get_secrets_auth_section,
+)
 from streamlit.errors import AuthError
-from streamlit.runtime.secrets import secrets_singleton
 from streamlit.url_util import make_url_path
 from streamlit.web.server.oidc_mixin import TornadoOAuth, TornadoOAuth2App
 from streamlit.web.server.server_util import AUTH_COOKIE_NAME
-
-
-class AuthCache:
-    """Simple cache implementation for storing info required for Authlib."""
-
-    def __init__(self):
-        self.cache = {}
-
-    def get(self, key):
-        return self.cache.get(key)
-
-    # for set method, we are follow the same signature used in Authlib
-    # the expires_in is not used in our case
-    def set(self, key, value, expires_in):
-        self.cache[key] = value
-
-    def get_dict(self):
-        return self.cache
-
-    def delete(self, key):
-        self.cache.pop(key, None)
-
 
 auth_cache = AuthCache()
 
 
 def create_oauth_client(provider: str) -> tuple[TornadoOAuth2App, str]:
     """Create an OAuth client for the given provider based on secrets.toml configuration."""
-    if secrets_singleton.load_if_toml_exists():
-        auth_section = secrets_singleton.get("auth")
-        if auth_section:
-            redirect_uri = auth_section.get("redirect_uri", None)
-            config = auth_section.to_dict()
-        else:
-            config = {}
-            redirect_uri = "/"
+    auth_section = get_secrets_auth_section()
+    if auth_section:
+        redirect_uri = auth_section.get("redirect_uri", None)
+        config = auth_section.to_dict()
     else:
         config = {}
         redirect_uri = "/"
@@ -180,10 +157,9 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
 
     def _get_origin_from_secrets(self) -> str | None:
         redirect_uri = None
-        if secrets_singleton.load_if_toml_exists():
-            auth_section = secrets_singleton.get("auth")
-            if auth_section:
-                redirect_uri = auth_section.get("redirect_uri", None)
+        auth_section = get_secrets_auth_section()
+        if auth_section:
+            redirect_uri = auth_section.get("redirect_uri", None)
 
         if not redirect_uri:
             return None

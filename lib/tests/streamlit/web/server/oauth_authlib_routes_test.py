@@ -49,7 +49,7 @@ SECRETS_MOCK = SecretMock(
 
 
 @patch(
-    "streamlit.web.server.oauth_authlib_routes.secrets_singleton",
+    "streamlit.auth_util.secrets_singleton",
     MagicMock(
         load_if_toml_exists=MagicMock(return_value=True),
         get=MagicMock(return_value=SECRETS_MOCK),
@@ -164,7 +164,7 @@ class LogoutHandlerTest(tornado.testing.AsyncHTTPTestCase):
 
 
 @patch(
-    "streamlit.web.server.oauth_authlib_routes.secrets_singleton",
+    "streamlit.auth_util.secrets_singleton",
     MagicMock(
         load_if_toml_exists=MagicMock(return_value=True),
         get=MagicMock(return_value=SECRETS_MOCK),

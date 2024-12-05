@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Mapping, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Mapping, TypedDict, cast
 
 from streamlit import config
 from streamlit.errors import AuthError
@@ -28,6 +28,27 @@ if TYPE_CHECKING:
         exp: int
 
 
+class AuthCache:
+    """Simple cache implementation for storing info required for Authlib."""
+
+    def __init__(self):
+        self.cache = {}
+
+    def get(self, key):
+        return self.cache.get(key)
+
+    # for set method, we are follow the same signature used in Authlib
+    # the expires_in is not used in our case
+    def set(self, key, value, expires_in):
+        self.cache[key] = value
+
+    def get_dict(self):
+        return self.cache
+
+    def delete(self, key):
+        self.cache.pop(key, None)
+
+
 def get_signing_secret() -> str:
     """Get the cookie signing secret from the configuration or secrets.toml."""
     signing_secret: str = config.get_option("server.cookieSecret")
@@ -36,6 +57,15 @@ def get_signing_secret() -> str:
         if auth_section:
             signing_secret = auth_section.get("cookie_secret", signing_secret)
     return signing_secret
+
+
+def get_secrets_auth_section() -> Mapping[str, Any]:
+    auth_section = {}
+    """Get the 'auth' section of the secrets.toml."""
+    if secrets_singleton.load_if_toml_exists():
+        auth_section = secrets_singleton.get("auth")
+
+    return auth_section
 
 
 def encode_provider_token(provider: str) -> str:
