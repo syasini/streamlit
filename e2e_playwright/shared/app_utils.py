@@ -389,16 +389,16 @@ def click_selectbox_option(
 ) -> None:
     selectbox = get_selectbox(page, selectbox_label)
     selectbox.click()
-    dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
 
-    # type first to bring the number of options down. Otherwise, getting & clicking
-    # might not work because the list is virtual. A more sophisticated solution would
-    # be to keep scrolling until the option is visible.
+    # select by typing, because getting & clicking might not work because the list is
+    # virtual. A more sophisticated solution would be to keep scrolling until the option
+    # is visible.
     selectbox.type(option_label)
+    dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
     option = dropdown.get_by_role("option").get_by_text(text=option_label, exact=True)
-    option.scroll_into_view_if_needed()
-    expect(option).to_be_visible()
-    option.click(force=True)
+    option.hover()
+    selectbox.press("Enter")
+    wait_for_app_run(page)
 
 
 def click_button(
