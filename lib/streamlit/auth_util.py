@@ -15,11 +15,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Any, Mapping, TypedDict, cast
+from typing import TYPE_CHECKING, Mapping, TypedDict, cast
 
 from streamlit import config
 from streamlit.errors import AuthError
-from streamlit.runtime.secrets import secrets_singleton
+from streamlit.runtime.secrets import AttrDict, secrets_singleton
 
 if TYPE_CHECKING:
 
@@ -59,11 +59,11 @@ def get_signing_secret() -> str:
     return signing_secret
 
 
-def get_secrets_auth_section() -> Mapping[str, Any]:
-    auth_section = {}
+def get_secrets_auth_section() -> AttrDict:
+    auth_section = AttrDict({})
     """Get the 'auth' section of the secrets.toml."""
     if secrets_singleton.load_if_toml_exists():
-        auth_section = secrets_singleton.get("auth")
+        auth_section = cast(AttrDict, secrets_singleton.get("auth"))
 
     return auth_section
 
