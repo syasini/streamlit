@@ -48,6 +48,28 @@ def get_checkbox(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
     return element
 
 
+def get_selectbox(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
+    """Get a selectbox widget with the given label.
+
+    Parameters
+    ----------
+
+    locator : Locator
+        The locator to search for the element.
+
+    label : str or Pattern[str]
+        The label of the element to get.
+
+    Returns
+    -------
+    Locator
+        The element.
+    """
+    element = locator.get_by_test_id("stSelectbox").filter(has_text=label)
+    expect(element).to_be_visible()
+    return element
+
+
 def get_radio_button(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
     """Get a radio button widget with the given label.
 
@@ -360,6 +382,23 @@ def click_toggle(
         The label of the toggle to click.
     """
     click_checkbox(page, label)
+
+
+def click_selectbox_option(
+    page: Page, selectbox_label: str | Pattern[str], option_label: str
+) -> None:
+    selectbox = get_selectbox(page, selectbox_label)
+    selectbox.click()
+    dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
+
+    # type first to bring the number of options down. Otherwise, getting & clicking
+    # might not work because the list is virtual. A more sophisticated solution would
+    # be to keep scrolling until the option is visible.
+    selectbox.type(option_label)
+    option = dropdown.get_by_role("option").get_by_text(text=option_label, exact=True)
+    option.scroll_into_view_if_needed()
+    expect(option).to_be_visible()
+    option.click(force=True)
 
 
 def click_button(
