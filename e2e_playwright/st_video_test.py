@@ -43,7 +43,8 @@ def _select_video_to_show(app: Page, label: str) -> Locator:
 def _wait_until_video_has_data(app: Page, video_element: Locator):
     # To prevent flakiness, we wait for the video to load and start playing
     # The readyState is defined in https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/readyState
-    # 3 means there is some data to play now and few frames for the future
+    # 3 means there is some data to play now and few frames for the future. On webkit
+    # this seems to be flaky, so we check also the duration of the video.
     wait_until(
         app,
         lambda: video_element.evaluate("el => el.readyState >= 3 || el.duration > 0")
