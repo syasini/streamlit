@@ -390,13 +390,22 @@ def click_selectbox_option(
     selectbox = get_selectbox(page, selectbox_label)
     selectbox.click()
 
-    # select by typing, because getting & clicking might not work because the list is
-    # virtual. A more sophisticated solution would be to keep scrolling until the option
-    # is visible.
-    selectbox.type(option_label)
+    # select by using the keyboard, because getting & clicking might not work because
+    # the list is virtual. Also, the selectbox might overlay other elements and clicking
+    # with the mouse might trigger some underlying visual effects, whereas using the
+    # keyboard is more resilient.
     dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
-    option = dropdown.get_by_role("option").get_by_text(text=option_label, exact=True)
-    option.hover()
+    options = dropdown.get_by_role("option")
+    option = options.get_by_text(text=option_label, exact=True)
+
+    count = 0
+    while (
+        dropdown.locator("[aria-selected=true]").inner_text() != option.inner_text()
+        and count <= options.count()
+    ):
+        selectbox.press("ArrowDown")
+        count += 1
+
     selectbox.press("Enter")
     wait_for_app_run(page)
 
