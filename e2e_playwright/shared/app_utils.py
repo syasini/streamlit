@@ -395,16 +395,25 @@ def click_selectbox_option(
     # with the mouse might trigger some underlying visual effects, whereas using the
     # keyboard is more resilient.
     dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
-    options = dropdown.get_by_role("option")
-    option = options.get_by_text(text=option_label, exact=True)
+    expect(dropdown).to_be_visible()
+    dropdown.get_by_role("option").first.hover()
 
-    count = 0
-    while (
-        dropdown.locator("[aria-selected=true]").inner_text() != option.inner_text()
-        and count <= options.count()
-    ):
-        selectbox.press("ArrowDown")
-        count += 1
+    previous_option_text = None
+    while True:
+        selected = dropdown.locator("[aria-selected=true]")
+        selected.scroll_into_view_if_needed()
+
+        # end loop if we have reached the last option which is indicated by the same
+        # inner text
+        selected_text = selected.inner_text()
+        if previous_option_text and previous_option_text == selected_text:
+            break
+        previous_option_text = selected_text
+
+        if selected.count() == 0 or selected.inner_text() != option_label:
+            selectbox.press("ArrowDown")
+        else:
+            break
 
     selectbox.press("Enter")
     wait_for_app_run(page)

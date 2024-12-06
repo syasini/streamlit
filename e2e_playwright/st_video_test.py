@@ -22,6 +22,7 @@ from e2e_playwright.shared.app_utils import (
     click_button,
     click_checkbox,
     click_selectbox_option,
+    wait_for_app_run,
 )
 
 VIDEO_ELEMENTS_COUNT = 12
@@ -111,6 +112,7 @@ def test_handles_changes_in_start_time(
 
     # Change the start time of second video from 6 to 5
     app.get_by_test_id("stNumberInput").get_by_test_id("stNumberInputStepDown").click()
+    wait_for_app_run(app)
     _wait_until_video_has_data(app, video_element)
 
     assert_snapshot(video_element, name="video-updated-start")
