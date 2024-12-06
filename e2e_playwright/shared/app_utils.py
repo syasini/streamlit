@@ -48,28 +48,6 @@ def get_checkbox(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
     return element
 
 
-def get_selectbox(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
-    """Get a selectbox widget with the given label.
-
-    Parameters
-    ----------
-
-    locator : Locator
-        The locator to search for the element.
-
-    label : str or Pattern[str]
-        The label of the element to get.
-
-    Returns
-    -------
-    Locator
-        The element.
-    """
-    element = locator.get_by_test_id("stSelectbox").filter(has_text=label)
-    expect(element).to_be_visible()
-    return element
-
-
 def get_radio_button(locator: Locator | Page, label: str | Pattern[str]) -> Locator:
     """Get a radio button widget with the given label.
 
@@ -384,38 +362,21 @@ def click_toggle(
     click_checkbox(page, label)
 
 
-def click_selectbox_option(
-    page: Page, selectbox_label: str | Pattern[str], option_label: str
-) -> None:
-    selectbox = get_selectbox(page, selectbox_label)
-    selectbox.click()
+def click_radio_button(page: Page, label: str | Pattern[str]) -> None:
+    """Click a radio button with the given label
+    and wait for the app to run.
 
-    # select by using the keyboard, because getting & clicking might not work because
-    # the list is virtual. Also, the selectbox might overlay other elements and clicking
-    # with the mouse might trigger some underlying visual effects, whereas using the
-    # keyboard is more resilient.
-    dropdown = page.get_by_test_id("stSelectboxVirtualDropdown")
-    expect(dropdown).to_be_visible()
-    dropdown.get_by_role("option").first.hover()
+    Parameters
+    ----------
 
-    previous_option_text = None
-    while True:
-        selected = dropdown.locator("[aria-selected=true]")
-        selected.scroll_into_view_if_needed()
+    page : Page
+        The page to click the radio button on.
 
-        # end loop if we have reached the last option which is indicated by the same
-        # inner text
-        selected_text = selected.inner_text()
-        if previous_option_text and previous_option_text == selected_text:
-            break
-        previous_option_text = selected_text
-
-        if selected.count() == 0 or selected.inner_text() != option_label:
-            selectbox.press("ArrowDown")
-        else:
-            break
-
-    selectbox.press("Enter")
+    label : str or Pattern[str]
+        The label of the radio button to click.
+    """
+    radio_button = get_radio_button(page, label)
+    radio_button.click()
     wait_for_app_run(page)
 
 

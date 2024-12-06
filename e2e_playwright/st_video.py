@@ -40,7 +40,7 @@ mp4_video_with_end_time_and_loop = "mp4 video with end time and loop"
 webm_video_with_autoplay = "webm video with autoplay"
 webm_video_muted = "webm video muted"
 
-video_to_show = st.selectbox(
+video_to_show = st.radio(
     "Choose a video to show",
     [
         "None",

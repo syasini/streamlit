@@ -21,7 +21,7 @@ from e2e_playwright.shared.app_utils import (
     check_top_level_class,
     click_button,
     click_checkbox,
-    click_selectbox_option,
+    click_radio_button,
     wait_for_app_run,
 )
 
@@ -29,8 +29,13 @@ VIDEO_ELEMENTS_COUNT = 12
 
 
 def _select_video_to_show(app: Page, label: str) -> Locator:
-    click_selectbox_option(app, "Choose a video to show", label)
-    video_element = app.get_by_test_id("stVideo").nth(0)
+    click_radio_button(app, re.compile(f"^{label}$"))
+    video_element = app.get_by_test_id("stVideo").first
+    # Prevent flakiness: we move the mouse before scrolling to prevent the cursor
+    # hovering over a video element and, thereby, changing how the video interface is
+    # rendered (e.g. without the controls in the bottom which are hidden)
+    app.mouse.move(0, 0)
+    video_element.scroll_into_view_if_needed()
     expect(video_element).to_be_visible()
     return video_element
 
@@ -38,9 +43,12 @@ def _select_video_to_show(app: Page, label: str) -> Locator:
 def _wait_until_video_has_data(app: Page, video_element: Locator):
     # To prevent flakiness, we wait for the video to load and start playing
     # The readyState is defined in https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/readyState
-    # 2 means there is some data to play
+    # 3 means there is some data to play now and few frames for the future
     wait_until(
-        app, lambda: video_element.evaluate("el => el.readyState") >= 2, timeout=15000
+        app,
+        lambda: video_element.evaluate("el => el.readyState >= 3 || el.duration > 0")
+        is True,
+        timeout=15000,
     )
 
 
