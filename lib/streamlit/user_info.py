@@ -60,11 +60,11 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
     """
     A read-only, dict-like object for accessing information about current user.
 
-    ``st.experimental_user`` is dependant on the host platform running the
+    ``st.experimental_user`` is dependent on the host platform running the
     Streamlit app. If the host platform has not configured the function, it
     will behave as it does in a locally running app.
 
-    Properties can by accessed via key or attribute notation. For example,
+    Properties can be accessed via key or attribute notation. For example,
     ``st.experimental_user["email"]`` or ``st.experimental_user.email``.
 
     Attributes
@@ -79,14 +79,21 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
         - ``None`` if the user is not logged in or not a member of the app's\
         workspace. Such users appear under anonymous pseudonyms in the app's\
         analytics.
-        - The user's email if the the user is logged in and a member of the\
+        - The user's email if the user is logged in and a member of the\
         app's workspace. Such users are identified by their email in the app's\
         analytics.
 
     """
 
     def login(self, provider: str) -> None:
-        """Initiate the login for the given provider."""
+        """Initiate the login for the given provider.
+
+        Parameters
+        ----------
+        provider : str
+            The provider to use for login. This value must match the name of a
+            provider configured in the app's auth section of ``secrets.toml`` file.
+        """
         context = _get_script_run_ctx()
         if context is not None:
             validate_auth_credentials(provider)
