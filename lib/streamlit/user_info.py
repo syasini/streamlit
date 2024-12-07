@@ -27,6 +27,7 @@ from streamlit import config, runtime
 from streamlit.auth_util import encode_provider_token, validate_auth_credentials
 from streamlit.errors import StreamlitAPIException
 from streamlit.proto.ForwardMsg_pb2 import ForwardMsg
+from streamlit.runtime.metrics_util import gather_metrics
 from streamlit.runtime.scriptrunner_utils.script_run_context import (
     get_script_run_ctx as _get_script_run_ctx,
 )
@@ -85,6 +86,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
 
     """
 
+    @gather_metrics("login")
     def login(self, provider: str) -> None:
         """Initiate the login for the given provider.
 
@@ -101,6 +103,7 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
             fwd_msg.auth_redirect.url = generate_login_redirect_url(provider)
             context.enqueue(fwd_msg)
 
+    @gather_metrics("logout")
     def logout(self) -> None:
         """Logout the current user."""
         context = _get_script_run_ctx()
