@@ -81,6 +81,9 @@ function generateToastOverrides(theme: EmotionTheme): ToastOverrides {
       },
     },
     CloseIcon: {
+      props: {
+        "data-testid": "stToastCloseIcon",
+      },
       style: {
         color: theme.colors.fadedText40,
         width: theme.fontSizes.lg,
