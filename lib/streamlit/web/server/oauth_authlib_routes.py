@@ -177,6 +177,7 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
             "provider": provider,
             "error": error,
             "email": None,
+            "_streamlit_logged_in": False,
             "origin": origin,
         }
 
@@ -185,5 +186,6 @@ class AuthCallbackHandler(AuthHandlerMixin, tornado.web.RequestHandler):
             "provider": None,
             "error": "Missing provider",
             "email": None,
+            "_streamlit_logged_in": False,
             "origin": origin,
         }
