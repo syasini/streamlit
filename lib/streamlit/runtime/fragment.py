@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 
 F = TypeVar("F", bound=Callable[..., Any])
-Fragment = Callable[[], Any]
+Fragment = Callable[[Callable[[str], None] | None], Any]
 
 
 class FragmentStorage(Protocol):
@@ -177,7 +177,18 @@ def _fragment(
         # that the fragment is associated with the correct script running.
         initialized_active_script_hash = ctx.active_script_hash
 
-        def wrapped_fragment():
+        def wrapped_fragment(
+            callback: Callable[[str], None] | None = None,
+        ) -> Any:
+            """The actual fragment function that gets called when the fragment is run.
+
+            Parameters
+            ----------
+            callback: Callable[[str], None], default=lambda: None
+                A callback function that is executed before the fragment function is
+                run, but within the fragment's context. The argument to the callback
+                is the fragment id.
+            """
             import streamlit as st
 
             if should_show_deprecation_warning:
@@ -243,6 +254,8 @@ def _fragment(
                                 if active_dg._cursor
                                 else []
                             )[:-1]
+                            if callback:
+                                callback(fragment_id)
                             result = non_optional_func(*args, **kwargs)
                         except (
                             RerunException,

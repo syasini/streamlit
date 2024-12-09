@@ -21,6 +21,7 @@ from dataclasses import dataclass, field, replace
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     Final,
     Iterator,
     KeysView,
@@ -270,7 +271,15 @@ class WStates(MutableMapping[str, Any]):
 
         args = metadata.callback_args or ()
         kwargs = metadata.callback_kwargs or {}
+        ctx = get_script_run_ctx()
+        previous_fragment_id = None
+        if ctx:
+            previous_fragment_id = ctx.current_fragment_id
+            ctx.current_fragment_id = metadata.fragment_id
         callback(*args, **kwargs)
+
+        if ctx:
+            ctx.current_fragment_id = previous_fragment_id
 
 
 def _missing_key_error_message(key: str) -> str:
@@ -546,7 +555,9 @@ class SessionState:
         for state in widget_states.widgets:
             self._new_widget_state.set_widget_from_proto(state)
 
-    def on_script_will_rerun(self, latest_widget_states: WidgetStatesProto) -> None:
+    def on_script_will_rerun(
+        self, latest_widget_states: WidgetStatesProto
+    ) -> Callable[[str | None], None]:
         """Called by ScriptRunner before its script re-runs.
 
         Update widget data and call callbacks on widgets whose value changed
@@ -556,9 +567,9 @@ class SessionState:
         self._reset_triggers()
         self._compact_state()
         self.set_widgets_from_proto(latest_widget_states)
-        self._call_callbacks()
+        return self._call_callbacks
 
-    def _call_callbacks(self) -> None:
+    def _call_callbacks(self, fragment_id: str | None) -> None:
         """Call any callback associated with each widget whose value
         changed between the previous and current script runs.
         """
@@ -568,6 +579,10 @@ class SessionState:
             wid for wid in self._new_widget_state if self._widget_changed(wid)
         ]
         for wid in changed_widget_ids:
+            if fragment_id is not None:
+                metadata = self._new_widget_state.widget_metadata.get(wid)
+                if metadata is not None and metadata.fragment_id != fragment_id:
+                    continue
             try:
                 self._new_widget_state.call_callback(wid)
             except RerunException:

@@ -532,25 +532,28 @@ class ScriptRunner:
             # assume is the main script directory.
             module.__dict__["__file__"] = script_path
 
-            def code_to_exec(code=code, module=module, ctx=ctx, rerun_data=rerun_data):
+            def code_to_exec(
+                code=code, module=module, ctx=ctx, rerun_data=rerun_data
+            ) -> None:
                 with modified_sys_path(
                     self._main_script_path
                 ), self._set_execing_flag():
                     # Run callbacks for widgets whose values have changed.
+                    callbacks: Callable[[str | None], None] | None = None
                     if rerun_data.widget_states is not None:
-                        self._session_state.on_script_will_rerun(
+                        callbacks = self._session_state.on_script_will_rerun(
                             rerun_data.widget_states
                         )
-
+                        if not rerun_data.fragment_id_queue:
+                            callbacks(None)
                     ctx.on_script_start()
-
                     if rerun_data.fragment_id_queue:
                         for fragment_id in rerun_data.fragment_id_queue:
                             try:
                                 wrapped_fragment = self._fragment_storage.get(
                                     fragment_id
                                 )
-                                wrapped_fragment()
+                                wrapped_fragment(callbacks)
 
                             except FragmentStorageKeyError:
                                 # Only raise an error if the fragment is not an
