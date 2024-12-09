@@ -271,15 +271,7 @@ class WStates(MutableMapping[str, Any]):
 
         args = metadata.callback_args or ()
         kwargs = metadata.callback_kwargs or {}
-        ctx = get_script_run_ctx()
-        previous_fragment_id = None
-        if ctx:
-            previous_fragment_id = ctx.current_fragment_id
-            ctx.current_fragment_id = metadata.fragment_id
         callback(*args, **kwargs)
-
-        if ctx:
-            ctx.current_fragment_id = previous_fragment_id
 
 
 def _missing_key_error_message(key: str) -> str:
