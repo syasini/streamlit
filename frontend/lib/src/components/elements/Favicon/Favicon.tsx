@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import nodeEmoji from "node-emoji"
+import * as emoji from "node-emoji"
 
 import { grabTheRightIcon } from "@streamlit/lib/src/vendor/twemoji"
 import { IGuestToHostMessage } from "@streamlit/lib/src/hostComm/types"
@@ -80,12 +80,13 @@ function overwriteFavicon(imageUrl: string): void {
 // Return the emoji if it exists, or empty string otherwise
 function extractEmoji(maybeEmoji: string): string {
   const shortcode = maybeEmoji.replace("-", "_")
-  if (nodeEmoji.hasEmoji(nodeEmoji.get(shortcode))) {
+  const emojiFromShortcode = emoji.get(shortcode) || ""
+  if (emoji.has(emojiFromShortcode)) {
     // Format: pizza or :pizza:
-    // Since hasEmoji(':pizza:') == true, we must do this check first
-    return nodeEmoji.get(shortcode)
+    // Since has(':pizza:') == true, we must do this check first
+    return emojiFromShortcode
   }
-  if (nodeEmoji.hasEmoji(maybeEmoji)) {
+  if (emoji.has(maybeEmoji)) {
     // Format: 🍕
     return maybeEmoji
   }
