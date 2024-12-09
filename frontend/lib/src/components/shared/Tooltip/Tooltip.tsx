@@ -78,6 +78,7 @@ function Tooltip({
       accessibilityType={ACCESSIBILITY_TYPE.tooltip}
       showArrow={false}
       popoverMargin={10}
+      ignoreBoundary={true}
       onMouseEnterDelay={onMouseEnterDelay}
       overrides={{
         Body: {

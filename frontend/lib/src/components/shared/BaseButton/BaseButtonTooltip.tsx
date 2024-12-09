@@ -18,6 +18,7 @@ import React, { ReactElement } from "react"
 
 import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
 import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
+import IsSidebarContext from "@streamlit/lib/src/components/core/IsSidebarContext"
 
 import { StyledTooltipMobile, StyledTooltipNormal } from "./styled-components"
 
@@ -32,13 +33,19 @@ export function BaseButtonTooltip({
   help,
   placement,
 }: Props): ReactElement {
+  // Set to auto when in sidebar to prevent cutoff tooltips
+  const defaultPlacement = React.useContext(IsSidebarContext)
+    ? Placement.AUTO
+    : Placement.TOP
+
   if (!help) {
     return children
   }
+
   return (
     <>
       <StyledTooltipNormal>
-        <TooltipIcon content={help} placement={placement || Placement.TOP}>
+        <TooltipIcon content={help} placement={placement || defaultPlacement}>
           {children}
         </TooltipIcon>
       </StyledTooltipNormal>
