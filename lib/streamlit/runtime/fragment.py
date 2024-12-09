@@ -42,7 +42,13 @@ if TYPE_CHECKING:
 
 
 F = TypeVar("F", bound=Callable[..., Any])
-Fragment = Callable[[Callable[[str], None] | None], Any]
+
+
+# class FragmentArg(Protocol):
+#     def __call__(self, fragment_id: str | None) -> None: ...
+
+
+Fragment = Callable[..., Any]
 
 
 class FragmentStorage(Protocol):
@@ -97,7 +103,7 @@ class MemoryFragmentStorage(FragmentStorage):
     the FragmentStorage protocol.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._fragments: dict[str, Fragment] = {}
 
     # Weirdly, we have to define this above the `set` method, or mypy gets it confused
@@ -178,7 +184,7 @@ def _fragment(
         initialized_active_script_hash = ctx.active_script_hash
 
         def wrapped_fragment(
-            callback: Callable[[str], None] | None = None,
+            callback: Callable[[str | None], None] | None = None,
         ) -> Any:
             """The actual fragment function that gets called when the fragment is run.
 
