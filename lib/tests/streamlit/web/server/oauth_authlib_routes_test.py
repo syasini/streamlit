@@ -234,6 +234,7 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 "error": "Missing provider",
                 "email": None,
                 "origin": "http://localhost:8501",
+                "_streamlit_logged_in": False,
             }
         )
 
@@ -256,6 +257,7 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
                 "error": "foo",
                 "email": None,
                 "origin": "http://localhost:8501",
+                "_streamlit_logged_in": False,
             }
         )
 
