@@ -54,10 +54,13 @@ def _get_user_info() -> UserInfo:
     if ctx is None:
         # TODO: Add appropriate warnings when ctx is missing
         return {}
-    return ctx.user_info
+    context_user_info = ctx.user_info.copy()
+    if "_streamlit_logged_in" in context_user_info:
+        del context_user_info["_streamlit_logged_in"]
+    return context_user_info
 
 
-class UserInfoProxy(Mapping[str, Union[str, None]]):
+class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
     """
     A read-only, dict-like object for accessing information about current user.
 
@@ -123,13 +126,15 @@ class UserInfoProxy(Mapping[str, Union[str, None]]):
 
     def is_logged_in(self) -> bool:
         """Check if the user is logged in."""
-        user_email = _get_user_info().get("email")
-        return user_email is not None and user_email != "test@example.com"
+        ctx = _get_script_run_ctx()
+        if ctx is None:
+            return False
+        return bool(ctx.user_info.get("_streamlit_logged_in", False))
 
-    def __getitem__(self, key: str) -> str | None:
+    def __getitem__(self, key: str) -> str | bool | None:
         return _get_user_info()[key]
 
-    def __getattr__(self, key: str) -> str | None:
+    def __getattr__(self, key: str) -> str | bool | None:
         try:
             return _get_user_info()[key]
         except KeyError:

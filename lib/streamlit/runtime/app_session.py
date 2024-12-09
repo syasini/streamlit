@@ -85,7 +85,7 @@ class AppSession:
         uploaded_file_manager: UploadedFileManager,
         script_cache: ScriptCache,
         message_enqueued_callback: Callable[[], None] | None,
-        user_info: dict[str, str | None],
+        user_info: dict[str, str | bool | None],
         session_id_override: str | None = None,
     ) -> None:
         """Initialize the AppSession.

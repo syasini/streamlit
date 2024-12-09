@@ -107,7 +107,11 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
         )
         if cookie_value_origin == expected_origin_value:
             user_info["email"] = cookie_value.get("email", email)
+            user_info["_streamlit_logged_in"] = cookie_value.get(
+                "_streamlit_logged_in", False
+            )
             del cookie_value["origin"]
+            del cookie_value["_streamlit_logged_in"]
             user_info["userinfo"] = cookie_value
 
         return user_info
@@ -158,8 +162,10 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
         except (KeyError, binascii.Error, json.decoder.JSONDecodeError):
             email = "test@example.com"
 
-        user_info: dict[str, str | None] = {
-            "email": None if is_public_cloud_app else email
+        user_info: dict[str, str | bool | None] = {
+            "email": None if is_public_cloud_app else email,
+            "_streamlit_logged_in": not is_public_cloud_app
+            and email != "test@example.com",
         }
 
         existing_session_id = None

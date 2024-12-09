@@ -346,7 +346,7 @@ class Runtime:
     def connect_session(
         self,
         client: SessionClient,
-        user_info: dict[str, str | None],
+        user_info: dict[str, str | bool | None],
         existing_session_id: str | None = None,
         session_id_override: str | None = None,
     ) -> str:
@@ -407,7 +407,7 @@ class Runtime:
     def create_session(
         self,
         client: SessionClient,
-        user_info: dict[str, str | None],
+        user_info: dict[str, str | bool | None],
         existing_session_id: str | None = None,
         session_id_override: str | None = None,
     ) -> str:
