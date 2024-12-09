@@ -21,13 +21,17 @@ import { screen } from "@testing-library/react"
 
 import { render } from "@streamlit/lib/src/test_util"
 
-import Modal, { calculateModalSize } from "./Modal"
+import Modal, { calculateModalSize, ModalBody } from "./Modal"
 
 describe("Modal component", () => {
   it("renders without crashing", () => {
     render(
       <BaseProvider theme={LightTheme}>
-        <Modal isOpen />
+        <Modal isOpen>
+          <ModalBody>
+            <div>test</div>
+          </ModalBody>
+        </Modal>
       </BaseProvider>
     )
 
