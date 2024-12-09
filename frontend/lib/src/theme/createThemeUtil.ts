@@ -230,5 +230,6 @@ export const createBaseUiTheme = (
 ): BaseTheme & Record<string, any> =>
   createBaseTheme(
     createBaseThemePrimitives(primitives, theme),
+    // @ts-expect-error - TS thinks 2 args passed here
     createThemeOverrides(theme)
   )
