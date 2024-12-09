@@ -16,7 +16,7 @@
 import React from "react"
 
 import { fireEvent, screen } from "@testing-library/react"
-import { enableAllPlugins } from "immer"
+import { enableMapSet } from "immer"
 
 import { render } from "@streamlit/lib/src/test_util"
 import { Button as ButtonProto } from "@streamlit/lib/src/proto"
@@ -29,7 +29,7 @@ import {
 import { FormSubmitButton, Props } from "./FormSubmitButton"
 
 // Required by ImmerJS
-enableAllPlugins()
+enableMapSet()
 
 describe("FormSubmitButton", () => {
   let formsData: FormsData

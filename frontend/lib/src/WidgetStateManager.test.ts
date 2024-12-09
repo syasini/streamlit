@@ -15,7 +15,7 @@
  */
 
 import { Mock } from "vitest"
-import { enableAllPlugins } from "immer"
+import { enableMapSet } from "immer"
 
 import {
   ArrowTable as ArrowTableProto,
@@ -69,7 +69,7 @@ const MOCK_FILE_UPLOADER_STATE = new FileUploaderStateProto({
 })
 
 // Required by ImmerJS
-enableAllPlugins()
+enableMapSet()
 
 describe("Widget State Manager", () => {
   let sendBackMsg: Mock
