@@ -266,7 +266,7 @@ def test_resets_to_default_single_value_if_calendar_closed_empty(app: Page):
     date_input_field.clear()
 
     # Click outside of the calendar to submit value
-    app.get_by_test_id("stMarkdown").first.click(delay=100)
+    app.get_by_test_id("stMarkdownContainer").first.click(delay=100)
 
     # Value should be reset to default
     expect(app.get_by_test_id("stMarkdown").first).to_have_text(
