@@ -12183,10 +12183,10 @@ typed-query-selector@^2.12.0:
   resolved "https://registry.yarnpkg.com/typed-query-selector/-/typed-query-selector-2.12.0.tgz#92b65dbc0a42655fccf4aeb1a08b1dddce8af5f2"
   integrity sha512-SbklCd1F0EiZOyPiW192rrHZzZ5sBijB6xM+cpmrwDqObvdtunOHHIk9fCGsoK5JVIYXoyEp4iEdE3upFH3PAg==
 
-typed-signals@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/typed-signals/-/typed-signals-2.5.0.tgz#7be73505c2ee0dc4e43f1c4ee002c855796bd89a"
-  integrity sha512-m9lHc3eBCJerXYdx+G0uWZihyUXdqTzzgOdqiDDsoUo75WjhFJH6vP5/6w/xhyu04zoxHUqgYhf9FEt85dk/Ng==
+typed-signals@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/typed-signals/-/typed-signals-3.0.0.tgz#00245bc435ce2b44a209fe3e7e1700f03ee578fa"
+  integrity sha512-HpYkOenDGcyiNabkvJ7XC1FfTb4I/yx95GEblpXf1058C89eLBIJBlq4IMW2jFxju7NC2J5fTss2k2OPs27GiA==
 
 typedarray-pool@^1.1.0:
   version "1.2.0"
