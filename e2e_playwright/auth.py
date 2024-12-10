@@ -22,7 +22,7 @@ if x:
     st.experimental_user.login("testprovider")
 
 
-if st.experimental_user.is_logged_in():
+if st.experimental_user.is_authenticated:
     st.markdown(f"YOU ARE LOGGED IN: {st.experimental_user.email}")
     st.markdown(st.experimental_user["name"])
 

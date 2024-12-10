@@ -124,8 +124,9 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
             fwd_msg.auth_redirect.url = make_url_path(base_path, AUTH_LOGOUT_ENDPOINT)
             context.enqueue(fwd_msg)
 
-    def is_logged_in(self) -> bool:
-        """Check if the user is logged in."""
+    @property
+    def is_authenticated(self) -> bool:
+        """Check if the user is authenticated."""
         ctx = _get_script_run_ctx()
         if ctx is None:
             return False
