@@ -24,7 +24,7 @@ if x:
 
 if st.experimental_user.is_logged_in():
     st.markdown(f"YOU ARE LOGGED IN: {st.experimental_user.email}")
-    st.markdown(st.experimental_user["userinfo"]["name"])
+    st.markdown(st.experimental_user["name"])
 
-if error := st.experimental_user.get("userinfo", {}).get("error"):
+if error := st.experimental_user.get("error"):
     st.markdown(f"ERROR: {error}")

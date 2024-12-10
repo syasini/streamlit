@@ -223,16 +223,13 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
         assert response.headers["Location"] == "/"
 
     @patch.object(AuthCallbackHandler, "set_auth_cookie")
-    def test_auth_callback_failure_missing_provider_in_cache(
-        self, mock_set_auth_cookie
-    ):
+    def test_auth_callback_failure_missing_provider(self, mock_set_auth_cookie):
         """Test auth callback missing provider failure."""
         response = self.fetch("/oauth2callback?state=456", follow_redirects=False)
         mock_set_auth_cookie.assert_called_with(
             {
                 "provider": None,
                 "error": "Missing provider",
-                "email": None,
                 "origin": "http://localhost:8501",
                 "_streamlit_logged_in": False,
             }
@@ -255,7 +252,6 @@ class AuthCallbackHandlerTest(tornado.testing.AsyncHTTPTestCase):
             {
                 "provider": "google",
                 "error": "foo",
-                "email": None,
                 "origin": "http://localhost:8501",
                 "_streamlit_logged_in": False,
             }
