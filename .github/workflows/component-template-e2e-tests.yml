@@ -50,10 +50,10 @@ jobs:
           streamlit_wheel=$(readlink -e "${streamlit_wheel}")
           echo "output_file=${streamlit_wheel}" >> $GITHUB_OUTPUT
 
-          - name: Install node dependencies for streamlit-component-lib
-          working-directory: component-lib
-          shell: bash
-          run: yarn install
+      - name: Install node dependencies for streamlit-component-lib
+        working-directory: component-lib
+        shell: bash
+        run: yarn install
 
       - name: Build streamlit-component-lib package
         working-directory: component-lib
