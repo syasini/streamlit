@@ -27,6 +27,7 @@ from blinker import Signal
 
 from streamlit import config_util, development, env_util, file_util, util
 from streamlit.config_option import ConfigOption
+from streamlit.elements.exception import ShowErrorDetailsConfigOptions
 from streamlit.errors import StreamlitAPIException
 
 # Config System Global State #
@@ -481,7 +482,7 @@ _create_option(
         - False        : This is deprecated. Streamlit displays "stacktrace"
                          error details.
     """,
-    default_val="full",
+    default_val=ShowErrorDetailsConfigOptions.FULL,
     type_=str,
     scriptable=True,
 )

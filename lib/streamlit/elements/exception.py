@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import os
 import traceback
+from enum import Enum
 from typing import TYPE_CHECKING, Callable, Final, TypeVar, cast
 
 from streamlit import config
@@ -36,6 +37,15 @@ _LOGGER: Final = get_logger(__name__)
 # When client.showErrorDetails is False, we show a generic warning in the
 # frontend when we encounter an uncaught app exception.
 _GENERIC_UNCAUGHT_EXCEPTION_TEXT: Final = "This app has encountered an error. The original error message is redacted to prevent data leaks.  Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app)."
+
+
+class ShowErrorDetailsConfigOptions(str, Enum):
+    """Valid options for the "client.showErrorDetails" config."""
+
+    FULL = "full"
+    STACKTRACE = "stacktrace"
+    TYPE = "type"
+    NONE = "none"
 
 
 class ExceptionMixin:
@@ -149,28 +159,26 @@ Traceback:
     if is_uncaught_app_exception:
         show_error_details = config.get_option("client.showErrorDetails")
 
-        # Options for show error details config.
-        FULL = "full"
-        STACKTRACE = "stacktrace"
-        TYPE = "type"
         # Config options can be set from several places including the command-line and
         # the user's script. Legacy config options (true/false) will have type string when set via
         # command-line and bool when set via user script (e.g. st.set_option("client.showErrorDetails", False)).
         TRUE_VARIATIONS = ["true", "True", True]
         FALSE_VARIATIONS = ["false", "False", False]
-        # "none" is also a valid config setting. We show only a default error message.
 
         show_message = (
-            show_error_details == FULL or show_error_details in TRUE_VARIATIONS
+            show_error_details == ShowErrorDetailsConfigOptions.FULL
+            or show_error_details in TRUE_VARIATIONS
         )
         # False is a legacy config option still in-use in community cloud. It is equivalent
         # to "stacktrace".
         show_trace = (
             show_message
-            or show_error_details == STACKTRACE
+            or show_error_details == ShowErrorDetailsConfigOptions.STACKTRACE
             or show_error_details in FALSE_VARIATIONS
         )
-        show_type = show_trace or show_error_details == TYPE
+        show_type = (
+            show_trace or show_error_details == ShowErrorDetailsConfigOptions.TYPE
+        )
 
         if not show_message:
             exception_proto.message = _GENERIC_UNCAUGHT_EXCEPTION_TEXT
