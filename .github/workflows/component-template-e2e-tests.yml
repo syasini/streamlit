@@ -33,6 +33,8 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_MAX_VERSION }}"
 
+      # Build the component lib first so we can use the old version of yarn
+      # Before the make init action is run
       - name: Install node dependencies for streamlit-component-lib
         working-directory: component-lib
         shell: bash

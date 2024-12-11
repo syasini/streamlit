@@ -36,13 +36,24 @@ repos:
       # known problem with hooks in subdirectories when pass_filenames option
       # is set to true
       # See: https://github.com/pre-commit/pre-commit/issues/1417
-      - id: prettier
-        name: Prettier
+      - id: prettier-app
+        name: Prettier App
         # NOTE: This hook currently does not work on Windows due to "yarn" not being an executable and win32api.CreateProcess
         # turning `subprocess.run(["yarn", "prettier", "--write"])` into a call to `yarn.exe prettier --write` which does not exist
-        entry: ./scripts/run_in_subdirectory.py frontend yarn workspaces foreach --all run format
+        entry: ./scripts/run_in_subdirectory.py frontend/app yarn run format
+        files: ^frontend/app/.*\.(js|jsx|ts|tsx)$
+        exclude: /vendor/
         language: node
-        pass_filenames: false
+        pass_filenames: true
+      - id: prettier-lib
+        name: Prettier Lib
+        # NOTE: This hook currently does not work on Windows due to "yarn" not being an executable and win32api.CreateProcess
+        # turning `subprocess.run(["yarn", "prettier", "--write"])` into a call to `yarn.exe prettier --write` which does not exist
+        entry: ./scripts/run_in_subdirectory.py frontend/lib yarn run format
+        files: ^frontend/lib/.*\.(js|jsx|ts|tsx)$
+        exclude: /vendor/
+        language: node
+        pass_filenames: true
       - id: prettier-yaml
         name: Prettier-yaml
         # NOTE: This hook currently does not work on Windows due to "yarn" not being an executable and win32api.CreateProcess
