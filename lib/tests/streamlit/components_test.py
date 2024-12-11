@@ -542,7 +542,8 @@ class InvokeComponentTest(DeltaGeneratorTestCase):
         callbacks = self.script_run_ctx.session_state.on_script_will_rerun(
             WidgetStates(widgets=[new_widget_state])
         )
-        callbacks()
+        for callback in callbacks["main"]:
+            callback()
         self.assertEqual(callback_call_value[0], expected_element_value)
 
     def assertJSONEqual(self, a, b):

@@ -57,8 +57,8 @@ class SafeSessionState:
             return self._state.register_widget(metadata, user_key)
 
     def on_script_will_rerun(
-        self, latest_widget_states: WidgetStatesProto
-    ) -> Callable[[str | None], None]:
+        self, latest_widget_states: WidgetStatesProto, fragment_id: str | None = None
+    ) -> dict[str, list[Callable[[], None]]]:
         self._yield_callback()
         with self._lock:
             # TODO: rewrite this to copy the callbacks list into a local

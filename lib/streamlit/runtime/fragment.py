@@ -43,11 +43,6 @@ if TYPE_CHECKING:
 
 F = TypeVar("F", bound=Callable[..., Any])
 
-
-# class FragmentArg(Protocol):
-#     def __call__(self, fragment_id: str | None) -> None: ...
-
-
 Fragment = Callable[..., Any]
 
 
@@ -184,7 +179,7 @@ def _fragment(
         initialized_active_script_hash = ctx.active_script_hash
 
         def wrapped_fragment(
-            callback: Callable[[str | None], None] | None = None,
+            callback: Callable[[], None] | None = None,
         ) -> Any:
             """The actual fragment function that gets called when the fragment is run.
 
@@ -261,7 +256,7 @@ def _fragment(
                                 else []
                             )[:-1]
                             if callback:
-                                callback(fragment_id)
+                                callback()
                             result = non_optional_func(*args, **kwargs)
                         except (
                             RerunException,
@@ -294,7 +289,7 @@ def _fragment(
             ctx.enqueue(msg)
 
         # Immediate execute the wrapped fragment since we are in a full app run
-        return wrapped_fragment()
+        return wrapped_fragment(None)
 
     with contextlib.suppress(AttributeError):
         # Make this a well-behaved decorator by preserving important function

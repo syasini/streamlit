@@ -539,13 +539,14 @@ class ScriptRunner:
                     self._main_script_path
                 ), self._set_execing_flag():
                     # Run callbacks for widgets whose values have changed.
-                    callbacks: Callable[[str | None], None] | None = None
+                    callbacks: dict[str, list[Callable[[], None]]] | None = {}
                     if rerun_data.widget_states is not None:
                         callbacks = self._session_state.on_script_will_rerun(
                             rerun_data.widget_states
                         )
-                        if not rerun_data.fragment_id_queue:
-                            callbacks(None)
+                        if "main" in callbacks:
+                            for callback in callbacks["main"]:
+                                callback()
                     ctx.on_script_start()
                     if rerun_data.fragment_id_queue:
                         for fragment_id in rerun_data.fragment_id_queue:
@@ -553,7 +554,14 @@ class ScriptRunner:
                                 wrapped_fragment = self._fragment_storage.get(
                                     fragment_id
                                 )
-                                wrapped_fragment(callbacks)
+
+                                def call_callbacks(fragment_id=fragment_id):
+                                    if fragment_id not in callbacks:
+                                        return
+                                    for callback in callbacks[fragment_id]:
+                                        callback()
+
+                                wrapped_fragment(call_callbacks)
 
                             except FragmentStorageKeyError:
                                 # Only raise an error if the fragment is not an
