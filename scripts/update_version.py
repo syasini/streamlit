@@ -66,12 +66,6 @@ NODE_ROOT = {"frontend/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$
 NODE_APP = {"frontend/app/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'}
 NODE_LIB = {"frontend/lib/package.json": r'(?P<pre>^ \s*"version": ").*(?P<post>",$)'}
 
-# This regex captures the "@streamlit/lib": field in a JSON-like structure
-# allowing for any amount of whitespace before the "version": field.
-NODE_APP_ST_LIB = {
-    "frontend/app/package.json": r'(?P<pre>^ \s*"@streamlit/lib": ").*(?P<post>",$)'
-}
-
 
 def verify_pep440(version):
     """Verify if version is PEP440 compliant.
