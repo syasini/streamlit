@@ -271,7 +271,16 @@ class WStates(MutableMapping[str, Any]):
 
         args = metadata.callback_args or ()
         kwargs = metadata.callback_kwargs or {}
-        return lambda: callback(*args, **kwargs)
+
+        def cb():
+            from streamlit.runtime.scriptrunner import RerunException
+
+            try:
+                callback(*args, **kwargs)
+            except RerunException:
+                st.warning("Calling st.rerun() within a callback is a no-op.")
+
+        return cb
 
 
 def _missing_key_error_message(key: str) -> str:
@@ -565,24 +574,19 @@ class SessionState:
         """Call any callback associated with each widget whose value
         changed between the previous and current script runs.
         """
-        from streamlit.runtime.scriptrunner import RerunException
-
         changed_widget_ids = [
             wid for wid in self._new_widget_state if self._widget_changed(wid)
         ]
         callbacks: dict[str, list[Callable]] = {}
         for wid in changed_widget_ids:
-            try:
-                id = "main"
-                metadata = self._new_widget_state.widget_metadata.get(wid)
-                if metadata is not None and metadata.fragment_id:
-                    id = metadata.fragment_id
-                cb = self._new_widget_state.call_callback(wid)
-                if cb:
-                    callbacks[id] = callbacks.get(id, [])
-                    callbacks[id].append(cb)
-            except RerunException:
-                st.warning("Calling st.rerun() within a callback is a no-op.")
+            id = "main"
+            metadata = self._new_widget_state.widget_metadata.get(wid)
+            if metadata is not None and metadata.fragment_id:
+                id = metadata.fragment_id
+            cb = self._new_widget_state.call_callback(wid)
+            if cb:
+                callbacks[id] = callbacks.get(id, [])
+                callbacks[id].append(cb)
         return callbacks
 
     def _widget_changed(self, widget_id: str) -> bool:
