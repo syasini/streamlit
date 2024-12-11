@@ -556,7 +556,7 @@ class ScriptRunner:
                                 )
 
                                 def call_callbacks(fragment_id=fragment_id):
-                                    if fragment_id not in callbacks:
+                                    if not callbacks or fragment_id not in callbacks:
                                         return
                                     for callback in callbacks[fragment_id]:
                                         callback()

@@ -276,7 +276,7 @@ class WStates(MutableMapping[str, Any]):
             from streamlit.runtime.scriptrunner import RerunException
 
             try:
-                callback(*args, **kwargs)
+                callback(*args, **kwargs)  # type: ignore
             except RerunException:
                 st.warning("Calling st.rerun() within a callback is a no-op.")
 
@@ -577,7 +577,7 @@ class SessionState:
         changed_widget_ids = [
             wid for wid in self._new_widget_state if self._widget_changed(wid)
         ]
-        callbacks: dict[str, list[Callable]] = {}
+        callbacks: dict[str, list[Callable[[], None]]] = {}
         for wid in changed_widget_ids:
             id = "main"
             metadata = self._new_widget_state.widget_metadata.get(wid)
