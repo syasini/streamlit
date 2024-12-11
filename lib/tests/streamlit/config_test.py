@@ -27,8 +27,8 @@ import pytest
 from parameterized import parameterized
 
 from streamlit import config, env_util
+from streamlit.config import ShowErrorDetailsConfigOptions
 from streamlit.config_option import ConfigOption
-from streamlit.elements.exception import ShowErrorDetailsConfigOptions
 from streamlit.errors import StreamlitAPIException
 
 SECTION_DESCRIPTIONS = copy.deepcopy(config._section_descriptions)

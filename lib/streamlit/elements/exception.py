@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import os
 import traceback
-from enum import Enum
 from typing import TYPE_CHECKING, Callable, Final, TypeVar, cast
 
 from streamlit import config
@@ -37,15 +36,6 @@ _LOGGER: Final = get_logger(__name__)
 # When client.showErrorDetails is False, we show a generic warning in the
 # frontend when we encounter an uncaught app exception.
 _GENERIC_UNCAUGHT_EXCEPTION_TEXT: Final = "This app has encountered an error. The original error message is redacted to prevent data leaks.  Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app)."
-
-
-class ShowErrorDetailsConfigOptions(str, Enum):
-    """Valid options for the "client.showErrorDetails" config."""
-
-    FULL = "full"
-    STACKTRACE = "stacktrace"
-    TYPE = "type"
-    NONE = "none"
 
 
 class ExceptionMixin:
@@ -166,18 +156,19 @@ Traceback:
         FALSE_VARIATIONS = ["false", "False", False]
 
         show_message = (
-            show_error_details == ShowErrorDetailsConfigOptions.FULL
+            show_error_details == config.ShowErrorDetailsConfigOptions.FULL
             or show_error_details in TRUE_VARIATIONS
         )
         # False is a legacy config option still in-use in community cloud. It is equivalent
         # to "stacktrace".
         show_trace = (
             show_message
-            or show_error_details == ShowErrorDetailsConfigOptions.STACKTRACE
+            or show_error_details == config.ShowErrorDetailsConfigOptions.STACKTRACE
             or show_error_details in FALSE_VARIATIONS
         )
         show_type = (
-            show_trace or show_error_details == ShowErrorDetailsConfigOptions.TYPE
+            show_trace
+            or show_error_details == config.ShowErrorDetailsConfigOptions.TYPE
         )
 
         if not show_message:

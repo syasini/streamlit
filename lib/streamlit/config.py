@@ -21,13 +21,13 @@ import os
 import secrets
 import threading
 from collections import OrderedDict
+from enum import Enum
 from typing import Any, Callable
 
 from blinker import Signal
 
 from streamlit import config_util, development, env_util, file_util, util
 from streamlit.config_option import ConfigOption
-from streamlit.elements.exception import ShowErrorDetailsConfigOptions
 from streamlit.errors import StreamlitAPIException
 
 # Config System Global State #
@@ -63,6 +63,15 @@ _DEFINED_BY_FLAG = "command-line argument or environment variable"
 
 # Indicates that a config option was defined in an environment variable
 _DEFINED_BY_ENV_VAR = "environment variable"
+
+
+class ShowErrorDetailsConfigOptions(str, Enum):
+    """Valid options for the "client.showErrorDetails" config."""
+
+    FULL = "full"
+    STACKTRACE = "stacktrace"
+    TYPE = "type"
+    NONE = "none"
 
 
 def set_option(key: str, value: Any, where_defined: str = _USER_DEFINED) -> None:
