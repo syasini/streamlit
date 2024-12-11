@@ -40,16 +40,14 @@ repos:
         name: Prettier
         # NOTE: This hook currently does not work on Windows due to "yarn" not being an executable and win32api.CreateProcess
         # turning `subprocess.run(["yarn", "prettier", "--write"])` into a call to `yarn.exe prettier --write` which does not exist
-        entry: ./scripts/run_in_subdirectory.py frontend/ yarn prettier --write
-        files: ^frontend/.*\.(js|jsx|ts|tsx)$
-        exclude: /vendor/
+        entry: ./scripts/run_in_subdirectory.py frontend yarn workspaces foreach --all run format
         language: node
-        pass_filenames: true
+        pass_filenames: false
       - id: prettier-yaml
         name: Prettier-yaml
         # NOTE: This hook currently does not work on Windows due to "yarn" not being an executable and win32api.CreateProcess
         # turning `subprocess.run(["yarn", "prettier", "--write"])` into a call to `yarn.exe prettier --write` which does not exist
-        entry: ./scripts/run_in_subdirectory.py frontend yarn prettier ../.github --write
+        entry: ./scripts/run_in_subdirectory.py frontend/app yarn prettier ../../.github --write
         files: ^.github/.*\.(yml|yaml)$
         language: node
         pass_filenames: false

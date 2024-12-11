@@ -33,24 +33,6 @@ jobs:
         with:
           python-version: "${{ env.PYTHON_MAX_VERSION }}"
 
-      - name: Setup virtual env
-        uses: ./.github/actions/make_init
-
-      - name: Run make develop
-        run: make develop
-
-      - name: Build Package
-        timeout-minutes: 120
-        run: BUILD_AS_FAST_AS_POSSIBLE=1 make package
-
-      - name: Return path to Streamlit wheel
-        id: streamlit_wheel
-        shell: bash
-        run: |
-          streamlit_wheel=$(find "./lib/dist" -maxdepth 1 -name '*.whl')
-          streamlit_wheel=$(readlink -e "${streamlit_wheel}")
-          echo "output_file=${streamlit_wheel}" >> $GITHUB_OUTPUT
-
       - name: Install node dependencies for streamlit-component-lib
         working-directory: component-lib
         shell: bash
@@ -69,6 +51,24 @@ jobs:
           component_lib_tar_gz=$(find "./" -maxdepth 1 -name 'streamlit-component-lib-*.tgz')
           component_lib_tar_gz=$(readlink -e "${component_lib_tar_gz}")
           echo "output_file=${component_lib_tar_gz}" >> $GITHUB_OUTPUT
+
+      - name: Setup virtual env
+        uses: ./.github/actions/make_init
+
+      - name: Run make develop
+        run: make develop
+
+      - name: Build Package
+        timeout-minutes: 120
+        run: BUILD_AS_FAST_AS_POSSIBLE=1 make package
+
+      - name: Return path to Streamlit wheel
+        id: streamlit_wheel
+        shell: bash
+        run: |
+          streamlit_wheel=$(find "./lib/dist" -maxdepth 1 -name '*.whl')
+          streamlit_wheel=$(readlink -e "${streamlit_wheel}")
+          echo "output_file=${streamlit_wheel}" >> $GITHUB_OUTPUT
 
       - name: Checkout streamlit/component-template
         uses: actions/checkout@v4

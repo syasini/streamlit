@@ -145,7 +145,6 @@ def main():
     update_files(NODE_ROOT, semver_version)
     update_files(NODE_APP, semver_version)
     update_files(NODE_LIB, semver_version)
-    update_files(NODE_APP_ST_LIB, semver_version)
 
 
 if __name__ == "__main__":
