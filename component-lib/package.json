@@ -51,5 +51,5 @@
     "@types/react": "^16.14.41",
     "@types/react-dom": "^16.9.24"
   },
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@3.8.7"
 }
