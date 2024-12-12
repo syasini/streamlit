@@ -122,6 +122,7 @@ import withScreencast, {
   ScreenCastHOC,
 } from "@streamlit/app/src/hocs/withScreencast/withScreencast"
 
+import { showDevelopmentOptions } from "./showDevelopmentOptions"
 // Used to import fonts + responsive reboot items
 import "@streamlit/app/src/assets/css/theme.scss"
 import { ThemeManager } from "./util/useThemeManager"
@@ -191,22 +192,6 @@ declare global {
     streamlitDebug: any
     iFrameResizer: any
   }
-}
-
-export const showDevelopmentOptions = (
-  hostIsOwner: boolean | undefined,
-  toolbarMode: Config.ToolbarMode
-): boolean => {
-  if (toolbarMode == Config.ToolbarMode.DEVELOPER) {
-    return true
-  }
-  if (
-    Config.ToolbarMode.VIEWER == toolbarMode ||
-    Config.ToolbarMode.MINIMAL == toolbarMode
-  ) {
-    return false
-  }
-  return hostIsOwner || isLocalhost()
 }
 
 export class App extends PureComponent<Props, State> {
