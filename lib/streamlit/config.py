@@ -73,6 +73,16 @@ class ShowErrorDetailsConfigOptions(str, Enum):
     TYPE = "type"
     NONE = "none"
 
+    def is_true_variation(val: str | bool):
+        return val in ["true", "True", True]
+
+    def is_false_variation(val: str | bool):
+        return val in ["false", "False", True]
+
+        # Config options can be set from several places including the command-line and
+        # the user's script. Legacy config options (true/false) will have type string when set via
+        # command-line and bool when set via user script (e.g. st.set_option("client.showErrorDetails", False)).
+
 
 def set_option(key: str, value: Any, where_defined: str = _USER_DEFINED) -> None:
     """Set config option.

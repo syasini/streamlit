@@ -149,22 +149,20 @@ Traceback:
     if is_uncaught_app_exception:
         show_error_details = config.get_option("client.showErrorDetails")
 
-        # Config options can be set from several places including the command-line and
-        # the user's script. Legacy config options (true/false) will have type string when set via
-        # command-line and bool when set via user script (e.g. st.set_option("client.showErrorDetails", False)).
-        TRUE_VARIATIONS = ["true", "True", True]
-        FALSE_VARIATIONS = ["false", "False", False]
-
         show_message = (
             show_error_details == config.ShowErrorDetailsConfigOptions.FULL
-            or show_error_details in TRUE_VARIATIONS
+            or config.ShowErrorDetailsConfigOptions.is_true_variation(
+                show_error_details
+            )
         )
         # False is a legacy config option still in-use in community cloud. It is equivalent
         # to "stacktrace".
         show_trace = (
             show_message
             or show_error_details == config.ShowErrorDetailsConfigOptions.STACKTRACE
-            or show_error_details in FALSE_VARIATIONS
+            or config.ShowErrorDetailsConfigOptions.is_false_variation(
+                show_error_details
+            )
         )
         show_type = (
             show_trace
