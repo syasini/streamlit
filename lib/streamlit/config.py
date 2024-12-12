@@ -73,11 +73,13 @@ class ShowErrorDetailsConfigOptions(str, Enum):
     TYPE = "type"
     NONE = "none"
 
+    @staticmethod
     def is_true_variation(val: str | bool):
         return val in ["true", "True", True]
 
+    @staticmethod
     def is_false_variation(val: str | bool):
-        return val in ["false", "False", True]
+        return val in ["false", "False", False]
 
         # Config options can be set from several places including the command-line and
         # the user's script. Legacy config options (true/false) will have type string when set via
