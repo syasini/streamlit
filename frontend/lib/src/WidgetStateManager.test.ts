@@ -158,41 +158,22 @@ describe("Widget State Manager", () => {
    * Buttons (which set trigger values) can't be used within forms, so this test
    * is not parameterized on insideForm.
    */
-  it("sets trigger value correctly", () => {
+  it("sets trigger value correctly", async () => {
     const widget = getWidget({ insideForm: false })
-    widgetMgr.setTriggerValue(widget, { fromUi: true }, undefined)
+    await widgetMgr.setTriggerValue(widget, { fromUi: true }, undefined)
+
     // @ts-expect-error
     expect(widgetMgr.getWidgetState(widget)).toBe(undefined)
     assertCallbacks({ insideForm: false })
   })
 
   /**
-   * We put test setTrigger value using a setTimeout by scheduling checks
-   * in the event loop. I could imagine that the test could succeed in a
-   * false positive manner, but when removing the setTimeout in the
-   * WidgetMgr.setTriggerValueAtEndOfEventLoop, it seems to consistently fail.
-   * We have an e2e test to check the actual runtime behavior.
-   */
-  it("sets trigger value at end of event loop", () => {
-    const widget = getWidget({ insideForm: false })
-    setTimeout(() => expect(sendBackMsg).not.toHaveBeenCalled(), 0)
-    widgetMgr.setTriggerValue(widget, { fromUi: true }, undefined)
-
-    setTimeout(() => {
-      expect(sendBackMsg).toHaveBeenCalledTimes(1)
-      // @ts-expect-error
-      expect(widgetMgr.getWidgetState(widget)).toBe(undefined)
-      assertCallbacks({ insideForm: false })
-    }, 0)
-  })
-
-  /**
    * String Triggers can't be used within forms, so this test
    * is not parameterized on insideForm.
    */
-  it("sets string trigger value correctly", () => {
+  it("sets string trigger value correctly", async () => {
     const widget = getWidget({ insideForm: false })
-    widgetMgr.setStringTriggerValue(
+    await widgetMgr.setStringTriggerValue(
       widget,
       "sample string",
       { fromUi: true },
@@ -405,9 +386,9 @@ describe("Widget State Manager", () => {
         setterMethod: "setFileUploaderStateValue",
         value: MOCK_FILE_UPLOADER_STATE,
       },
-    ])("%p", ({ setterMethod, value }) => {
+    ])("%p", async ({ setterMethod, value }) => {
       // @ts-expect-error
-      widgetMgr[setterMethod](
+      await widgetMgr[setterMethod](
         MOCK_WIDGET,
         value,
         {
@@ -425,8 +406,8 @@ describe("Widget State Manager", () => {
 
     // This test isn't parameterized like the ones above because setTriggerValue
     // has a slightly different signature from the other setter methods.
-    it("can set fragmentId in setTriggerValue", () => {
-      widgetMgr.setTriggerValue(
+    it("can set fragmentId in setTriggerValue", async () => {
+      await widgetMgr.setTriggerValue(
         MOCK_WIDGET,
         {
           fromUi: true,

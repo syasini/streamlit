@@ -286,16 +286,21 @@ export class WidgetStateManager {
   /* Sometimes users change an input field and directly click on a button to trigger a rerun
    *  the setTimeout is used to ensure the input field value is sent to the server before the button click
    *  by putting the the button click in the end of the event loop
+   *
+   * Returns a promise that is resolved as soon as the timeout was triggered for testing purposes.
    */
   private setTriggerValueAtEndOfEventLoop(
     widget: WidgetInfo,
     source: Source,
     fragmentId: string | undefined
-  ): void {
-    setTimeout(() => {
-      this.onWidgetValueChanged(widget.formId, source, fragmentId)
-      this.deleteWidgetState(widget.id)
-    }, 0)
+  ): Promise<void> {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        this.onWidgetValueChanged(widget.formId, source, fragmentId)
+        this.deleteWidgetState(widget.id)
+        resolve()
+      }, 0)
+    })
   }
 
   /**
@@ -308,10 +313,10 @@ export class WidgetStateManager {
     value: string,
     source: Source,
     fragmentId: string | undefined
-  ): void {
+  ): Promise<void> {
     this.createWidgetState(widget, source).stringTriggerValue =
       new StringTriggerValue({ data: value })
-    this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
+    return this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
   }
 
   /**
@@ -322,9 +327,9 @@ export class WidgetStateManager {
     widget: WidgetInfo,
     source: Source,
     fragmentId: string | undefined
-  ): void {
+  ): Promise<void> {
     this.createWidgetState(widget, source).triggerValue = true
-    this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
+    return this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
   }
 
   public getBoolValue(widget: WidgetInfo): boolean | undefined {
