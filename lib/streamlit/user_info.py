@@ -134,6 +134,8 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
         ctx = _get_script_run_ctx()
         if ctx is None:
             return False
+        # TODO[kajarenc] replace user_info object type from a Dict, to more
+        #  structured object (e.g. user AuthenticatedUser vs. AnonymousUser).
         return bool(ctx.user_info.get("_streamlit_logged_in", False))
 
     def __getitem__(self, key: str) -> str | bool | None:

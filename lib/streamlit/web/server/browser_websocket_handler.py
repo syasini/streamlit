@@ -69,6 +69,7 @@ class BrowserWebSocketHandler(WebSocketHandler, SessionClient):
     ) -> bytes | None:
         """Get a signed cookie from the request. Added for compatibility with
         Tornado < 6.3.0.
+        See release notes: https://www.tornadoweb.org/en/stable/releases/v6.3.0.html#deprecation-notices
         """
         try:
             return super().get_signed_cookie(name, value, max_age_days, min_version)
