@@ -289,7 +289,7 @@ export class WidgetStateManager {
    * for an onBlur event of an input field, that are already in the event loop will then be deterministically
    * executed before the trigger-based code.
    *
-   * Returns a promise that is resolved as soon as the timeout was triggered, mainly to make this easier testable
+   * Returns a promise that is resolved as soon as the timeout was triggered, mainly to make this easier to test.
    * in our unit tests.
    */
   private setTriggerValueAtEndOfEventLoop(
