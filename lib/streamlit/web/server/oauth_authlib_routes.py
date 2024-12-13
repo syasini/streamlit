@@ -66,18 +66,19 @@ class AuthHandlerMixin(tornado.web.RequestHandler):
     def set_auth_cookie(self, user_info: dict[str, Any]) -> None:
         serialized_cookie_value = json.dumps(user_info)
         try:
+            # We don't specify Tornado secure flag here because it leads to missing cookie on Safari.
+            # The OIDC flow should work only on secure context anyway (localhost or HTTPS),
+            # so specifying the secure flag here will not add anything in terms of security.
             self.set_signed_cookie(
                 AUTH_COOKIE_NAME,
                 serialized_cookie_value,
                 httpOnly=True,
-                secure=True,
             )
         except AttributeError:
             self.set_secure_cookie(
                 AUTH_COOKIE_NAME,
                 serialized_cookie_value,
                 httponly=True,
-                secure=True,
             )
 
     def clear_auth_cookie(self) -> None:
