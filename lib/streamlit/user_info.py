@@ -126,7 +126,11 @@ class UserInfoProxy(Mapping[str, Union[str, bool, None]]):
 
     @property
     def is_authenticated(self) -> bool:
-        """Check if the user is authenticated."""
+        """Check if the user is authenticated.
+        For checking that we rely on the `_streamlit_logged_in` key in the user_info,
+        that should be passed to the script context by the auth mechanism either from
+        cookie, or from the fact of special header presence.
+        """
         ctx = _get_script_run_ctx()
         if ctx is None:
             return False
