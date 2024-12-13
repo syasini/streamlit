@@ -283,11 +283,14 @@ export class WidgetStateManager {
     }
   }
 
-  /* Sometimes users change an input field and directly click on a button to trigger a rerun
-   *  the setTimeout is used to ensure the input field value is sent to the server before the button click
-   *  by putting the the button click in the end of the event loop
+  /* Sometimes users change an input field and directly click on a button - which uses the trigger value -
+   * to trigger a rerun. We wrap the code that sends the trigger update in `setTimeout` so that trigger-based
+   * updates will be added to the end of JavaScript's event loop. Callbacks for other elements, for example
+   * for an onBlur event of an input field, that are already in the event loop will then be deterministically
+   * executed before the trigger-based code.
    *
-   * Returns a promise that is resolved as soon as the timeout was triggered for testing purposes.
+   * Returns a promise that is resolved as soon as the timeout was triggered, mainly to make this easier testable
+   * in our unit tests.
    */
   private setTriggerValueAtEndOfEventLoop(
     widget: WidgetInfo,
