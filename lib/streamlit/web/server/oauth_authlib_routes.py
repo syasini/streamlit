@@ -70,12 +70,14 @@ class AuthHandlerMixin(tornado.web.RequestHandler):
                 AUTH_COOKIE_NAME,
                 serialized_cookie_value,
                 httpOnly=True,
+                secure=True,
             )
         except AttributeError:
             self.set_secure_cookie(
                 AUTH_COOKIE_NAME,
                 serialized_cookie_value,
                 httponly=True,
+                secure=True,
             )
 
     def clear_auth_cookie(self) -> None:
