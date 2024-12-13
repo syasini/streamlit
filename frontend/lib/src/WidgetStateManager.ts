@@ -283,6 +283,21 @@ export class WidgetStateManager {
     }
   }
 
+  /* Sometimes users change an input field and directly click on a button to trigger a rerun
+   *  the setTimeout is used to ensure the input field value is sent to the server before the button click
+   *  by putting the the button click in the end of the event loop
+   */
+  private setTriggerValueAtEndOfEventLoop(
+    widget: WidgetInfo,
+    source: Source,
+    fragmentId: string | undefined
+  ): void {
+    setTimeout(() => {
+      this.onWidgetValueChanged(widget.formId, source, fragmentId)
+      this.deleteWidgetState(widget.id)
+    }, 0)
+  }
+
   /**
    * Sets the string trigger value for the given widget ID to a string value,
    * sends a rerunScript message to the server, and then immediately unsets the
@@ -296,8 +311,7 @@ export class WidgetStateManager {
   ): void {
     this.createWidgetState(widget, source).stringTriggerValue =
       new StringTriggerValue({ data: value })
-    this.onWidgetValueChanged(widget.formId, source, fragmentId)
-    this.deleteWidgetState(widget.id)
+    this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
   }
 
   /**
@@ -310,8 +324,7 @@ export class WidgetStateManager {
     fragmentId: string | undefined
   ): void {
     this.createWidgetState(widget, source).triggerValue = true
-    this.onWidgetValueChanged(widget.formId, source, fragmentId)
-    this.deleteWidgetState(widget.id)
+    this.setTriggerValueAtEndOfEventLoop(widget, source, fragmentId)
   }
 
   public getBoolValue(widget: WidgetInfo): boolean | undefined {

@@ -167,6 +167,26 @@ describe("Widget State Manager", () => {
   })
 
   /**
+   * We put test setTrigger value using a setTimeout by scheduling checks
+   * in the event loop. I could imagine that the test could succeed in a
+   * false positive manner, but when removing the setTimeout in the
+   * WidgetMgr.setTriggerValueAtEndOfEventLoop, it seems to consistently fail.
+   * We have an e2e test to check the actual runtime behavior.
+   */
+  it("sets trigger value at end of event loop", () => {
+    const widget = getWidget({ insideForm: false })
+    setTimeout(() => expect(sendBackMsg).not.toHaveBeenCalled(), 0)
+    widgetMgr.setTriggerValue(widget, { fromUi: true }, undefined)
+
+    setTimeout(() => {
+      expect(sendBackMsg).toHaveBeenCalledTimes(1)
+      // @ts-expect-error
+      expect(widgetMgr.getWidgetState(widget)).toBe(undefined)
+      assertCallbacks({ insideForm: false })
+    }, 0)
+  })
+
+  /**
    * String Triggers can't be used within forms, so this test
    * is not parameterized on insideForm.
    */
