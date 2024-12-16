@@ -244,7 +244,7 @@ function DataFrame({
 
   const [columnOrder, setColumnOrder] = React.useState(element.columnOrder)
 
-  const { columns: originalColumns } = useColumnLoader(
+  const { columns: originalColumns, allColumns } = useColumnLoader(
     element,
     data,
     disabled,
@@ -671,11 +671,11 @@ function DataFrame({
     }, 1)
   }, [resizableSize, numRows, glideColumns])
 
-  const unpinColumn = React.useCallback((column: BaseColumn) => {
+  const unpinColumn = React.useCallback((columnName: string) => {
     setColumnConfigMapping(prevColumnConfigMapping => {
       const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(column.name)
-      newColumnConfigMapping.set(column.name, {
+      const existingConfig = newColumnConfigMapping.get(columnName)
+      newColumnConfigMapping.set(columnName, {
         ...(existingConfig || {}),
         pinned: false,
       })
@@ -683,11 +683,11 @@ function DataFrame({
     })
   }, [])
 
-  const pinColumn = React.useCallback((column: BaseColumn) => {
+  const pinColumn = React.useCallback((columnName: string) => {
     setColumnConfigMapping(prevColumnConfigMapping => {
       const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(column.name)
-      newColumnConfigMapping.set(column.name, {
+      const existingConfig = newColumnConfigMapping.get(columnName)
+      newColumnConfigMapping.set(columnName, {
         ...(existingConfig || {}),
         pinned: true,
       })
@@ -695,13 +695,25 @@ function DataFrame({
     })
   }, [])
 
-  const hideColumn = React.useCallback((column: BaseColumn) => {
+  const hideColumn = React.useCallback((columnName: string) => {
     setColumnConfigMapping(prevColumnConfigMapping => {
       const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(column.name)
-      newColumnConfigMapping.set(column.name, {
+      const existingConfig = newColumnConfigMapping.get(columnName)
+      newColumnConfigMapping.set(columnName, {
         ...(existingConfig || {}),
         hidden: true,
+      })
+      return newColumnConfigMapping
+    })
+  }, [])
+
+  const showColumn = React.useCallback((columnName: string) => {
+    setColumnConfigMapping(prevColumnConfigMapping => {
+      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+      const existingConfig = newColumnConfigMapping.get(columnName)
+      newColumnConfigMapping.set(columnName, {
+        ...(existingConfig || {}),
+        hidden: false,
       })
       return newColumnConfigMapping
     })
@@ -810,8 +822,14 @@ function DataFrame({
             }}
           />
         )}
-        {!isEmptyTable && (
-          <ColumnsMenu columns={columns.map(column => column.name)} />
+        {!isEmptyTable && allColumns.length > columns.length && (
+          // Only show the columns menu if there are more columns than the current
+          // visible columns
+          <ColumnsMenu
+            columns={allColumns}
+            hideColumn={hideColumn}
+            showColumn={showColumn}
+          />
         )}
         {!isLargeTable && !isEmptyTable && (
           <ToolbarAction
@@ -919,9 +937,9 @@ function DataFrame({
 
             // Pin or unpin the column if necessary:
             if (toIdx < freezeColumns && !movedColumn.isPinned) {
-              pinColumn(movedColumn)
+              pinColumn(movedColumn.name)
             } else if (toIdx >= freezeColumns && movedColumn.isPinned) {
-              unpinColumn(movedColumn)
+              unpinColumn(movedColumn.name)
             }
 
             // Update the column order with the new sequence of column names
@@ -1131,15 +1149,15 @@ function DataFrame({
           }
           unpinColumn={() => {
             const selectedColumn = originalColumns[showMenu.col]
-            unpinColumn(selectedColumn)
+            unpinColumn(selectedColumn.name)
           }}
           pinColumn={() => {
             const selectedColumn = originalColumns[showMenu.col]
-            pinColumn(selectedColumn)
+            pinColumn(selectedColumn.name)
           }}
           hideColumn={() => {
             const selectedColumn = originalColumns[showMenu.col]
-            hideColumn(selectedColumn)
+            hideColumn(selectedColumn.name)
             // Remove column from column order:
             // setColumnOrder(prevColumnOrder => {
             //   if (prevColumnOrder && prevColumnOrder.length > 0) {

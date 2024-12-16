@@ -179,6 +179,7 @@ export function getColumnConfig(configJson: string): Map<string, any> {
 
 type ColumnLoaderReturn = {
   columns: BaseColumn[]
+  allColumns: BaseColumn[]
 }
 
 /**
@@ -230,59 +231,61 @@ function useColumnLoader(
     element.useContainerWidth ||
     (notNullOrUndefined(element.width) && element.width > 0)
 
+  const allColumns: BaseColumn[] = React.useMemo(() => {
+    return getAllColumnsFromArrow(data).map(column => {
+      // Apply column configurations
+      let updatedColumn = {
+        ...column,
+        ...applyColumnConfig(column, columnConfigMapping),
+        isStretched: stretchColumns,
+      } as BaseColumnProps
+      const ColumnType = getColumnType(updatedColumn)
+
+      // Make sure editing is deactivated if the column is read-only, disabled,
+      // or a not editable type.
+      if (
+        element.editingMode === ArrowProto.EditingMode.READ_ONLY ||
+        disabled ||
+        ColumnType.isEditableType === false
+      ) {
+        updatedColumn = {
+          ...updatedColumn,
+          isEditable: false,
+        }
+      }
+
+      if (
+        element.editingMode !== ArrowProto.EditingMode.READ_ONLY &&
+        updatedColumn.isEditable == true
+      ) {
+        // Set editable icon for all editable columns:
+        updatedColumn = {
+          ...updatedColumn,
+          icon: "editable",
+        }
+
+        // Make sure that required columns are not hidden when editing mode is dynamic:
+        if (
+          updatedColumn.isRequired &&
+          element.editingMode === ArrowProto.EditingMode.DYNAMIC
+        ) {
+          updatedColumn = {
+            ...updatedColumn,
+            isHidden: false,
+          }
+        }
+      }
+
+      return ColumnType(updatedColumn, theme)
+    })
+  }, [data, columnConfigMapping, stretchColumns])
+
   // Converts the columns from Arrow into columns compatible with glide-data-grid
   const columns: BaseColumn[] = React.useMemo(() => {
-    let configuredColumns = getAllColumnsFromArrow(data)
-      .map(column => {
-        // Apply column configurations
-        let updatedColumn = {
-          ...column,
-          ...applyColumnConfig(column, columnConfigMapping),
-          isStretched: stretchColumns,
-        } as BaseColumnProps
-        const ColumnType = getColumnType(updatedColumn)
-
-        // Make sure editing is deactivated if the column is read-only, disabled,
-        // or a not editable type.
-        if (
-          element.editingMode === ArrowProto.EditingMode.READ_ONLY ||
-          disabled ||
-          ColumnType.isEditableType === false
-        ) {
-          updatedColumn = {
-            ...updatedColumn,
-            isEditable: false,
-          }
-        }
-
-        if (
-          element.editingMode !== ArrowProto.EditingMode.READ_ONLY &&
-          updatedColumn.isEditable == true
-        ) {
-          // Set editable icon for all editable columns:
-          updatedColumn = {
-            ...updatedColumn,
-            icon: "editable",
-          }
-
-          // Make sure that required columns are not hidden when editing mode is dynamic:
-          if (
-            updatedColumn.isRequired &&
-            element.editingMode === ArrowProto.EditingMode.DYNAMIC
-          ) {
-            updatedColumn = {
-              ...updatedColumn,
-              isHidden: false,
-            }
-          }
-        }
-
-        return ColumnType(updatedColumn, theme)
-      })
-      .filter(column => {
-        // Filter out all columns that are hidden
-        return !column.isHidden
-      })
+    const visibleColumns = allColumns.filter(column => {
+      // Filter out all columns that are hidden
+      return !column.isHidden
+    })
 
     const pinnedColumns: BaseColumn[] = []
     const unpinnedColumns: BaseColumn[] = []
@@ -290,7 +293,7 @@ function useColumnLoader(
     if (columnOrder?.length) {
       // Special case: index columns not part of the column order
       // are shown as the first columns in the table
-      configuredColumns.forEach(column => {
+      visibleColumns.forEach(column => {
         if (column.isIndex && !columnOrder.includes(column.name)) {
           pinnedColumns.push(column)
         }
@@ -298,7 +301,7 @@ function useColumnLoader(
 
       // Reorder columns based on the configured column order:
       columnOrder.forEach(columnName => {
-        const column = configuredColumns.find(
+        const column = visibleColumns.find(
           column => column.name === columnName
         )
         if (column) {
@@ -312,7 +315,7 @@ function useColumnLoader(
     } else {
       // If no column order is configured, we just need to split
       // the columns into pinned and unpinned:
-      configuredColumns.forEach(column => {
+      visibleColumns.forEach(column => {
         if (column.isPinned) {
           pinnedColumns.push(column)
         } else {
@@ -321,12 +324,12 @@ function useColumnLoader(
       })
     }
 
-    configuredColumns = [...pinnedColumns, ...unpinnedColumns]
+    const orderedColumns = [...pinnedColumns, ...unpinnedColumns]
 
     // If all columns got filtered out, we add an empty index column
     // to prevent errors from glide-data-grid.
-    return configuredColumns.length > 0
-      ? configuredColumns
+    return orderedColumns.length > 0
+      ? orderedColumns
       : [ObjectColumn(getEmptyIndexColumn())]
   }, [
     data,
@@ -340,6 +343,7 @@ function useColumnLoader(
 
   return {
     columns,
+    allColumns,
   }
 }
 
