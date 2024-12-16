@@ -26,11 +26,17 @@ random.seed(0)
 st.set_page_config(layout="wide")
 
 selected_test_case = st.number_input(
-    "Select test case", max_value=len(SHARED_TEST_CASES) - 1, value=0
+    "Select test case", max_value=len(SHARED_TEST_CASES) - 1
 )
 
 # Render all test cases with st.dataframe:
 test_case = SHARED_TEST_CASES[selected_test_case]
 data = test_case[0]
 st.subheader(str(test_case[1].expected_data_format))
+
+# Little hack to make st.dataframe re-calculate width since
+# it's a new element with a new delta path.
+for _ in range(selected_test_case):
+    st.empty()
+
 st.dataframe(data)
