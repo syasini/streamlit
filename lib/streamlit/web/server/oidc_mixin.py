@@ -85,6 +85,9 @@ class TornadoOAuth2App(OAuth2Mixin, OpenIDMixin, BaseApp):  # type: ignore[misc]
         return token
 
     def _save_authorize_data(self, **kwargs):
+        """Authlib underlying uses the concept of "session" to store state data.
+        In Tornado, we don't have a session, so we use the framework's cache option.
+        """
         state = kwargs.pop("state", None)
         if state:
             assert self.framework.cache is not None

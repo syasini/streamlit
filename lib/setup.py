@@ -30,6 +30,7 @@ VERSION = "1.41.0"  # PEP-440
 # - And include an upper bound that's < NEXT_MAJOR_VERSION
 INSTALL_REQUIRES = [
     "altair>=4.0, <6",
+    "Authlib>=1.3.1, <2",
     "blinker>=1.0.0, <2",
     "cachetools>=4.0, <6",
     "click>=7.0, <9",
@@ -49,7 +50,6 @@ INSTALL_REQUIRES = [
     "rich>=10.14.0, <14",
     "tenacity>=8.1.0, <10",
     "toml>=0.10.1, <2",
-    "Authlib>=1.3.1",
     "typing-extensions>=4.3.0, <5",
     # Don't require watchdog on MacOS, since it'll fail without xcode tools.
     # Without watchdog, we fallback to a polling file watcher to check for app changes.
