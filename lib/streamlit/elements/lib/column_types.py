@@ -176,10 +176,6 @@ class ColumnConfig(TypedDict, total=False):
         (default), Streamlit will decide: index columns are pinned, and data
         columns are not pinned.
 
-    pinned: bool or None
-        Whether the column is pinned. A pinned column will not scroll horizontally
-        when the user scrolls the table. Defaults to False.
-
     default: str, bool, int, float, or None
         Specifies the default value in this column when a new row is added by
         the user. This defaults to ``None``.
