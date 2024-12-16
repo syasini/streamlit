@@ -48,7 +48,7 @@ const ColumnsMenu: React.FC<ColumnsMenuProps> = ({
     <div data-testid="stPopover" className="stPopover">
       <UIPopover
         triggerType={TRIGGER_TYPE.click}
-        placement={PLACEMENT.bottomLeft}
+        placement={PLACEMENT.bottomRight}
         autoFocus={true}
         focusLock={true}
         content={() => (
@@ -144,58 +144,10 @@ const ColumnsMenu: React.FC<ColumnsMenuProps> = ({
                   },
                 }}
               >
-                {column.title}
+                {!column.title && column.isIndex ? "(index)" : column.title}
               </UICheckbox>
             ))}
-
-            {/* <StyledMenuListItem>Foo</StyledMenuListItem> */}
           </div>
-          // <List
-          //   items={items}
-          //   removable
-          //   onChange={({ oldIndex, newIndex }) =>
-          //     setItems(
-          //       newIndex === -1
-          //         ? arrayRemove(items, oldIndex)
-          //         : arrayMove(items, oldIndex, newIndex)
-          //     )
-          //   }
-          //   overrides={{
-          //     DragHandle: {
-          //       style: () => ({
-          //         width: theme.iconSizes.sm,
-          //       }),
-          //     },
-          //     Label: {
-          //       style: () => ({
-          //         fontSize: theme.fontSizes.sm,
-          //       }),
-          //     },
-          //     Item: {
-          //       style: () => ({
-          //         paddingTop: 0,
-          //         paddingBottom: 0,
-          //         paddingLeft: 0,
-          //         paddingRight: 0,
-          //         borderTopColor: "transparent",
-          //         borderBottomColor: "transparent",
-          //         borderLeftColor: "transparent",
-          //         borderRightColor: "transparent",
-          //         ":hover": {
-          //           borderTopColor: "transparent",
-          //           borderBottomColor: "transparent",
-          //           borderLeftColor: "transparent",
-          //           borderRightColor: "transparent",
-          //         },
-          //       }),
-          //     },
-          //     CloseHandle: {
-          //       style: () => ({
-          //         width: theme.iconSizes.md,
-          //       }),
-          //     },
-          //   }}
-          // />
         )}
         isOpen={open}
         onClickOutside={() => setOpen(false)}
