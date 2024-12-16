@@ -36,6 +36,10 @@ export interface MenuProps {
   hideColumn: () => void
   // Callback to pin the column
   pinColumn: () => void
+  // Callback to sort column ascending
+  sortColumnAscending: () => void
+  // Callback to sort column descending
+  sortColumnDescending: () => void
   // Whether the column is pinned
   isPinned: boolean
   // Callback to unpin the column
@@ -57,6 +61,8 @@ function Menu({
   pinColumn,
   isPinned,
   unpinColumn,
+  sortColumnAscending,
+  sortColumnDescending,
 }: MenuProps): ReactElement {
   const [open, setOpen] = React.useState(true)
   const theme: EmotionTheme = useTheme()
@@ -76,6 +82,42 @@ function Menu({
             paddingBottom: theme.spacing.xs,
           }}
         >
+          <StyledMenuListItem
+            onClick={() => {
+              sortColumnAscending()
+              closeMenu()
+            }}
+          >
+            <DynamicIcon
+              size={"base"}
+              margin="0"
+              color="inherit"
+              iconValue=":material/arrow_upward:"
+            />
+            Sort ascending
+          </StyledMenuListItem>
+          <StyledMenuListItem
+            onClick={() => {
+              sortColumnDescending()
+              closeMenu()
+            }}
+          >
+            <DynamicIcon
+              size={"base"}
+              margin="0"
+              color="inherit"
+              iconValue=":material/arrow_downward:"
+            />
+            Sort descending
+          </StyledMenuListItem>
+          <div
+            style={{
+              height: theme.sizes.borderWidth,
+              backgroundColor: theme.colors.borderColor,
+              marginTop: theme.spacing.xs,
+              marginBottom: theme.spacing.xs,
+            }}
+          />
           <StyledMenuListItem
             onClick={() => {
               hideColumn()

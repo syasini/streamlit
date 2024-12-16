@@ -695,6 +695,18 @@ function DataFrame({
     })
   }, [])
 
+  const hideColumn = React.useCallback((column: BaseColumn) => {
+    setColumnConfigMapping(prevColumnConfigMapping => {
+      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+      const existingConfig = newColumnConfigMapping.get(column.name)
+      newColumnConfigMapping.set(column.name, {
+        ...(existingConfig || {}),
+        hidden: true,
+      })
+      return newColumnConfigMapping
+    })
+  }, [])
+
   return (
     <StyledResizableContainer
       className="stDataFrame"
@@ -895,7 +907,6 @@ function DataFrame({
           rangeSelect={isTouchDevice ? "cell" : "rect"}
           columnSelect={"none"}
           rowSelect={"none"}
-          // isDraggable={"header"}
           onColumnMoved={(fromIdx, toIdx) => {
             // Create a shallow copy of the original columns
             const newColumns = [...originalColumns]
@@ -906,6 +917,7 @@ function DataFrame({
             // Insert the column into its new position
             newColumns.splice(toIdx, 0, movedColumn)
 
+            // Pin or unpin the column if necessary:
             if (toIdx < freezeColumns && !movedColumn.isPinned) {
               pinColumn(movedColumn)
             } else if (toIdx >= freezeColumns && movedColumn.isPinned) {
@@ -954,7 +966,7 @@ function DataFrame({
               // to the new index of the selected row which adds complexity.
               clearSelection()
             }
-            sortColumn(colIndex)
+            sortColumn(colIndex, "auto")
           }}
           gridSelection={gridSelection}
           // We don't have to react to "onSelectionCleared" since
@@ -1126,19 +1138,22 @@ function DataFrame({
             pinColumn(selectedColumn)
           }}
           hideColumn={() => {
-            // Remove column from column order:
             const selectedColumn = originalColumns[showMenu.col]
-            setColumnOrder(prevColumnOrder => {
-              if (prevColumnOrder && prevColumnOrder.length > 0) {
-                return prevColumnOrder.filter(
-                  col => col !== selectedColumn.name
-                )
-              }
-              return originalColumns
-                .map(column => column.name)
-                .filter(col => col !== selectedColumn.name)
-            })
+            hideColumn(selectedColumn)
+            // Remove column from column order:
+            // setColumnOrder(prevColumnOrder => {
+            //   if (prevColumnOrder && prevColumnOrder.length > 0) {
+            //     return prevColumnOrder.filter(
+            //       col => col !== selectedColumn.name
+            //     )
+            //   }
+            //   return originalColumns
+            //     .map(column => column.name)
+            //     .filter(col => col !== selectedColumn.name)
+            // })
           }}
+          sortColumnAscending={() => sortColumn(showMenu.col, "asc")}
+          sortColumnDescending={() => sortColumn(showMenu.col, "desc")}
         ></Menu>
       )}
     </StyledResizableContainer>
