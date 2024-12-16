@@ -1216,6 +1216,8 @@ export class App extends PureComponent<Props, State> {
       if (
         this.connectionManager !== null &&
         status !== ForwardMsg.ScriptFinishedStatus.FINISHED_EARLY_FOR_RERUN &&
+        status !==
+          ForwardMsg.ScriptFinishedStatus.FINISHED_FRAGMENT_RUN_SUCCESSFULLY &&
         this.sessionInfo.isSet
       ) {
         this.connectionManager.incrementMessageCacheRunCount(
