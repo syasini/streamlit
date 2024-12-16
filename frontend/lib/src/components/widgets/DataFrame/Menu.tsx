@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement } from "react"
+import React, { ReactElement, useEffect } from "react"
 
 import { useTheme } from "@emotion/react"
 import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
@@ -68,6 +68,26 @@ function Menu({
   const theme: EmotionTheme = useTheme()
   const { colors, fontSizes, radii, fontWeights } = theme
 
+  // Disable scrolling by preventing defaults on wheel and touch events:
+  useEffect(() => {
+    function preventScroll(e: WheelEvent | TouchEvent) {
+      e.preventDefault()
+    }
+
+    if (open) {
+      document.addEventListener("wheel", preventScroll, { passive: false })
+      document.addEventListener("touchmove", preventScroll, { passive: false })
+    } else {
+      document.removeEventListener("wheel", preventScroll)
+      document.removeEventListener("touchmove", preventScroll)
+    }
+
+    return () => {
+      document.removeEventListener("wheel", preventScroll)
+      document.removeEventListener("touchmove", preventScroll)
+    }
+  }, [open])
+
   const closeMenu = React.useCallback((): void => {
     setOpen(false)
     menuClosed()
@@ -75,6 +95,7 @@ function Menu({
 
   return (
     <Popover
+      autoFocus
       content={
         <div
           style={{
