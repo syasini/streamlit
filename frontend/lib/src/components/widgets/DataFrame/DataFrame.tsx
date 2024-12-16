@@ -360,6 +360,7 @@ function DataFrame({
       }
     }),
     [
+      columns,
       element.id,
       element.formId,
       widgetMgr,
@@ -671,53 +672,69 @@ function DataFrame({
     }, 1)
   }, [resizableSize, numRows, glideColumns])
 
-  const unpinColumn = React.useCallback((columnName: string) => {
-    setColumnConfigMapping(prevColumnConfigMapping => {
-      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(columnName)
-      newColumnConfigMapping.set(columnName, {
-        ...(existingConfig || {}),
-        pinned: false,
+  const unpinColumn = React.useCallback(
+    (columnName: string) => {
+      setColumnConfigMapping(prevColumnConfigMapping => {
+        const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+        const existingConfig = newColumnConfigMapping.get(columnName)
+        newColumnConfigMapping.set(columnName, {
+          ...(existingConfig || {}),
+          pinned: false,
+        })
+        return newColumnConfigMapping
       })
-      return newColumnConfigMapping
-    })
-  }, [])
+      clearSelection(true, false)
+    },
+    [clearSelection]
+  )
 
-  const pinColumn = React.useCallback((columnName: string) => {
-    setColumnConfigMapping(prevColumnConfigMapping => {
-      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(columnName)
-      newColumnConfigMapping.set(columnName, {
-        ...(existingConfig || {}),
-        pinned: true,
+  const pinColumn = React.useCallback(
+    (columnName: string) => {
+      setColumnConfigMapping(prevColumnConfigMapping => {
+        const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+        const existingConfig = newColumnConfigMapping.get(columnName)
+        newColumnConfigMapping.set(columnName, {
+          ...(existingConfig || {}),
+          pinned: true,
+        })
+        return newColumnConfigMapping
       })
-      return newColumnConfigMapping
-    })
-  }, [])
+      clearSelection(true, false)
+    },
+    [clearSelection]
+  )
 
-  const hideColumn = React.useCallback((columnName: string) => {
-    setColumnConfigMapping(prevColumnConfigMapping => {
-      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(columnName)
-      newColumnConfigMapping.set(columnName, {
-        ...(existingConfig || {}),
-        hidden: true,
+  const hideColumn = React.useCallback(
+    (columnName: string) => {
+      setColumnConfigMapping(prevColumnConfigMapping => {
+        const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+        const existingConfig = newColumnConfigMapping.get(columnName)
+        newColumnConfigMapping.set(columnName, {
+          ...(existingConfig || {}),
+          hidden: true,
+        })
+        return newColumnConfigMapping
       })
-      return newColumnConfigMapping
-    })
-  }, [])
+      clearSelection(true, false)
+    },
+    [clearSelection]
+  )
 
-  const showColumn = React.useCallback((columnName: string) => {
-    setColumnConfigMapping(prevColumnConfigMapping => {
-      const newColumnConfigMapping = new Map(prevColumnConfigMapping)
-      const existingConfig = newColumnConfigMapping.get(columnName)
-      newColumnConfigMapping.set(columnName, {
-        ...(existingConfig || {}),
-        hidden: false,
+  const showColumn = React.useCallback(
+    (columnName: string) => {
+      setColumnConfigMapping(prevColumnConfigMapping => {
+        const newColumnConfigMapping = new Map(prevColumnConfigMapping)
+        const existingConfig = newColumnConfigMapping.get(columnName)
+        newColumnConfigMapping.set(columnName, {
+          ...(existingConfig || {}),
+          hidden: false,
+        })
+        return newColumnConfigMapping
       })
-      return newColumnConfigMapping
-    })
-  }, [])
+      clearSelection(true, false)
+    },
+    [clearSelection]
+  )
 
   return (
     <StyledResizableContainer
@@ -925,26 +942,30 @@ function DataFrame({
           rangeSelect={isTouchDevice ? "cell" : "rect"}
           columnSelect={"none"}
           rowSelect={"none"}
-          onColumnMoved={(fromIdx, toIdx) => {
-            // Create a shallow copy of the original columns
-            const newColumns = [...originalColumns]
+          onColumnMoved={
+            isColumnSelectionActivated
+              ? undefined
+              : (fromIdx, toIdx) => {
+                  // Create a shallow copy of the original columns
+                  const newColumns = [...originalColumns]
 
-            // Remove the column from its original position
-            const [movedColumn] = newColumns.splice(fromIdx, 1)
+                  // Remove the column from its original position
+                  const [movedColumn] = newColumns.splice(fromIdx, 1)
 
-            // Insert the column into its new position
-            newColumns.splice(toIdx, 0, movedColumn)
+                  // Insert the column into its new position
+                  newColumns.splice(toIdx, 0, movedColumn)
 
-            // Pin or unpin the column if necessary:
-            if (toIdx < freezeColumns && !movedColumn.isPinned) {
-              pinColumn(movedColumn.name)
-            } else if (toIdx >= freezeColumns && movedColumn.isPinned) {
-              unpinColumn(movedColumn.name)
-            }
+                  // Pin or unpin the column if necessary:
+                  if (toIdx < freezeColumns && !movedColumn.isPinned) {
+                    pinColumn(movedColumn.name)
+                  } else if (toIdx >= freezeColumns && movedColumn.isPinned) {
+                    unpinColumn(movedColumn.name)
+                  }
 
-            // Update the column order with the new sequence of column names
-            setColumnOrder(newColumns.map(column => column.name))
-          }}
+                  // Update the column order with the new sequence of column names
+                  setColumnOrder(newColumns.map(column => column.name))
+                }
+          }
           // Enable tooltips on hover of a cell or column header:
           onItemHovered={(args: GridMouseEventArgs) => {
             const [, row] = args.location
