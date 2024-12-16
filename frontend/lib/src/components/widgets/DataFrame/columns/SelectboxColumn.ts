@@ -17,7 +17,7 @@
 import { GridCell, GridCellKind } from "@glideapps/glide-data-grid"
 import { DropdownCellType } from "@glideapps/glide-data-grid-cells"
 
-import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
+import { getTypeName } from "@streamlit/lib/src/dataframes/arrowTypeUtils"
 import {
   isNullOrUndefined,
   notNullOrUndefined,
@@ -53,8 +53,7 @@ function SelectboxColumn(props: BaseColumnProps): BaseColumn {
   const parameters = mergeColumnParameters(
     // Default parameters:
     {
-      options:
-        Quiver.getTypeName(props.arrowType) === "bool" ? [true, false] : [],
+      options: getTypeName(props.arrowType) === "bool" ? [true, false] : [],
     },
     // User parameters:
     props.columnTypeOptions
@@ -75,6 +74,7 @@ function SelectboxColumn(props: BaseColumnProps): BaseColumn {
     copyData: "",
     contentAlign: props.contentAlignment,
     readonly: !props.isEditable,
+    // The text in pinned columns should be faded.
     style: props.isPinned ? "faded" : "normal",
     data: {
       kind: "dropdown-cell",

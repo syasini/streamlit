@@ -16,9 +16,9 @@
 
 import {
   Type as ArrowType,
-  DataFrameCell,
-  Quiver,
-} from "@streamlit/lib/src/dataframes/Quiver"
+  getTypeName,
+} from "@streamlit/lib/src/dataframes/arrowTypeUtils"
+import { DataFrameCell, Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
   CATEGORICAL_COLUMN,
   DECIMAL,
@@ -258,6 +258,7 @@ describe("getIndexFromArrow", () => {
         pandas_type: "unicode",
       },
       isIndex: true,
+      isPinned: true,
       isHidden: false,
     })
   })
@@ -344,6 +345,7 @@ describe("getColumnFromArrow", () => {
         pandas_type: "unicode",
       },
       isIndex: false,
+      isPinned: false,
       isHidden: false,
       group: "1",
     })
@@ -576,6 +578,7 @@ describe("getCellFromArrow", () => {
         isEditable: false,
         isHidden: false,
         isIndex: false,
+        isPinned: false,
         isStretched: false,
         isPinned: false,
         columnTypeOptions: {
@@ -629,7 +632,7 @@ describe("getCellFromArrow", () => {
           numpy_type: "object",
         },
       }),
-      getCell: jest.fn().mockReturnValue(getTextCell(false, false)),
+      getCell: vi.fn().mockReturnValue(getTextCell(false, false)),
     }
 
     // Create a mock arrowCell object with time data
@@ -675,7 +678,7 @@ describe("getCellFromArrow", () => {
           numpy_type: "datetime64[ns]",
         },
       }),
-      getCell: jest.fn().mockReturnValue(getTextCell(false, false)),
+      getCell: vi.fn().mockReturnValue(getTextCell(false, false)),
     }
 
     // Create a mock arrowCell object with time data
@@ -1017,7 +1020,7 @@ describe("isIntegerType", () => {
   ])(
     "interprets %p as integer type: %p",
     (arrowType: ArrowType, expected: boolean) => {
-      expect(isIntegerType(Quiver.getTypeName(arrowType))).toEqual(expected)
+      expect(isIntegerType(getTypeName(arrowType))).toEqual(expected)
     }
   )
 })
