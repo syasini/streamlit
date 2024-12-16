@@ -115,10 +115,10 @@ const ColumnsMenu: React.FC<ColumnsMenuProps> = ({
               [`@media (max-width: ${theme.breakpoints.sm})`]: {
                 maxWidth: `calc(100% - 2rem)`,
               },
-              borderTopLeftRadius: theme.radii.lg,
-              borderTopRightRadius: theme.radii.lg,
-              borderBottomRightRadius: theme.radii.lg,
-              borderBottomLeftRadius: theme.radii.lg,
+              borderTopLeftRadius: theme.radii.default,
+              borderTopRightRadius: theme.radii.default,
+              borderBottomRightRadius: theme.radii.default,
+              borderBottomLeftRadius: theme.radii.default,
 
               borderLeftWidth: theme.sizes.borderWidth,
               borderRightWidth: theme.sizes.borderWidth,

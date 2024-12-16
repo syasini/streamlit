@@ -19,7 +19,7 @@ import React, { ReactElement } from "react"
 import { useTheme } from "@emotion/react"
 import { ACCESSIBILITY_TYPE, PLACEMENT, Popover } from "baseui/popover"
 
-import { hasLightBackgroundColor } from "@streamlit/lib/src/theme/utils"
+import { hasLightBackgroundColor } from "@streamlit/lib/src/theme"
 import { EmotionTheme } from "@streamlit/lib/src/theme"
 import { DynamicIcon } from "@streamlit/lib/src/components/shared/Icon"
 
