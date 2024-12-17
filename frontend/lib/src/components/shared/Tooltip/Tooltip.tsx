@@ -80,6 +80,10 @@ function Tooltip({
 
           const overflowRight =
             xCoordinate + boundingClientRect.width - window.innerWidth
+
+          // this is the out-of-tree Basweb DOM structure. For the right overflow,
+          // this is the element that has the transform-style property set that needs
+          // to be modified.
           const parentsParentElement = parentElement.parentElement
 
           if (overflowRight > 0 && parentsParentElement) {
