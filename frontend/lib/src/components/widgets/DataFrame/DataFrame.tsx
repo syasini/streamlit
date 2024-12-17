@@ -324,6 +324,13 @@ function DataFrame({
     ]
   )
 
+  // Next, useMemo to create the debounced version of the callback.
+  // Now the linter can inspect `innerSyncSelectionState` for dependencies properly.
+  const debouncedSyncSelectionState = React.useMemo(() => {
+    // `debounce` returns a new function. We rely on `innerSyncSelectionState` being stable (due to useCallback).
+    return debounce(DEBOUNCE_TIME_MS, innerSyncSelectionState)
+  }, [innerSyncSelectionState])
+
   /**
    * This callback is used to synchronize the selection state with the state
    * of the widget state of the component.
@@ -332,15 +339,11 @@ function DataFrame({
    *
    * @param newSelection - The new selection state
    */
-  // The debounce method doesn't allow dependency inspection. Therefore, we
-  // need to disable the eslint rule for exhaustive-deps.
-  // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const syncSelectionState = React.useCallback(
-    // Use debounce to prevent rapid updates to the widget state.
-    debounce(DEBOUNCE_TIME_MS, innerSyncSelectionState),
-    [innerSyncSelectionState]
+    (newSelection: GridSelection) => {
+      debouncedSyncSelectionState(newSelection)
+    },
+    [debouncedSyncSelectionState]
   )
 
   const {
@@ -456,54 +459,46 @@ function DataFrame({
     }
   }, [numRows])
 
+  const innerSyncEditState = React.useCallback(() => {
+    const currentEditingState = editingState.current.toJson(columns)
+    let currentWidgetState = widgetMgr.getStringValue({
+      id: element.id,
+      formId: element.formId,
+    } as WidgetInfo)
+
+    if (currentWidgetState === undefined) {
+      // Create an empty widget state
+      currentWidgetState = new EditingState(0).toJson([])
+    }
+
+    // Only update if there is actually a difference between editing and widget state
+    if (currentEditingState !== currentWidgetState) {
+      widgetMgr.setStringValue(
+        {
+          id: element.id,
+          formId: element.formId,
+        } as WidgetInfo,
+        currentEditingState,
+        {
+          fromUi: true,
+        },
+        fragmentId
+      )
+    }
+  }, [columns, element.id, element.formId, widgetMgr, fragmentId])
+
+  const debouncedSyncEditState = React.useMemo(() => {
+    return debounce(DEBOUNCE_TIME_MS, innerSyncEditState)
+  }, [innerSyncEditState])
+
   /**
    * This callback is used to synchronize the editing state with
    * the widget state of the component. This might also send a rerun message
    * to the backend if the editing state has changed.
    */
-  // The debounce method doesn't allow dependency inspection. Therefore, we
-  // need to disable the eslint rule for exhaustive-deps.
-  // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const syncEditState = React.useCallback(
-    // Use debounce to prevent rapid updates to the widget state.
-    debounce(DEBOUNCE_TIME_MS, () => {
-      const currentEditingState = editingState.current.toJson(columns)
-      let currentWidgetState = widgetMgr.getStringValue({
-        id: element.id,
-        formId: element.formId,
-      } as WidgetInfo)
-
-      if (currentWidgetState === undefined) {
-        // Create an empty widget state
-        currentWidgetState = new EditingState(0).toJson([])
-      }
-
-      // Only update if there is actually a difference between editing and widget state
-      if (currentEditingState !== currentWidgetState) {
-        widgetMgr.setStringValue(
-          {
-            id: element.id,
-            formId: element.formId,
-          } as WidgetInfo,
-          currentEditingState,
-          {
-            fromUi: true,
-          },
-          fragmentId
-        )
-      }
-    }),
-    [
-      element.id,
-      element.formId,
-      widgetMgr,
-      fragmentId,
-      columns,
-      editingState.current,
-    ]
-  )
+  const syncEditState = React.useCallback(() => {
+    debouncedSyncEditState()
+  }, [debouncedSyncEditState])
 
   const { exportToCsv } = useDataExporter(
     getCellContent,
