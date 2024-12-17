@@ -419,6 +419,10 @@ class ArrowMixin:
 
             When column selections are enabled, column sorting is disabled.
 
+        row_height : int or None
+            The height of each row in the dataframe in pixels. If ``row_height``
+            is ``None`` (default), Streamlit will use a default row height.
+
         Returns
         -------
         element or dict

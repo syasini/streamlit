@@ -695,6 +695,10 @@ class DataEditorMixin:
         kwargs : dict
             An optional dict of kwargs to pass to the callback.
 
+        row_height : int or None
+            The height of each row in the data editor  in pixels. If ``row_height``
+            is ``None`` (default), Streamlit will use a default row height.
+
         Returns
         -------
         pandas.DataFrame, pandas.Series, pyarrow.Table, numpy.ndarray, list, set, tuple, or dict.
