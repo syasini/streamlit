@@ -260,20 +260,16 @@ function DataFrame({
     useColumnSort(originalNumRows, originalColumns, getOriginalCellContent)
 
   /**
-   * This callback is used to synchronize the selection state with the state
-   * of the widget state of the component. This might also send a rerun message
-   * to the backend if the selection state has changed.
+   * Synchronizes the selection state with the state of the widget state of the component.
+   * This might also send a rerun message to the backend if the selection state has changed.
+   *
+   * This is the inner version to be used by the debounce callback below.
+   * Its split out to allow better dependency inspection.
    *
    * @param newSelection - The new selection state
    */
-  // The debounce method doesn't allow dependency inspection. Therefore, we
-  // need to disable the eslint rule for exhaustive-deps.
-  // TODO: Update to match React best practices
-  // eslint-disable-next-line react-compiler/react-compiler
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const syncSelectionState = React.useCallback(
-    // Use debounce to prevent rapid updates to the widget state.
-    debounce(DEBOUNCE_TIME_MS, (newSelection: GridSelection) => {
+  const innerSyncSelectionState = React.useCallback(
+    (newSelection: GridSelection) => {
       // If we want to support selections also with the editable mode,
       // we would need to integrate the `syncEditState` and `syncSelections` functions
       // into a single function that updates the widget state with both the editing
@@ -317,7 +313,7 @@ function DataFrame({
           fragmentId
         )
       }
-    }),
+    },
     [
       columns,
       element.id,
@@ -325,8 +321,26 @@ function DataFrame({
       widgetMgr,
       fragmentId,
       getOriginalIndex,
-      getColumnName,
     ]
+  )
+
+  /**
+   * This callback is used to synchronize the selection state with the state
+   * of the widget state of the component.
+   *
+   * Uses debounce to prevent rapid updates to the widget state.
+   *
+   * @param newSelection - The new selection state
+   */
+  // The debounce method doesn't allow dependency inspection. Therefore, we
+  // need to disable the eslint rule for exhaustive-deps.
+  // TODO: Update to match React best practices
+  // eslint-disable-next-line react-compiler/react-compiler
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const syncSelectionState = React.useCallback(
+    // Use debounce to prevent rapid updates to the widget state.
+    debounce(DEBOUNCE_TIME_MS, innerSyncSelectionState),
+    [innerSyncSelectionState]
   )
 
   const {
