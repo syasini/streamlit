@@ -49,6 +49,6 @@ def test_data_frame_resizing(app: Page):
     expect(dataframe_element).to_have_css("width", "200px")
     expect(dataframe_element).to_have_css("height", "100px")
 
-    click_button(app, "Resize table")
+    click_button(app, "Resize dataframe")
     expect(dataframe_element).to_have_css("width", "400px")
     expect(dataframe_element).to_have_css("height", "200px")
