@@ -15,6 +15,7 @@
 from playwright.sync_api import Page, expect
 
 from e2e_playwright.conftest import ImageCompareFunction
+from e2e_playwright.shared.app_utils import get_checkbox
 
 
 def test_tooltip_does_not_overflow_on_the_left_side(
@@ -38,13 +39,21 @@ def test_tooltip_does_not_overflow_on_the_right_side(
 ):
     # Resize the viewport to make sure there is not a lot of space on the right side
     app.set_viewport_size({"width": 750, "height": 800})
-    sidebar_button = (
-        app.get_by_test_id("stButton")
-        .filter(has_text="Right-button with help")
+    app.wait_for_function("() => window.innerWidth === 750")
+
+    popover_button = (
+        app.get_by_test_id("stPopover")
+        .filter(has_text="Popover with toggle")
         .locator("button")
-        .first
     )
-    sidebar_button.hover()
+
+    # Click the button to open it:
+    popover_button.click()
+
+    toggle = get_checkbox(app, "Right-toggle with help")
+    expect(toggle).to_be_visible()
+    toggle.get_by_test_id("stTooltipHoverTarget").hover()
+
     tooltip = app.get_by_test_id("stTooltipContent")
     expect(tooltip).to_be_visible()
 

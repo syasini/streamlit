@@ -26,12 +26,12 @@ with st.sidebar:
 
 
 columns_ = st.columns([9, 1.5, 1.5])
-with columns_[1].popover("hi"):
+with columns_[1].popover("Some popover"):
     pass
 
-with columns_[2]:
-    st.button(
-        "Right-button with help",
+with columns_[2].popover("Popover with toggle"):
+    st.toggle(
+        "Right-toggle with help",
         help="""
             View statistics of all damage done at each skill level only.
             This includes all damage done at each player level available at
