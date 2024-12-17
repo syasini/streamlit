@@ -66,7 +66,6 @@ function Tooltip({
 
   return (
     <StatefulTooltip
-      // initialState={{ isOpen: true }}
       onOpen={() => {
         const parentElement = tooltipRef.current?.parentElement
         if (!parentElement) {

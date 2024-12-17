@@ -18,7 +18,6 @@ import React, { ReactElement } from "react"
 
 import TooltipIcon from "@streamlit/lib/src/components/shared/TooltipIcon"
 import { Placement } from "@streamlit/lib/src/components/shared/Tooltip"
-import IsSidebarContext from "@streamlit/lib/src/components/core/IsSidebarContext"
 
 import { StyledTooltipMobile, StyledTooltipNormal } from "./styled-components"
 
@@ -36,7 +35,6 @@ export function BaseButtonTooltip({
   if (!help) {
     return children
   }
-
   return (
     <>
       <StyledTooltipNormal>
