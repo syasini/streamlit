@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { ReactElement, ReactNode } from "react"
+import React, { ReactElement, ReactNode, useRef } from "react"
 
 import { useTheme } from "@emotion/react"
 import { ACCESSIBILITY_TYPE, PLACEMENT, StatefulTooltip } from "baseui/tooltip"
@@ -62,13 +62,31 @@ function Tooltip({
   const theme: EmotionTheme = useTheme()
   const { colors, fontSizes, radii, fontWeights } = theme
 
+  const tooltipRef = useRef<HTMLDivElement>(null)
+
   return (
     <StatefulTooltip
+      onOpen={() => {
+        const parentElement = tooltipRef.current?.parentElement
+        if (!parentElement) {
+          return
+        }
+        // if the tooltip is offscreen to the left, move it to the right by the same amount of pixels
+        // use a timeout to that parentElement.getBoundingClientRect returns the correct value; otherwise
+        // I have observed it to be "0".
+        setTimeout(() => {
+          const xCoordinate = parentElement.getBoundingClientRect().x
+          if (xCoordinate < 0) {
+            parentElement.style.left = `${-xCoordinate}px`
+          }
+        }, 0)
+      }}
       content={
         content ? (
           <StyledTooltipContentWrapper
             className="stTooltipContent"
             data-testid="stTooltipContent"
+            ref={tooltipRef}
           >
             {content}
           </StyledTooltipContentWrapper>

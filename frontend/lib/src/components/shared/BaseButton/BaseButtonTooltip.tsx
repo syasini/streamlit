@@ -33,11 +33,6 @@ export function BaseButtonTooltip({
   help,
   placement,
 }: Props): ReactElement {
-  // Set to auto when in sidebar to prevent cutoff tooltips
-  const defaultPlacement = React.useContext(IsSidebarContext)
-    ? Placement.AUTO
-    : Placement.TOP
-
   if (!help) {
     return children
   }
@@ -45,7 +40,7 @@ export function BaseButtonTooltip({
   return (
     <>
       <StyledTooltipNormal>
-        <TooltipIcon content={help} placement={placement || defaultPlacement}>
+        <TooltipIcon content={help} placement={placement || Placement.TOP}>
           {children}
         </TooltipIcon>
       </StyledTooltipNormal>
