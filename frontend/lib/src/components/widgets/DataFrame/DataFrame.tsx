@@ -319,6 +319,7 @@ function DataFrame({
       }
     }),
     [
+      columns,
       element.id,
       element.formId,
       widgetMgr,
