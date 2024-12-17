@@ -66,6 +66,7 @@ function Tooltip({
 
   return (
     <StatefulTooltip
+      // initialState={{ isOpen: true }}
       onOpen={() => {
         const parentElement = tooltipRef.current?.parentElement
         if (!parentElement) {
@@ -75,7 +76,23 @@ function Tooltip({
         // use a timeout to that parentElement.getBoundingClientRect returns the correct value; otherwise
         // I have observed it to be "0".
         setTimeout(() => {
-          const xCoordinate = parentElement.getBoundingClientRect().x
+          const boundingClientRect = parentElement.getBoundingClientRect()
+          const xCoordinate = boundingClientRect.x
+
+          const overflowRight =
+            xCoordinate + boundingClientRect.width - window.innerWidth
+
+          if (overflowRight > 0) {
+            // Baseweb uses a transform to position the tooltip, so we need to adjust the transform instead
+            // of the left / right property, otherwise it looks weird when the tooltip overflows the right side
+            const transformStyleMatrix = new DOMMatrix(
+              window.getComputedStyle(parentElement.parentElement!)?.transform
+            )
+            parentElement.parentElement!.style.transform = `translate3d(${
+              transformStyleMatrix.e - overflowRight
+            }px, ${transformStyleMatrix.f}px, 0px)`
+          }
+
           if (xCoordinate < 0) {
             parentElement.style.left = `${-xCoordinate}px`
           }
@@ -96,7 +113,6 @@ function Tooltip({
       accessibilityType={ACCESSIBILITY_TYPE.tooltip}
       showArrow={false}
       popoverMargin={10}
-      ignoreBoundary={true}
       onMouseEnterDelay={onMouseEnterDelay}
       overrides={{
         Body: {
