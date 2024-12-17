@@ -19,7 +19,7 @@ const streamlitExecutionStartedAt = Date.now()
 
 import React from "react"
 
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { Client as Styletron } from "styletron-engine-atomic"
 import { Provider as StyletronProvider } from "styletron-react"
 
@@ -27,12 +27,12 @@ import ThemedApp from "./ThemedApp"
 
 const engine = new Styletron({ prefix: "st-" })
 
-// TODO: Deprecated in React 18 - Need to revise to new API
-// react-18-upgrade
-// eslint-disable-next-line react/no-deprecated
-ReactDOM.render(
-  <StyletronProvider value={engine}>
-    <ThemedApp streamlitExecutionStartedAt={streamlitExecutionStartedAt} />
-  </StyletronProvider>,
-  document.getElementById("root")
-)
+const container = document.getElementById("root")
+if (container) {
+  const root = createRoot(container)
+  root.render(
+    <StyletronProvider value={engine}>
+      <ThemedApp streamlitExecutionStartedAt={streamlitExecutionStartedAt} />
+    </StyletronProvider>
+  )
+}
