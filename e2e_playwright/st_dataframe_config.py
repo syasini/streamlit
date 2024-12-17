@@ -501,7 +501,10 @@ st.dataframe(
             "B",
             "this is another very very column long header name",
             "C",
-            "this is another very very very very very very very very very very very very very very very long header name",
+            (
+                "this is another very very very very very very very very very very very"
+                " very very very very long header name"
+            ),
             "D",
             "E",
             "F",
@@ -511,27 +514,41 @@ st.dataframe(
             "J",
             "K",
         ],
-    )
+    ),
 )
 
 st.subheader("Hierarchical headers")
 
-df = pd.DataFrame(
-    np.random.randn(3, 5),
-    index=["A", "B", "C"],
-    columns=pd.MultiIndex.from_tuples(
-        [
-            ("a", "b", "c"),
-            ("a", "b", "d"),
-            ("e", "f", "c"),
-            ("g", "h", "d"),
-            ("", "h", "i"),
-        ],
-        names=["first", "second", "third"],
-    ),
+st.dataframe(
+    pd.DataFrame(
+        np.random.randn(3, 5),
+        index=["A", "B", "C"],
+        columns=pd.MultiIndex.from_tuples(
+            [
+                ("a", "b", "c"),
+                ("a", "b", "d"),
+                ("e", "f", "c"),
+                ("g", "h", "d"),
+                ("", "h", "i"),
+            ],
+            names=["first", "second", "third"],
+        ),
+    )
 )
 
-st.dataframe(df)
+st.header("Pinned columns:")
+st.dataframe(
+    pd.DataFrame(
+        np.random.randn(5, 25),
+        columns=("col_%d" % i for i in range(25)),
+    ),
+    column_config={
+        "_index": st.column_config.Column(pinned=False),
+        "col_2": st.column_config.Column(pinned=True),
+        "col_4": st.column_config.Column(pinned=True),
+        "col_16": st.column_config.Column(pinned=True),
+    },
+)
 
 st.header("Configurable row height:")
 
