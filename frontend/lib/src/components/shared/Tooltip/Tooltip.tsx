@@ -80,14 +80,15 @@ function Tooltip({
 
           const overflowRight =
             xCoordinate + boundingClientRect.width - window.innerWidth
+          const parentsParentElement = parentElement.parentElement
 
-          if (overflowRight > 0) {
+          if (overflowRight > 0 && parentsParentElement) {
             // Baseweb uses a transform to position the tooltip, so we need to adjust the transform instead
             // of the left / right property, otherwise it looks weird when the tooltip overflows the right side
             const transformStyleMatrix = new DOMMatrix(
-              window.getComputedStyle(parentElement.parentElement!)?.transform
+              window.getComputedStyle(parentsParentElement)?.transform
             )
-            parentElement.parentElement!.style.transform = `translate3d(${
+            parentsParentElement.style.transform = `translate3d(${
               transformStyleMatrix.e - overflowRight
             }px, ${transformStyleMatrix.f}px, 0px)`
           }

@@ -31,7 +31,9 @@ def test_tooltip_does_not_overflow_on_the_left_side(
     tooltip = app.get_by_test_id("stTooltipContent")
     expect(tooltip).to_be_visible()
 
-    assert_snapshot(tooltip, name="help_tooltip-no_left_side_overflow")
+    # make a screenshot of the entire app to capture potential overflow
+    main_container = app.get_by_test_id("stMainBlockContainer")
+    assert_snapshot(main_container, name="help_tooltip-no_left_side_overflow")
 
 
 def test_tooltip_does_not_overflow_on_the_right_side(
@@ -57,4 +59,6 @@ def test_tooltip_does_not_overflow_on_the_right_side(
     tooltip = app.get_by_test_id("stTooltipContent")
     expect(tooltip).to_be_visible()
 
-    assert_snapshot(tooltip, name="help_tooltip-no_right_side_overflow")
+    # make a screenshot of the entire app to capture potential overflow
+    main_container = app.get_by_test_id("stMainBlockContainer")
+    assert_snapshot(main_container, name="help_tooltip-no_right_side_overflow")
