@@ -278,7 +278,14 @@ function useColumnLoader(
 
       return ColumnType(updatedColumn, theme)
     })
-  }, [data, columnConfigMapping, stretchColumns])
+  }, [
+    data,
+    columnConfigMapping,
+    stretchColumns,
+    element.editingMode,
+    disabled,
+    theme,
+  ])
 
   // Converts the columns from Arrow into columns compatible with glide-data-grid
   const columns: BaseColumn[] = React.useMemo(() => {
@@ -294,7 +301,12 @@ function useColumnLoader(
       // Special case: index columns not part of the column order
       // are shown as the first columns in the table
       visibleColumns.forEach(column => {
-        if (column.isIndex && !columnOrder.includes(column.name)) {
+        if (
+          column.isIndex &&
+          !columnOrder.includes(column.name) &&
+          // Don't add the index column if it is explicitly not pinned
+          column.isPinned !== false
+        ) {
           pinnedColumns.push(column)
         }
       })
@@ -331,15 +343,7 @@ function useColumnLoader(
     return orderedColumns.length > 0
       ? orderedColumns
       : [ObjectColumn(getEmptyIndexColumn())]
-  }, [
-    data,
-    columnConfigMapping,
-    stretchColumns,
-    disabled,
-    element.editingMode,
-    columnOrder,
-    theme,
-  ])
+  }, [allColumns, columnOrder])
 
   return {
     columns,
