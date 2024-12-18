@@ -30,6 +30,7 @@ const MOCK_DATETIME_COLUMN_TEMPLATE: BaseColumnProps = {
   isEditable: true,
   isHidden: false,
   isIndex: false,
+  isPinned: false,
   isStretched: false,
   arrowType: {
     // The arrow type of the underlying data is
@@ -47,6 +48,7 @@ const MOCK_DATE_COLUMN_TEMPLATE: BaseColumnProps = {
   isEditable: true,
   isHidden: false,
   isIndex: false,
+  isPinned: false,
   isStretched: false,
   arrowType: {
     // The arrow type of the underlying data is
@@ -64,6 +66,7 @@ const MOCK_TIME_COLUMN_TEMPLATE: BaseColumnProps = {
   isEditable: true,
   isHidden: false,
   isIndex: false,
+  isPinned: false,
   isStretched: false,
   arrowType: {
     // The arrow type of the underlying data is

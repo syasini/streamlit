@@ -230,6 +230,7 @@ export function getIndexFromArrow(
     isEditable,
     arrowType,
     isIndex: true,
+    isPinned: true,
     isHidden: false,
   } as BaseColumnProps
 }
@@ -261,12 +262,13 @@ export function getColumnFromArrow(
   // column name. E.g.
   // columnHeaders = ["a", "b", "c"] -> group = "a / b" name: "c"
   // columnHeaders = ["", "b", "c"] -> group = "b" name: "c"
+  // columnHeaders = ["a", "", ""] -> group = "a" name: ""
 
   const group =
     columnHeaderNames.length > 1
       ? columnHeaderNames
-          .filter(column => column !== "")
           .slice(0, -1)
+          .filter(column => column !== "")
           .join(" / ")
       : undefined
 
@@ -299,6 +301,7 @@ export function getColumnFromArrow(
     arrowType,
     columnTypeOptions,
     isIndex: false,
+    isPinned: false,
     isHidden: false,
     group,
   } as BaseColumnProps
@@ -316,6 +319,7 @@ export function getEmptyIndexColumn(): BaseColumnProps {
     indexNumber: 0,
     isEditable: false,
     isIndex: true,
+    isPinned: true,
   } as BaseColumnProps
 }
 
