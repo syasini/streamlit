@@ -31,7 +31,11 @@ import {
   UINT64,
 } from "@streamlit/lib/src/mocks/arrow"
 
-import { format } from "./arrowFormatUtils"
+import {
+  convertTimestampToSeconds,
+  format,
+  formatPeriodFromFreq,
+} from "./arrowFormatUtils"
 
 describe("format", () => {
   test("null", () => {
@@ -195,6 +199,28 @@ describe("format", () => {
     ).toEqual("(0, 1]")
   })
 
+  test("categorical interval", () => {
+    const mockElement = { data: CATEGORICAL_INTERVAL }
+    const q = new Quiver(mockElement)
+    const { content, contentType, field } = q.getCell(1, 1)
+
+    expect(format(content, contentType, field)).toEqual("(23.535, 256.5]")
+  })
+
+  test("invalid interval type", () => {
+    const mockElement = { data: INTERVAL_INT64 }
+    const INVALID_TYPE = "interval"
+    const q = new Quiver(mockElement)
+    const { content } = q.getCell(1, 0)
+
+    expect(() =>
+      format(content, {
+        pandas_type: "object",
+        numpy_type: INVALID_TYPE,
+      })
+    ).toThrow("Invalid interval type: interval")
+  })
+
   test("decimal", () => {
     const mockElement = { data: DECIMAL }
     const q = new Quiver(mockElement)
@@ -248,14 +274,6 @@ describe("format", () => {
     const q = new Quiver(mockElement)
     const { content, contentType, field } = q.getCell(1, 1)
     expect(format(content, contentType, field)).toEqual(`{"a":1,"b":2}`)
-  })
-
-  test("categorical interval", () => {
-    const mockElement = { data: CATEGORICAL_INTERVAL }
-    const q = new Quiver(mockElement)
-    const { content, contentType, field } = q.getCell(1, 1)
-
-    expect(format(content, contentType, field)).toEqual("(23.535, 256.5]")
   })
 
   test("period", () => {
@@ -313,20 +331,6 @@ describe("format", () => {
     })
   })
 
-  test("invalid interval type", () => {
-    const mockElement = { data: INTERVAL_INT64 }
-    const INVALID_TYPE = "interval"
-    const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
-
-    expect(() =>
-      format(content, {
-        pandas_type: "object",
-        numpy_type: INVALID_TYPE,
-      })
-    ).toThrow("Invalid interval type: interval")
-  })
-
   test("list[unicode]", () => {
     expect(
       format(vectorFromArray(["foo", "bar", "baz"]), {
@@ -334,5 +338,61 @@ describe("format", () => {
         numpy_type: "object",
       })
     ).toEqual('["foo","bar","baz"]')
+  })
+})
+
+describe("formatPeriodFromFreq", () => {
+  it.each([
+    // Basic frequencies
+    [1, "Y", "1971"],
+    [1, "M", "1970-02"],
+    [1, "D", "1970-01-02"],
+    [1, "h", "1970-01-01 01:00"],
+    [1, "min", "1970-01-01 00:01"],
+    [1, "s", "1970-01-01 00:00:01"],
+    [1, "ms", "1970-01-01 00:00:00.001"],
+    // Weekly frequencies
+    [1, "W-MON", "1969-12-30/1970-01-05"],
+    [1, "W-TUE", "1969-12-31/1970-01-06"],
+    [1, "W-WED", "1970-01-01/1970-01-07"],
+    [1, "W-THU", "1970-01-02/1970-01-08"],
+    [1, "W-FRI", "1970-01-03/1970-01-09"],
+    [1, "W-SAT", "1970-01-04/1970-01-10"],
+    [1, "W-SUN", "1969-12-29/1970-01-04"],
+    // Invalid frequencies
+    [1, "invalid", "1"],
+  ])("formats %s with frequency %s to %s", (value, freq, expected) => {
+    expect(formatPeriodFromFreq(value, freq as any)).toEqual(expected)
+  })
+
+  test("handles weekly frequency without parameter", () => {
+    expect(() => formatPeriodFromFreq(1, "W")).toThrow(
+      'Frequency "W" requires parameter'
+    )
+  })
+
+  test("handles weekly frequency with invalid parameter", () => {
+    expect(() => formatPeriodFromFreq(1, "W-INVALID")).toThrow(
+      'Invalid value: INVALID. Supported values: ["SUN","MON","TUE","WED","THU","FRI","SAT"]'
+    )
+  })
+})
+
+describe("convertTimestampToSeconds", () => {
+  it.each([
+    // [input, unit, expected]
+    [1000, 0, 1000], // seconds -> seconds
+    [1000, 1, 1], // milliseconds -> seconds
+    [1000000, 2, 1], // microseconds -> seconds
+    [1000123, 2, 1.000123], // microseconds -> seconds
+    [1000000000, 3, 1], // nanoseconds -> seconds
+    [1000, 999, 1000], // unknown unit defaults to seconds
+    [1000123, 999, 1000123], // unknown unit defaults to seconds
+    // Bigint values
+    [BigInt("9223372036854775807"), 3, 9223372036], // nanoseconds -> seconds
+    // Maintains precision for safe integers
+    [1234567890123, 3, 1234.567890123],
+  ])("converts %s with unit %s to %s seconds", (value, unit, expected) => {
+    expect(convertTimestampToSeconds(value, unit)).toBe(expected)
   })
 })
