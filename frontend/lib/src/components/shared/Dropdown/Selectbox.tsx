@@ -93,11 +93,10 @@ const Selectbox: React.FC<Props> = ({
   const [isEmpty, setIsEmpty] = useState(false)
   const [value, setValue] = useState<number | null>(propValue)
 
+  // Update the value whenever the value provided by the props changes
   useEffect(() => {
-    if (propValue !== value) {
-      setValue(propValue)
-    }
-  }, [propValue, value])
+    setValue(propValue)
+  }, [propValue])
 
   const handleChange = useCallback(
     (params: OnChangeParams): void => {
