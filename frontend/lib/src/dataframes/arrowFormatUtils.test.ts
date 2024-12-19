@@ -31,7 +31,7 @@ import {
 } from "@streamlit/lib/src/mocks/arrow"
 
 import {
-  convertTimestampToSeconds,
+  convertTimestampToDate,
   format,
   formatPeriodFromFreq,
 } from "./arrowFormatUtils"
@@ -346,21 +346,29 @@ describe("formatPeriodFromFreq", () => {
   })
 })
 
-describe("convertTimestampToSeconds", () => {
-  it.each([
-    // [input, unit, expected]
-    [1000, 0, 1000], // seconds -> seconds
-    [1000, 1, 1], // milliseconds -> seconds
-    [1000000, 2, 1], // microseconds -> seconds
-    [1000123, 2, 1.000123], // microseconds -> seconds
-    [1000000000, 3, 1], // nanoseconds -> seconds
-    [1000, 999, 1000], // unknown unit defaults to seconds
-    [1000123, 999, 1000123], // unknown unit defaults to seconds
-    // Bigint values
-    [BigInt("9223372036854775807"), 3, 9223372036], // nanoseconds -> seconds
-    // Maintains precision for safe integers
-    [1234567890123, 3, 1234.567890123],
-  ])("converts %s with unit %s to %s seconds", (value, unit, expected) => {
-    expect(convertTimestampToSeconds(value, unit)).toBe(expected)
-  })
+describe("convertTimestampToDate", () => {
+  test.each([
+    // [timestamp, unit, expected date string]
+    [1000, TimeUnit.SECOND, "1970-01-01T00:16:40.000Z"],
+    [1000, TimeUnit.MILLISECOND, "1970-01-01T00:00:01.000Z"],
+    [1000, TimeUnit.MICROSECOND, "1970-01-01T00:00:00.001Z"],
+    [1000, TimeUnit.NANOSECOND, "1970-01-01T00:00:00.000Z"],
+    // Test with BigInt values
+    [BigInt(1000), TimeUnit.SECOND, "1970-01-01T00:16:40.000Z"],
+    [BigInt(1000), TimeUnit.MILLISECOND, "1970-01-01T00:00:01.000Z"],
+    // Test with undefined field (should default to SECOND)
+    [1000, undefined, "1970-01-01T00:16:40.000Z"],
+    // Test with large timestamps
+    [1647356400, TimeUnit.SECOND, "2022-03-15T15:00:00.000Z"],
+    [1647356400000, TimeUnit.MILLISECOND, "2022-03-15T15:00:00.000Z"],
+  ])(
+    "converts timestamp %s with unit %s to %s",
+    (timestamp, unit, expected) => {
+      const result = convertTimestampToDate(
+        timestamp,
+        unit ? new Field("test", new Timestamp(unit), true, null) : undefined
+      )
+      expect(result.toISOString()).toBe(expected)
+    }
+  )
 })
