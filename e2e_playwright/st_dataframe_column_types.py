@@ -15,17 +15,11 @@
 import random
 
 import numpy as np
+import pandas as pd
 
 import streamlit as st
 from shared.data_mocks import (
-    BASE_TYPES_DF,
-    DATETIME_TYPES_DF,
     INTERVAL_TYPES_DF,
-    LIST_TYPES_DF,
-    NUMBER_TYPES_DF,
-    PERIOD_TYPES_DF,
-    SPECIAL_TYPES_DF,
-    UNSUPPORTED_TYPES_DF,
 )
 
 np.random.seed(0)
@@ -33,26 +27,38 @@ random.seed(0)
 
 st.set_page_config(layout="wide")
 
-st.subheader("Base types")
-st.dataframe(BASE_TYPES_DF, use_container_width=True, hide_index=True)
+# st.subheader("Base types")
+# st.dataframe(BASE_TYPES_DF, use_container_width=True, hide_index=True)
 
-st.subheader("Number types")
-st.dataframe(NUMBER_TYPES_DF, use_container_width=True, hide_index=True)
+# st.subheader("Number types")
+# st.dataframe(NUMBER_TYPES_DF, use_container_width=True, hide_index=True)
 
-st.subheader("Date, time and datetime types")
-st.dataframe(DATETIME_TYPES_DF, use_container_width=True, hide_index=True)
+# st.subheader("Date, time and datetime types")
+# st.dataframe(DATETIME_TYPES_DF, use_container_width=True, hide_index=True)
 
-st.subheader("List types")
-st.dataframe(LIST_TYPES_DF, use_container_width=True, hide_index=True)
+# st.subheader("List types")
+# st.dataframe(LIST_TYPES_DF, use_container_width=True, hide_index=True)
 
 st.subheader("Interval types")
 st.dataframe(INTERVAL_TYPES_DF, use_container_width=True, hide_index=True)
 
-st.subheader("Special types")
-st.dataframe(SPECIAL_TYPES_DF, use_container_width=True, hide_index=True)
+df = pd.DataFrame(
+    [["foo", 100], ["bar", 200]],
+    index=pd.interval_range(
+        start=pd.Timestamp("2017-01-01"), end=pd.Timestamp("2017-01-03")
+    ),
+    columns=pd.interval_range(
+        start=pd.Timestamp("2017-01-01"), end=pd.Timestamp("2017-01-03")
+    ),
+)
 
-st.subheader("Period types")
-st.dataframe(PERIOD_TYPES_DF, use_container_width=True, hide_index=True)
+st.dataframe(df, use_container_width=True)
 
-st.subheader("Unsupported types (string fallback)")
-st.dataframe(UNSUPPORTED_TYPES_DF, use_container_width=True, hide_index=True)
+# st.subheader("Special types")
+# st.dataframe(SPECIAL_TYPES_DF, use_container_width=True, hide_index=True)
+
+# st.subheader("Period types")
+# st.dataframe(PERIOD_TYPES_DF, use_container_width=True, hide_index=True)
+
+# st.subheader("Unsupported types (string fallback)")
+# st.dataframe(UNSUPPORTED_TYPES_DF, use_container_width=True, hide_index=True)
