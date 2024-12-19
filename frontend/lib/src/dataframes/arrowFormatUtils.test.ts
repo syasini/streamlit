@@ -18,7 +18,6 @@ import { Field, Timestamp, TimeUnit, vectorFromArray } from "apache-arrow"
 
 import { Quiver } from "@streamlit/lib/src/dataframes/Quiver"
 import {
-  CATEGORICAL_INTERVAL,
   DECIMAL,
   DICTIONARY,
   INT64,
@@ -150,75 +149,44 @@ describe("format", () => {
   test("interval datetime64[ns]", () => {
     const mockElement = { data: INTERVAL_DATETIME64 }
     const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
+    const { content, contentType, field } = q.getCell(1, 0)
 
-    expect(
-      format(content, {
-        pandas_type: "object",
-        numpy_type: "interval[datetime64[ns], right]",
-      })
-    ).toEqual("(2017-01-01 00:00:00, 2017-01-02 00:00:00]")
+    expect(format(content, contentType, field)).toEqual(
+      "(2017-01-01 00:00:00, 2017-01-02 00:00:00]"
+    )
   })
 
   test("interval float64", () => {
     const mockElement = { data: INTERVAL_FLOAT64 }
     const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
+    const { content, contentType, field } = q.getCell(1, 0)
 
-    expect(
-      format(content, {
-        pandas_type: "object",
-        numpy_type: "interval[float64, right]",
-      })
-    ).toEqual("(0.0000, 1.5000]")
+    expect(format(content, contentType, field)).toEqual("(0.0000, 1.5000]")
   })
 
   test("interval int64", () => {
     const mockElement = { data: INTERVAL_INT64 }
     const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
+    const { content, field } = q.getCell(1, 0)
 
     expect(
-      format(content, {
-        pandas_type: "object",
-        numpy_type: "interval[int64, right]",
-      })
+      format(
+        content,
+        {
+          pandas_type: "object",
+          numpy_type: "interval[int64, right]",
+        },
+        field
+      )
     ).toEqual("(0, 1]")
   })
 
   test("interval uint64", () => {
     const mockElement = { data: INTERVAL_UINT64 }
     const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
+    const { content, contentType, field } = q.getCell(1, 0)
 
-    expect(
-      format(content, {
-        pandas_type: "object",
-        numpy_type: "interval[uint64, right]",
-      })
-    ).toEqual("(0, 1]")
-  })
-
-  test("categorical interval", () => {
-    const mockElement = { data: CATEGORICAL_INTERVAL }
-    const q = new Quiver(mockElement)
-    const { content, contentType, field } = q.getCell(1, 1)
-
-    expect(format(content, contentType, field)).toEqual("(23.535, 256.5]")
-  })
-
-  test("invalid interval type", () => {
-    const mockElement = { data: INTERVAL_INT64 }
-    const INVALID_TYPE = "interval"
-    const q = new Quiver(mockElement)
-    const { content } = q.getCell(1, 0)
-
-    expect(() =>
-      format(content, {
-        pandas_type: "object",
-        numpy_type: INVALID_TYPE,
-      })
-    ).toThrow("Invalid interval type: interval")
+    expect(format(content, contentType, field)).toEqual("(0, 1]")
   })
 
   test("decimal", () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Field, Struct, StructRow, util } from "apache-arrow"
+import { Field, Float, Struct, StructRow, Timestamp, util } from "apache-arrow"
 import trimEnd from "lodash/trimEnd"
 import moment from "moment-timezone"
 import numbro from "numbro"
@@ -229,17 +229,15 @@ function formatDate(date: number | Date, field?: Field): string {
  * Format datetime value from Arrow to string.
  */
 function formatDatetime(date: number | Date, field?: Field): string {
-  let datetime
-  if (date instanceof Date) {
-    datetime = moment.utc(date)
-  } else {
-    // Handle numeric timestamps with unit conversion
-    const timeInSeconds = convertTimestampToSeconds(
-      date,
-      field?.type?.unit ?? 0
-    )
-    datetime = moment.unix(timeInSeconds).utc()
-  }
+  let datetime = moment.utc(date)
+  // TODO(lukasmasuch): Handle numeric timestamps with unit conversion
+  // However, it seems that datetime intervals use a wrong unit (ns instead of ms)
+  // that does not reflect the actual numerical value.
+  //   const timeInSeconds = convertTimestampToSeconds(
+  //     date,
+  //     field?.type?.unit ?? 0
+  //   )
+  //   datetime = moment.unix(timeInSeconds).utc()
 
   const timezone = field?.type?.timezone
   if (timezone) {
@@ -428,14 +426,23 @@ function formatInterval(x: StructRow, field?: Field): string {
 
     const leftBracket = closed === "both" || closed === "left" ? "[" : "("
     const rightBracket = closed === "both" || closed === "right" ? "]" : ")"
-    const leftInterval = format(interval.left, {
-      pandas_type: subtype,
-      numpy_type: subtype,
-    })
-    const rightInterval = format(interval.right, {
-      pandas_type: subtype,
-      numpy_type: subtype,
-    })
+
+    const leftInterval = format(
+      interval.left,
+      {
+        pandas_type: subtype,
+        numpy_type: subtype,
+      },
+      (field.type as Struct)?.children?.[0]
+    )
+    const rightInterval = format(
+      interval.right,
+      {
+        pandas_type: subtype,
+        numpy_type: subtype,
+      },
+      (field.type as Struct)?.children?.[1]
+    )
 
     return `${leftBracket + leftInterval}, ${rightInterval + rightBracket}`
   }
@@ -446,6 +453,7 @@ function formatInterval(x: StructRow, field?: Field): string {
 export function format(x: DataType, type?: Type, field?: Field): string {
   const typeName = type && getTypeName(type)
   const extensionName = field && field.metadata.get("ARROW:extension:name")
+  const fieldType = field?.type
 
   if (isNullOrUndefined(x)) {
     return "<NA>"
@@ -463,7 +471,10 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   }
 
   // datetimetz, datetime, datetime64, datetime64[ns], etc.
-  if (isDate && typeName?.startsWith("datetime")) {
+  if (
+    isDate &&
+    (typeName?.startsWith("datetime") || fieldType instanceof Timestamp)
+  ) {
     return formatDatetime(x as Date | number, field)
   }
 
@@ -487,7 +498,10 @@ export function format(x: DataType, type?: Type, field?: Field): string {
     return formatObject(x, field)
   }
 
-  if (typeName === "float64" && Number.isFinite(x)) {
+  if (
+    (typeName === "float64" || fieldType instanceof Float) &&
+    Number.isFinite(x)
+  ) {
     return formatFloat(x as number)
   }
 
