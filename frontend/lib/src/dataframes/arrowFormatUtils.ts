@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { Field, Float, Struct, StructRow, Timestamp, util } from "apache-arrow"
+import {
+  Field,
+  Float,
+  Struct,
+  StructRow,
+  Timestamp,
+  TimeUnit,
+  util,
+} from "apache-arrow"
 import trimEnd from "lodash/trimEnd"
 import moment from "moment-timezone"
 import numbro from "numbro"
@@ -159,13 +167,13 @@ export function convertTimestampToSeconds(
 ): number {
   let unitAdjustment
 
-  if (unit === 1) {
+  if (unit === TimeUnit.MILLISECOND) {
     // Milliseconds
     unitAdjustment = 1000
-  } else if (unit === 2) {
+  } else if (unit === TimeUnit.MICROSECOND) {
     // Microseconds
     unitAdjustment = 1000 * 1000
-  } else if (unit === 3) {
+  } else if (unit === TimeUnit.NANOSECOND) {
     // Nanoseconds
     unitAdjustment = 1000 * 1000 * 1000
   } else {
@@ -197,7 +205,7 @@ export function convertTimestampToSeconds(
 function formatTime(timestamp: number | bigint, field?: Field): string {
   const timeInSeconds = convertTimestampToSeconds(
     timestamp,
-    field?.type?.unit ?? 0
+    field?.type?.unit ?? TimeUnit.SECOND
   )
   return moment
     .unix(timeInSeconds)
@@ -205,20 +213,17 @@ function formatTime(timestamp: number | bigint, field?: Field): string {
     .format(timeInSeconds % 1 === 0 ? "HH:mm:ss" : "HH:mm:ss.SSS")
 }
 
-function formatDate(date: number | Date, field?: Field): string {
+function formatDate(date: number | Date): string {
   const formatPattern = "YYYY-MM-DD"
 
-  if (date instanceof Date) {
+  // Date values from arrow are already converted to a date object
+  // or a timestamp in milliseconds even if the field unit might indicate a
+  // different unit.
+  if (
+    date instanceof Date ||
+    (typeof date === "number" && Number.isFinite(date))
+  ) {
     return moment.utc(date).format(formatPattern)
-  } else if (typeof date === "number" && Number.isFinite(date)) {
-    // TODO: what is the best default?
-    const unit = field?.type?.unit ?? 1
-    // 0 is DAY, 1 is MILLISECOND
-    // https://github.com/apache/arrow/blob/3ab246f374c17a216d86edcfff7ff416b3cff803/js/src/enum.ts#L87
-    // When unit === 0, convert days to milliseconds:
-
-    const timestamp = unit === 0 ? date * 86400000 : date
-    return moment.utc(timestamp).format(formatPattern)
   }
 
   logWarning(`Unsupported date type: ${date}`)
@@ -266,7 +271,10 @@ function formatDuration(duration: number | bigint, field?: Field): string {
   // unit: 0 is seconds, 1 is milliseconds, 2 is microseconds, 3 is nanoseconds.
   return moment
     .duration(
-      convertTimestampToSeconds(duration, field?.type?.unit ?? 3),
+      convertTimestampToSeconds(
+        duration,
+        field?.type?.unit ?? TimeUnit.NANOSECOND
+      ),
       "seconds"
     )
     .humanize()
@@ -462,7 +470,7 @@ export function format(x: DataType, type?: Type, field?: Field): string {
   // date
   const isDate = x instanceof Date || Number.isFinite(x)
   if (isDate && typeName === "date") {
-    return formatDate(x as Date | number, field)
+    return formatDate(x as Date | number)
   }
 
   // time
