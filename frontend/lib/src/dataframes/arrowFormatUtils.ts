@@ -494,15 +494,15 @@ export function format(x: DataType, type?: Type, field?: Field): string {
     return formatDecimal(x as Uint32Array, field)
   }
 
-  if (typeName === "object" || typeName?.startsWith("list")) {
-    return formatObject(x, field)
-  }
-
   if (
     (typeName === "float64" || fieldType instanceof Float) &&
     Number.isFinite(x)
   ) {
     return formatFloat(x as number)
+  }
+
+  if (typeName === "object" || typeName?.startsWith("list")) {
+    return formatObject(x, field)
   }
 
   return String(x)
