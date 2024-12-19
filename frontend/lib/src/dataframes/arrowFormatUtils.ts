@@ -219,7 +219,7 @@ function formatDate(date: number | Date): string {
   // Date values from arrow are already converted to a date object
   // or a timestamp in milliseconds even if the field unit might indicate a
   // different unit.
-  // https://github.com/apache/arrow/blob/main/js/src/visitor/get.ts
+  // https://github.com/apache/arrow/blob/9e08c57c0986531879aadf7942998d26a94a5d1b/js/src/visitor/get.ts#L167-L171
   if (
     date instanceof Date ||
     (typeof date === "number" && Number.isFinite(date))
@@ -238,7 +238,7 @@ function formatDatetime(date: number | Date, field?: Field): string {
   // Datetime values from arrow are already converted to a date object
   // or a timestamp in milliseconds even if the field unit might indicate a
   // different unit.
-  // https://github.com/apache/arrow/blob/main/js/src/visitor/get.ts
+  // https://github.com/apache/arrow/blob/9e08c57c0986531879aadf7942998d26a94a5d1b/js/src/visitor/get.ts#L174-L190
   let datetime = moment.utc(date)
 
   const timezone = field?.type?.timezone
