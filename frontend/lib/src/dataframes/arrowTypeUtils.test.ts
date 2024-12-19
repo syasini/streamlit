@@ -38,7 +38,10 @@ import {
   getTypeName,
   IndexTypeName,
   isBooleanType,
+  isDecimalType,
+  isFloatType,
   isIntegerType,
+  isNumericType,
   isUnsignedIntegerType,
   Type,
 } from "./arrowTypeUtils"
@@ -383,6 +386,148 @@ describe("getTimezone", () => {
     "returns correct timezone for %o",
     (arrowType: Type, expected: string | undefined) => {
       expect(getTimezone(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isFloatType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "float32",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as float type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isFloatType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isDecimalType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "decimal",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "decimal",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as decimal type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isDecimalType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isNumericType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "decimal",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "uint64",
+        numpy_type: "uint64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "unicode",
+        numpy_type: "object",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as numeric type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isNumericType(arrowType)).toEqual(expected)
     }
   )
 })
