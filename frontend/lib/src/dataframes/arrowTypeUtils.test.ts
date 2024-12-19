@@ -312,15 +312,15 @@ describe("isBooleanType", () => {
     ],
     [
       {
-        pandas_type: "int64",
-        numpy_type: "int64",
+        pandas_type: "object",
+        numpy_type: "bool",
       },
-      false,
+      true,
     ],
     [
       {
-        pandas_type: "object",
-        numpy_type: "bool",
+        pandas_type: "int64",
+        numpy_type: "int64",
       },
       false,
     ],
