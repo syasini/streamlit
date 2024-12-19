@@ -104,6 +104,9 @@ def test_submit_hover_state_with_input_value(
 ):
     """Test the submit button's hover state when input value is present."""
     chat_input = app.get_by_test_id("stChatInput").nth(3)
+    chat_input_area = chat_input.locator("textarea")
+    chat_input_area.type("Corgi")
+
     submit_button = chat_input.get_by_test_id("stChatInputSubmitButton")
     submit_button.hover()
     assert_snapshot(chat_input, name="st_chat_input-submit_hover")
