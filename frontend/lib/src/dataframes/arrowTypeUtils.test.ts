@@ -33,7 +33,15 @@ import {
   UNICODE,
 } from "@streamlit/lib/src/mocks/arrow"
 
-import { getTypeName, IndexTypeName } from "./arrowTypeUtils"
+import {
+  getTimezone,
+  getTypeName,
+  IndexTypeName,
+  isBooleanType,
+  isIntegerType,
+  isUnsignedIntegerType,
+  Type,
+} from "./arrowTypeUtils"
 
 describe("getTypeName", () => {
   describe("uses numpy_type", () => {
@@ -159,4 +167,222 @@ describe("getTypeName", () => {
       expect(getTypeName(indexType)).toEqual(IndexTypeName.UnicodeIndex)
     })
   })
+})
+
+describe("isIntegerType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "int16",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "range",
+        numpy_type: "range",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "uint64",
+        numpy_type: "uint64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "unicode",
+        numpy_type: "object",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "int8",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "interval[int64, both]",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as integer type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isIntegerType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isUnsignedIntegerType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "uint64",
+        numpy_type: "uint64",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "uint16",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "unicode",
+        numpy_type: "object",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "uint8",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as unsigned integer type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isUnsignedIntegerType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("isBooleanType", () => {
+  it.each([
+    [
+      {
+        pandas_type: "bool",
+        numpy_type: "bool",
+      },
+      true,
+    ],
+    [
+      {
+        pandas_type: "int64",
+        numpy_type: "int64",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "object",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "categorical",
+        numpy_type: "bool",
+      },
+      false,
+    ],
+    [
+      {
+        pandas_type: "float64",
+        numpy_type: "float64",
+      },
+      false,
+    ],
+  ])(
+    "interprets %s as boolean type: %s",
+    (arrowType: Type, expected: boolean) => {
+      expect(isBooleanType(arrowType)).toEqual(expected)
+    }
+  )
+})
+
+describe("getTimezone", () => {
+  it.each([
+    [
+      {
+        pandas_type: "datetime",
+        numpy_type: "datetime64[ns]",
+        meta: { timezone: "UTC" },
+      },
+      "UTC",
+    ],
+    [
+      {
+        pandas_type: "datetime",
+        numpy_type: "datetime64[ns]",
+        meta: { timezone: "America/New_York" },
+      },
+      "America/New_York",
+    ],
+    [
+      {
+        pandas_type: "datetime",
+        numpy_type: "datetime64[ns]",
+        meta: {},
+      },
+      undefined,
+    ],
+    [
+      {
+        pandas_type: "datetime",
+        numpy_type: "datetime64[ns]",
+      },
+      undefined,
+    ],
+  ])(
+    "returns correct timezone for %o",
+    (arrowType: Type, expected: string | undefined) => {
+      expect(getTimezone(arrowType)).toEqual(expected)
+    }
+  )
 })

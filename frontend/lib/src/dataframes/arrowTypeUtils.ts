@@ -104,3 +104,31 @@ export function sameIndexTypes(t1: Type[], t2: Type[]): boolean {
       index < t2.length && getTypeName(type) === getTypeName(t2[index])
   )
 }
+
+/** Returns the timezone of the arrow type metadata. */
+export function getTimezone(arrowType: Type): string | undefined {
+  // TODO(lukasmasuch): Use info from field instead:
+  // return arrowType?.field?.type?.timezone
+  return arrowType?.meta?.timezone
+}
+
+/** True if the arrow type is an integer type. */
+export function isIntegerType(arrowType: Type): boolean {
+  const typeName = getTypeName(arrowType) ?? ""
+  return (
+    (typeName.startsWith("int") && !typeName.startsWith("interval")) ||
+    typeName === "range" ||
+    typeName.startsWith("uint")
+  )
+}
+
+/** True if the arrow type is an unsigned integer type. */
+export function isUnsignedIntegerType(arrowType: Type): boolean {
+  const typeName = getTypeName(arrowType) ?? ""
+  return typeName.startsWith("uint")
+}
+
+/** True if the arrow type is a boolean type. */
+export function isBooleanType(arrowType: Type): boolean {
+  return getTypeName(arrowType) === "bool"
+}
