@@ -219,6 +219,7 @@ function formatDate(date: number | Date): string {
   // Date values from arrow are already converted to a date object
   // or a timestamp in milliseconds even if the field unit might indicate a
   // different unit.
+  // https://github.com/apache/arrow/blob/main/js/src/visitor/get.ts
   if (
     date instanceof Date ||
     (typeof date === "number" && Number.isFinite(date))
@@ -234,15 +235,11 @@ function formatDate(date: number | Date): string {
  * Format datetime value from Arrow to string.
  */
 function formatDatetime(date: number | Date, field?: Field): string {
+  // Datetime values from arrow are already converted to a date object
+  // or a timestamp in milliseconds even if the field unit might indicate a
+  // different unit.
+  // https://github.com/apache/arrow/blob/main/js/src/visitor/get.ts
   let datetime = moment.utc(date)
-  // TODO(lukasmasuch): Handle numeric timestamps with unit conversion
-  // However, it seems that datetime intervals use a wrong unit (ns instead of ms)
-  // that does not reflect the actual numerical value.
-  //   const timeInSeconds = convertTimestampToSeconds(
-  //     date,
-  //     field?.type?.unit ?? 0
-  //   )
-  //   datetime = moment.unix(timeInSeconds).utc()
 
   const timezone = field?.type?.timezone
   if (timezone) {
